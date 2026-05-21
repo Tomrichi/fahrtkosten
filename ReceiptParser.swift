@@ -1,7 +1,7 @@
 import Vision
 import UIKit
 
-// MARK: - Einzelne Beleg-Position (für KFZ-Kosten Multi-Erkennung)
+//// MARK: - Einzelne Beleg-Position (für KFZ-Kosten Multi-Erkennung)
 struct ReceiptLineItem {
     var description      : String
     var amount           : Double
