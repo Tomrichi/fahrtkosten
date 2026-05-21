@@ -1,0 +1,218 @@
+import CarPlay
+import UIKit
+
+// MARK: - CarPlay Scene Delegate
+// Zeigt: Monatssumme, aktive Siri-Fahrt, GPS-Status, Start/Stop-Buttons
+final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
+
+    var interfaceController: CPInterfaceController?
+
+    private var refreshTimer: Timer?
+    private static let appGroup = "group.de.tommwagner.fahrtkosten"
+
+    // MARK: - Connect / Disconnect
+    func templateApplicationScene(_ scene: CPTemplateApplicationScene,
+                                  didConnect interfaceController: CPInterfaceController) {
+        self.interfaceController = interfaceController
+
+        // Alle 5 Sekunden Dashboard aktualisieren (GPS-Status + Siri-Fahrt + Monatsdaten)
+        refreshTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+            self?.renderDashboard()
+        }
+        RunLoop.main.add(refreshTimer!, forMode: .common)
+
+        renderDashboard()
+    }
+
+    func templateApplicationScene(_ scene: CPTemplateApplicationScene,
+                                  didDisconnectInterfaceController ic: CPInterfaceController) {
+        interfaceController = nil
+        refreshTimer?.invalidate()
+        refreshTimer = nil
+    }
+
+    // GPS-Status direkt aus App Group UserDefaults lesen (prozessübergreifend zuverlässig)
+    private func readGPSState() -> (recording: Bool, km: Double, elapsed: Int) {
+        guard let ud = UserDefaults(suiteName: Self.appGroup) else {
+            return (false, 0, 0)
+        }
+        return (
+            ud.bool(forKey: "gpsIsRecording"),
+            ud.double(forKey: "gpsKm"),
+            ud.integer(forKey: "gpsElapsed")
+        )
+    }
+
+    // MARK: - Dashboard rendern
+    private func renderDashboard() {
+        let monthly  = CarPlayDataAccess.monthlyData()
+        let active   = CarPlayDataAccess.activeTrip()
+        let gps      = readGPSState()
+
+        var items: [CPInformationItem] = []
+        var actions: [CPTextButton]    = []
+
+        // ── Aktive Siri-Fahrt ──────────────────────────────────────
+        if let trip = active {
+            let elapsed = Int(Date().timeIntervalSince(trip.startTime ?? Date()))
+            let h = elapsed / 3600
+            let m = (elapsed % 3600) / 60
+            let s = elapsed % 60
+            let timeStr = h > 0
+                ? String(format: "%d:%02d:%02d", h, m, s)
+                : String(format: "%02d:%02d", m, s)
+
+            items.append(CPInformationItem(title: "🔴 Fahrt läuft", detail: "→ \(trip.to)"))
+            items.append(CPInformationItem(title: "Fahrzeit", detail: timeStr))
+
+            let stopBtn = CPTextButton(title: "Fahrt stoppen",
+                                       textStyle: .confirm) { [weak self] _ in
+                self?.stopActiveTripFromCarPlay(trip: trip)
+            }
+            actions.append(stopBtn)
+
+        // ── GPS-Aufzeichnung läuft ─────────────────────────────────
+        } else if gps.recording {
+            let h = gps.elapsed / 3600
+            let m = (gps.elapsed % 3600) / 60
+            let s = gps.elapsed % 60
+            let timeStr = h > 0
+                ? String(format: "%d:%02d:%02d", h, m, s)
+                : String(format: "%02d:%02d", m, s)
+
+            items.append(CPInformationItem(title: "🔴 GPS-Aufzeichnung", detail: "Aktiv"))
+            items.append(CPInformationItem(title: "Strecke", detail: "\(Int(gps.km.rounded())) km"))
+            items.append(CPInformationItem(title: "Fahrzeit", detail: timeStr))
+
+        // ── Bereit ────────────────────────────────────────────────
+        } else {
+            items.append(CPInformationItem(title: "Status", detail: "Bereit"))
+        }
+
+        // ── Monatsdaten immer anzeigen ─────────────────────────────
+        items.append(CPInformationItem(
+            title: "Monat",
+            detail: "\(monthly.monthLabel)"
+        ))
+        items.append(CPInformationItem(
+            title: "Erstattung",
+            detail: carPlayEuro(monthly.monthEuro)
+        ))
+        items.append(CPInformationItem(
+            title: "Kilometer",
+            detail: "\(Int(monthly.monthKm)) km · \(monthly.tripCount) Fahrten"
+        ))
+
+        // ── Template ───────────────────────────────────────────────
+        let title = active != nil
+            ? "Fahrt läuft"
+            : gps.recording
+                ? "GPS · Fahrtkosten"
+                : "Fahrtkosten"
+
+        let tpl = CPInformationTemplate(
+            title: title,
+            layout: .leading,
+            items: items,
+            actions: actions
+        )
+
+        interfaceController?.setRootTemplate(tpl, animated: false, completion: nil)
+    }
+
+    // MARK: - Siri-Fahrt über CarPlay stoppen
+    // Speichert die Fahrt ohne km (0) – Nutzer kann km später in der App nachtragen
+    private func stopActiveTripFromCarPlay(trip: Trip) {
+        var finished = trip
+        finished.endTime = Date()
+        // km = 0 da wir in CarPlay keine Tastatur haben
+        // Nutzer wird über Alert informiert
+        CarPlayDataAccess.finishActiveTrip(finished)
+        renderDashboard()
+
+        // Kurze Bestätigung als neues Template
+        let items = [
+            CPInformationItem(title: "✓ Fahrt gespeichert", detail: "→ \(trip.to)"),
+            CPInformationItem(title: "Hinweis", detail: "Kilometer bitte in der App nachtragen")
+        ]
+        let tpl = CPInformationTemplate(
+            title: "Fahrt beendet",
+            layout: .leading,
+            items: items,
+            actions: []
+        )
+        interfaceController?.setRootTemplate(tpl, animated: true, completion: nil)
+
+        // Nach 3 Sekunden zurück zum Dashboard
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+            self?.renderDashboard()
+        }
+    }
+}
+
+// MARK: - CarPlay Data Access
+// Liest aus App Group UserDefaults (gleicher Speicher wie Intents + DataStore)
+private struct CarPlayDataAccess {
+
+    static let defaults: UserDefaults = {
+        UserDefaults(suiteName: "group.de.tommwagner.fahrtkosten") ?? .standard
+    }()
+
+    static func loadTrips() -> [Trip] {
+        guard let data = defaults.data(forKey: "trips") else { return [] }
+        return (try? JSONDecoder().decode([Trip].self, from: data)) ?? []
+    }
+
+    static func kmRate() -> Double {
+        let r = defaults.double(forKey: "kmRate")
+        return r == 0 ? 0.30 : r
+    }
+
+    static func activeTrip() -> Trip? {
+        guard let data = defaults.data(forKey: "activeTrip") else { return nil }
+        return try? JSONDecoder().decode(Trip.self, from: data)
+    }
+
+    static func finishActiveTrip(_ trip: Trip) {
+        // Zur Fahrtenliste hinzufügen
+        var trips = loadTrips()
+        trips.append(trip)
+        if let data = try? JSONEncoder().encode(trips) {
+            defaults.set(data, forKey: "trips")
+            NSUbiquitousKeyValueStore.default.set(data, forKey: "trips")
+            NSUbiquitousKeyValueStore.default.synchronize()
+        }
+        // Aktive Fahrt löschen
+        defaults.removeObject(forKey: "activeTrip")
+    }
+
+    static func monthlyData() -> (monthLabel: String, monthEuro: Double, monthKm: Double, tripCount: Int) {
+        let trips = loadTrips()
+        let rate  = kmRate()
+        let cal   = Calendar.current
+        let now   = Date()
+
+        let monthTrips = trips.filter {
+            cal.isDate($0.date, equalTo: now, toGranularity: .month)
+        }
+        let euro = monthTrips.reduce(0.0) { $0 + $1.km * rate }
+        let km   = monthTrips.reduce(0.0) { $0 + $1.km }
+
+        let fmt = DateFormatter()
+        fmt.locale = Locale(identifier: "de_DE")
+        fmt.dateFormat = "MMMM yyyy"
+
+        return (fmt.string(from: now), euro, km, monthTrips.count)
+    }
+}
+
+// MARK: - Euro Formatter (kein Zugriff auf App-Helpers in CarPlay)
+private func carPlayEuro(_ value: Double) -> String {
+    let f = NumberFormatter()
+    f.numberStyle = .decimal
+    f.minimumFractionDigits = 2
+    f.maximumFractionDigits = 2
+    f.decimalSeparator = ","
+    f.groupingSeparator = "."
+    return (f.string(from: NSNumber(value: value)) ?? "0,00") + " €"
+}

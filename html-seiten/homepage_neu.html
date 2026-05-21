@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fahrtkosten App – Startseite</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #f5f5f7;
+    color: #1d1d1f;
+    line-height: 1.6;
+    font-size: 16px;
+  }
+
+  /* Header */
+  .page-header { background: linear-gradient(135deg, #2a3545 0%, #36455a 100%); color: #fff; padding: 26px 32px; }
+  .page-header-inner { max-width: 860px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+  .hero-icon { width: 56px; height: 56px; border-radius: 13px; display: block; flex-shrink: 0; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+  .page-header h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; }
+  .page-header .subtitle { margin-top: 5px; font-size: 0.9rem; color: rgba(255,255,255,0.55); }
+
+  /* Container */
+  .container { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* Section card */
+  .section {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  .section-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 24px; padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .section-number {
+    background: #ddeaf4; color: #4a7fa5;
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+  }
+  .section-header h2 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.01em; }
+
+  p { margin: 10px 0; color: #3a3a3c; font-size: 0.95rem; line-height: 1.7; }
+  p:first-child { margin-top: 0; }
+  strong { color: #1d1d1f; }
+  a { color: #4a7fa5; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Tip box */
+  .tip {
+    background: #edf4f9; border-left: 3px solid #4a7fa5;
+    border-radius: 0 10px 10px 0; padding: 12px 16px;
+    margin: 14px 0; font-size: 0.9rem; color: #1d3557;
+  }
+  .tip strong { color: #4a7fa5; }
+
+  /* Image grid */
+  .img-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .img-grid img {
+    width: 100%; border-radius: 10px;
+    aspect-ratio: 9 / 19.5;
+    object-fit: cover;
+    display: block;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  /* Feature grid */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 4px;
+  }
+  .feature-card {
+    background: #f5f5f7;
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .feature-card .fc-icon { font-size: 1.5rem; margin-bottom: 10px; display: block; }
+  .feature-card h3 { font-size: 0.97rem; font-weight: 700; margin-bottom: 6px; }
+  .feature-card p { font-size: 0.87rem; color: #6e6e73; margin: 0; line-height: 1.55; }
+
+  /* Link row */
+  .link-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+  .btn-dark {
+    background: #3a3a3c; color: #fff; text-decoration: none;
+    padding: 9px 20px; border-radius: 980px;
+    font-size: 0.88rem; font-weight: 500; display: inline-block;
+  }
+  .btn-dark:hover { background: #4a4a4c; text-decoration: none; }
+
+  /* Contact */
+  .contact-card {
+    background: #f5f5f7; border-radius: 10px;
+    padding: 16px 20px; margin-top: 14px;
+    font-size: 0.93rem; color: #3a3a3c; line-height: 1.8;
+  }
+
+  /* Footer */
+  .footer-card {
+    background: #fff; border-radius: 16px; padding: 24px 32px;
+    margin-top: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    text-align: center; color: #6e6e73; font-size: 0.88rem; line-height: 1.8;
+  }
+  .footer-card a { color: #4a7fa5; }
+
+  @media (max-width: 600px) {
+    .page-header { padding: 20px; }
+    .page-header h1 { font-size: 1.3rem; }
+    .section { padding: 22px 18px; }
+    .img-grid { grid-template-columns: repeat(2, 1fr); }
+    .feature-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <img class="hero-icon"
+      src="https://impro.usercontent.one/appid/oneComWsb/domain/wagner-fahrtkosten.de/media/wagner-fahrtkosten.de/onewebmedia/icon-ios-64x64%403x.png?etag=W%2F%224010-19e2bedcf90%22&sourceContentType=image%2Fpng&ignoreAspectRatio&resize=192%2B192"
+      alt="Fahrtkosten App Icon">
+    <div>
+      <h1>Fahrtkosten App</h1>
+      <p class="subtitle">Fahrten, Arbeitszeit &amp; Spesen · Thomas Wagner</p>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- 1. Willkommen -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-number">1</div>
+      <h2>Willkommen bei der Fahrtkosten App</h2>
+    </div>
+    <p>Ich bin 56 Jahre alt und habe aus eigener Erfahrung — bisher mit Excel-Tabellen — eine App entwickelt, um mir die Arbeit zu erleichtern. Die App vereint <strong>Fahrten, Arbeitszeiten, Hotelbesuche sowie allgemeine KFZ-Kosten</strong>, damit man alles im Überblick hat.</p>
+    <p>Bleiben Sie mit den neuesten Entwicklungen der Fahrtkosten App auf dem Laufenden.</p>
+    <div class="link-row">
+      <a href="/changelog" class="btn-dark">Neuigkeiten &amp; Updates</a>
+      <a href="/hilfe-und-bedienung" class="btn-dark">Hilfe &amp; Bedienung</a>
+    </div>
+  </div>
+
+  <!-- 2. Meine Erfahrung -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-number">2</div>
+      <h2>Meine persönliche Erfahrung mit der App</h2>
+    </div>
+    <p>Man kennt es: jedes Mal das Laptop öffnen, um Einträge zu tätigen — Fahrten, Hotelbesuche und andere Ausgaben aus dem täglichen Arbeitsalltag in eine Excel-Tabelle einzutragen.</p>
+    <p>Hierzu habe ich mir diese App gebaut, um alles direkt am iPhone zu erledigen, ohne das Laptop öffnen zu müssen.</p>
+    <p>In der App kann ich alles erfassen, was im beruflichen Alltag anfällt: die Fahrten von Kunde zu Kunde, Hotelbesuche und alle Kosten, die für das KFZ anfallen.</p>
+    <p>In der App sind bereits diverse <strong>Voreinstellungen</strong> hinterlegt, die den steuerlichen Vorgaben in Deutschland entsprechen — Kilometerpauschalen, Hotelpauschale (20 €/Nacht gem. § 9 EStG) sowie Verpflegungssätze für Frühstück, Mittag und Abendessen. Diese Voreinstellungen sind jederzeit individuell anpassbar.</p>
+
+    <div class="img-grid">
+      <img src="https://impro.usercontent.one/appid/oneComWsb/domain/wagner-fahrtkosten.de/media/wagner-fahrtkosten.de/onewebmedia/87E30455-6D00-4EEE-BAB5-2F04979B6826_1_105_c.jpeg?etag=W%2F%22b362-19e2bedf6a0%22&sourceContentType=image%2Fjpeg&quality=85" alt="Screenshot">
+      <img src="https://impro.usercontent.one/appid/oneComWsb/domain/wagner-fahrtkosten.de/media/wagner-fahrtkosten.de/onewebmedia/E1EE687D-CFA1-4229-B38F-CB44DC935D82_1_105_c.jpeg?etag=W%2F%222abd4-19e2bee0e10%22&sourceContentType=image%2Fjpeg&quality=85" alt="Screenshot">
+      <img src="https://impro.usercontent.one/appid/oneComWsb/domain/wagner-fahrtkosten.de/media/wagner-fahrtkosten.de/onewebmedia/9208B7DB-938E-4F60-8E71-EA6BEB055A75_1_105_c.jpeg?etag=W%2F%2216327-19e2bee0258%22&sourceContentType=image%2Fjpeg&quality=85" alt="Screenshot">
+    </div>
+  </div>
+
+  <!-- 3. Features -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-number">3</div>
+      <h2>Was die App für Sie tut</h2>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <span class="fc-icon">🚗</span>
+        <h3>All-in-one für Ihre Fahrten</h3>
+        <p>Die App vereint Fahrten, Arbeitszeiten, Hotelbesuche und allgemeine KFZ-Kosten — alles im Überblick.</p>
+      </div>
+      <div class="feature-card">
+        <span class="fc-icon">⏱</span>
+        <h3>Zeit und Nerven sparen</h3>
+        <p>Dank der App behalten Sie spielend leicht den Überblick über Ihre Kosten und erhalten effiziente Unterstützung im Alltag.</p>
+      </div>
+      <div class="feature-card">
+        <span class="fc-icon">🇩🇪</span>
+        <h3>Deutsche Steuerpauschalen</h3>
+        <p>Kilometerpauschale, Verpflegungssätze und Hotelpauschale (20 €/Nacht, Deutschland) sind bereits voreingestellt und jederzeit anpassbar.</p>
+      </div>
+      <div class="feature-card">
+        <span class="fc-icon">🔒</span>
+        <h3>Nur lokal — keine Cloud</h3>
+        <p>Alle Daten bleiben auf Ihrem iPhone. Kein Account, keine Registrierung, kein Abo.</p>
+      </div>
+    </div>
+
+    <div class="img-grid" style="grid-template-columns: repeat(3, 1fr); margin-top: 20px;">
+      <img src="https://impro.usercontent.one/appid/oneComWsb/domain/wagner-fahrtkosten.de/media/wagner-fahrtkosten.de/onewebmedia/44097DA1-8301-4BE7-9DB9-2CB11F2F047A_1_105_c.jpeg?etag=W%2F%221338e-19e2bee0258%22&sourceContentType=image%2Fjpeg&quality=85" alt="Screenshot">
+      <img src="https://impro.usercontent.one/appid/oneComWsb/domain/wagner-fahrtkosten.de/media/wagner-fahrtkosten.de/onewebmedia/F23DE99D-34F3-4F45-8075-5727425A7AFC_1_105_c.jpeg?etag=W%2F%221c894-19e2bee15e0%22&sourceContentType=image%2Fjpeg&quality=85" alt="Screenshot">
+      <img src="https://impro.usercontent.one/appid/oneComWsb/domain/wagner-fahrtkosten.de/media/wagner-fahrtkosten.de/onewebmedia/03194A99-3A8A-47CE-9868-A51785E1084B_1_105_c.jpeg?etag=W%2F%2214c21-19e2bedfa88%22&sourceContentType=image%2Fjpeg&quality=85" alt="Screenshot">
+    </div>
+  </div>
+
+  <!-- 4. Kontakt -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-number">4</div>
+      <h2>Kontakt &amp; Support</h2>
+    </div>
+    <p>Bei Fragen, Anregungen oder Problemen stehe ich persönlich zur Verfügung.</p>
+    <div class="contact-card">
+      <strong>E-Mail:</strong> <a href="mailto:info@wagner-fahrtkosten.de">info@wagner-fahrtkosten.de</a><br>
+      <strong>Telefon:</strong> <a href="tel:04915119471134">04915119471134</a>
+    </div>
+    <div class="link-row">
+      <a href="/hilfe-und-bedienung" class="btn-dark">Hilfe &amp; Bedienung</a>
+      <a href="/fahrtkosten-beschreibung" class="btn-dark">App-Beschreibung</a>
+      <a href="/gallery" class="btn-dark">Galerie</a>
+      <a href="/changelog" class="btn-dark">Changelog</a>
+    </div>
+  </div>
+
+  <div class="footer-card">
+    Fahrtkosten App · Version 1.14.5 · Thomas Wagner · Mai 2026<br>
+    <a href="mailto:info@wagner-fahrtkosten.de">info@wagner-fahrtkosten.de</a>
+  </div>
+
+</div>
+</body>
+</html>

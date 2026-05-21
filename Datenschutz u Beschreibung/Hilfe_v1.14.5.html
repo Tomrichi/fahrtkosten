@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fahrtkosten – Hilfe & Bedienungsanleitung</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #f5f5f7;
+    color: #1d1d1f;
+    line-height: 1.6;
+    font-size: 16px;
+  }
+
+  .page-header {
+    background: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%);
+    color: #fff;
+    padding: 48px 24px 40px;
+    text-align: center;
+  }
+  .page-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .page-header .subtitle {
+    margin-top: 8px;
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.02em;
+  }
+
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* TOC */
+  .toc {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 40px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  .toc h2 {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6e6e73;
+    margin-bottom: 16px;
+  }
+  .toc ol {
+    padding-left: 20px;
+  }
+  .toc li {
+    margin: 6px 0;
+  }
+  .toc a {
+    color: #0071e3;
+    text-decoration: none;
+    font-size: 0.95rem;
+  }
+  .toc a:hover { text-decoration: underline; }
+
+  /* Sections */
+  .section {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .section-number {
+    background: #1d1d1f;
+    color: #fff;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .section-header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 24px 0 10px;
+    color: #1d1d1f;
+  }
+  h3:first-child { margin-top: 0; }
+
+  p { margin: 10px 0; color: #3a3a3c; font-size: 0.95rem; }
+
+  ul, ol {
+    padding-left: 22px;
+    margin: 10px 0;
+    color: #3a3a3c;
+    font-size: 0.95rem;
+  }
+  li { margin: 5px 0; }
+
+  strong { color: #1d1d1f; }
+
+  /* Steps */
+  .steps {
+    list-style: none;
+    padding: 0;
+    counter-reset: step;
+    margin: 12px 0;
+  }
+  .steps li {
+    counter-increment: step;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 0;
+    font-size: 0.95rem;
+    color: #3a3a3c;
+  }
+  .steps li::before {
+    content: counter(step);
+    background: #f0f0f5;
+    color: #1d1d1f;
+    font-weight: 600;
+    font-size: 0.8rem;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin: 14px 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    background: #fafafa;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  thead { background: #f0f0f5; }
+  th {
+    text-align: left;
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.03em;
+    color: #6e6e73;
+    text-transform: uppercase;
+  }
+  td {
+    padding: 10px 14px;
+    color: #3a3a3c;
+    border-top: 1px solid #f0f0f0;
+  }
+  tr:first-child td { border-top: none; }
+
+  /* Tip box */
+  .tip {
+    background: #f0f7ff;
+    border-left: 3px solid #0071e3;
+    border-radius: 0 10px 10px 0;
+    padding: 12px 16px;
+    margin: 14px 0;
+    font-size: 0.9rem;
+    color: #1d3557;
+  }
+  .tip strong { color: #005bb5; }
+
+  /* Warning */
+  .warning {
+    background: #fff8f0;
+    border-left: 3px solid #ff9500;
+    border-radius: 0 10px 10px 0;
+    padding: 12px 16px;
+    margin: 14px 0;
+    font-size: 0.9rem;
+    color: #7a4000;
+  }
+
+  /* Note (new in version) */
+  .note {
+    background: #f5f5f7;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 14px 0;
+    font-size: 0.9rem;
+    color: #3a3a3c;
+    border: 1px solid #e5e5e7;
+  }
+  .note-label {
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #6e6e73;
+    margin-bottom: 4px;
+  }
+
+  /* FAQ */
+  .faq-item {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 18px 0;
+  }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-q {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #1d1d1f;
+    margin-bottom: 8px;
+  }
+  .faq-a {
+    font-size: 0.92rem;
+    color: #3a3a3c;
+    line-height: 1.6;
+  }
+
+  /* Divider between subsections */
+  .subsection { margin-top: 28px; }
+
+  /* Limitation list */
+  .limit-list {
+    background: #fafafa;
+    border-radius: 10px;
+    border: 1px solid #e5e5e7;
+    padding: 14px 18px 14px 36px;
+    margin: 10px 0;
+    font-size: 0.92rem;
+    color: #3a3a3c;
+  }
+  .limit-list li { margin: 6px 0; }
+
+  /* Contact card */
+  .contact-card {
+    background: #f5f5f7;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-top: 16px;
+    font-size: 0.93rem;
+  }
+  .contact-card a { color: #0071e3; text-decoration: none; }
+  .contact-card a:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    .page-header h1 { font-size: 1.5rem; }
+    .section { padding: 22px 18px; }
+    .toc { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Fahrtkosten – Hilfe</h1>
+  <div class="subtitle">Version 1.14.5 &nbsp;·&nbsp; Mai 2026</div>
+</div>
+
+<div class="container">
+
+  <!-- TOC -->
+  <div class="toc">
+    <h2>Inhaltsverzeichnis</h2>
+    <ol>
+      <li><a href="#s1">Erste Schritte</a></li>
+      <li><a href="#s2">Fahrten erfassen</a></li>
+      <li><a href="#s3">Arbeitszeit &amp; Spesen</a></li>
+      <li><a href="#s4">Google Maps Import</a></li>
+      <li><a href="#s5">Apple Watch</a></li>
+      <li><a href="#s6">GPS-Aufzeichnung</a></li>
+      <li><a href="#s7">Export &amp; Backup</a></li>
+      <li><a href="#s8">Einstellungen</a></li>
+      <li><a href="#s9">Häufige Fragen</a></li>
+    </ol>
+  </div>
+
+  <!-- 1 Erste Schritte -->
+  <div class="section" id="s1">
+    <div class="section-header">
+      <div class="section-number">1</div>
+      <h2>Erste Schritte</h2>
+    </div>
+
+    <h3>App einrichten</h3>
+    <p>Beim ersten Start führt die App dich durch die wichtigsten Einstellungen:</p>
+    <ul>
+      <li><strong>Kilometerpauschale</strong> – Der gesetzliche Standardwert beträgt 0,30 € / km. Du kannst diesen Wert in den Einstellungen anpassen.</li>
+      <li><strong>Fahrzeugtyp</strong> – Wähle zwischen Benzin/Diesel, Elektro und Hybrid.</li>
+      <li><strong>Sprache</strong> – Die App ist in Deutsch, Englisch, Polnisch und Tschechisch verfügbar. Die Sprache kann jederzeit unabhängig von der iPhone-Systemsprache gewechselt werden.</li>
+    </ul>
+
+    <div class="subsection">
+      <h3>Erste Fahrt erfassen</h3>
+      <ol class="steps">
+        <li>Tippe auf den Tab <strong>Fahrten</strong>.</li>
+        <li>Tippe auf das <strong>+</strong>-Symbol oben rechts.</li>
+        <li>Fülle mindestens <strong>Datum</strong>, <strong>Startort</strong> und <strong>Zielort</strong> aus.</li>
+        <li>Gib die <strong>Kilometer</strong> ein oder lass sie via Apple Maps automatisch berechnen.</li>
+        <li>Tippe auf <strong>Speichern</strong>.</li>
+      </ol>
+      <p>Die berechnete Erstattung erscheint sofort in der Fahrtenliste.</p>
+    </div>
+  </div>
+
+  <!-- 2 Fahrten erfassen -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <div class="section-number">2</div>
+      <h2>Fahrten erfassen</h2>
+    </div>
+
+    <h3>Manuelle Eingabe</h3>
+    <p>Tippe auf <strong>+</strong> im Fahrten-Tab. Folgende Felder stehen zur Verfügung:</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Feld</th><th>Beschreibung</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Datum</td><td>Datum der Fahrt</td></tr>
+          <tr><td>Startort</td><td>Abfahrtsadresse oder Ortsname</td></tr>
+          <tr><td>Zielort</td><td>Zieladresse oder Ortsname</td></tr>
+          <tr><td>Kilometer</td><td>Strecke in km (kann automatisch berechnet werden)</td></tr>
+          <tr><td>Abfahrtszeit</td><td>Uhrzeit der Abfahrt (für Abwesenheitszeitberechnung)</td></tr>
+          <tr><td>Ankunftszeit</td><td>Uhrzeit der Ankunft (für Abwesenheitszeitberechnung)</td></tr>
+          <tr><td>Fahrzeug</td><td>Fahrzeugtyp und Kraftstoff</td></tr>
+          <tr><td>Notiz</td><td>Freitext, z. B. Kundennummer oder Projektnummer</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="tip">
+      <strong>Tipp:</strong> Gibst du Start- und Zieladresse vollständig ein, kannst du die Kilometer automatisch via Apple Maps berechnen lassen – tippe dazu auf das Karten-Symbol neben dem Kilometer-Feld.
+    </div>
+
+    <div class="subsection">
+      <h3>Einträge bearbeiten und duplizieren</h3>
+      <ul>
+        <li><strong>Bearbeiten:</strong> Tippe auf einen Eintrag in der Liste, um ihn zu öffnen und zu bearbeiten.</li>
+        <li><strong>Duplizieren:</strong> Wische den Eintrag nach rechts und tippe auf <strong>Duplizieren</strong>. Nützlich bei wiederkehrenden Fahrten zur gleichen Strecke.</li>
+        <li><strong>Löschen:</strong> Wische den Eintrag nach links und tippe auf <strong>Löschen</strong>.</li>
+      </ul>
+      <p>Die Wischgesten-Aktionen und deren Farben können in den Einstellungen unter <strong>Wischgesten</strong> frei konfiguriert werden.</p>
+    </div>
+
+    <div class="subsection">
+      <h3>Weitere Erfassungsmethoden</h3>
+      <ul>
+        <li><strong>Via GPS:</strong> Siehe Abschnitt <a href="#s6">6. GPS-Aufzeichnung</a></li>
+        <li><strong>Via Apple Watch:</strong> Siehe Abschnitt <a href="#s5">5. Apple Watch</a></li>
+        <li><strong>Via Google Maps / Apple Maps:</strong> Siehe Abschnitt <a href="#s4">4. Google Maps Import</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 3 Arbeitszeit & Spesen -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <div class="section-number">3</div>
+      <h2>Arbeitszeit &amp; Spesen</h2>
+    </div>
+
+    <h3>Wie die Abwesenheitszeitberechnung funktioniert</h3>
+    <p>Die App berechnet die tägliche Gesamtabwesenheitszeit aus zwei Quellen:</p>
+    <ol>
+      <li><strong>Fahrzeiten</strong> der an diesem Tag erfassten Fahrten (nur manuell eingetragene Fahrzeiten, keine automatischen Schätzungen)</li>
+      <li><strong>Manuell erfasste Arbeitszeit</strong> im Tab Arbeitszeit</li>
+    </ol>
+    <p>Die Summe ergibt die Gesamtabwesenheitszeit, die für die Verpflegungspauschale maßgeblich ist.</p>
+
+    <div class="subsection">
+      <h3>Verpflegungspauschalen (§ 9 Abs. 4a EStG)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Region</th><th>Unter 3 Std.</th><th>3 bis 6 Std.</th><th>Ab 6 Std.</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Inland</td><td>0,00 €</td><td>14,00 €</td><td>28,00 €</td></tr>
+            <tr><td>Schweiz / Ausland</td><td>0,00 €</td><td>20,00 €</td><td>35,00 €</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Die Pauschale wird automatisch angesetzt, sobald die Gesamtabwesenheitszeit den jeweiligen Schwellenwert überschreitet.</p>
+    </div>
+
+    <div class="subsection">
+      <h3>Arbeitszeit erfassen</h3>
+      <ol class="steps">
+        <li>Tippe auf den Tab <strong>Arbeitszeit</strong>.</li>
+        <li>Tippe auf <strong>+</strong> und wähle das Datum aus.</li>
+        <li>Trage <strong>Beginn</strong> und <strong>Ende</strong> der Arbeitszeit ein.</li>
+        <li>Optional: Region wählen (Inland / Schweiz / Ausland).</li>
+      </ol>
+      <p>Die App kombiniert die eingetragene Arbeitszeit automatisch mit den Fahrzeiten des gleichen Tages und zeigt die errechnete Verpflegungspauschale an.</p>
+    </div>
+
+    <div class="note">
+      <div class="note-label">Neu in Version 1.14.5</div>
+      Bei mehreren Fahrten am gleichen Tag fließen <strong>nur manuell eingetragene Fahrzeiten</strong> (Abfahrts- und Ankunftszeit) in die Berechnung ein. Fahrten ohne eingetragene Uhrzeiten oder Fahrten, bei denen die Fahrzeit nur aus Kilometern oder der Maps-API geschätzt wurde, werden nicht automatisch hinzugerechnet. Dies verhindert eine Überschätzung der Abwesenheitszeit.
+    </div>
+  </div>
+
+  <!-- 4 Google Maps Import -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <div class="section-number">4</div>
+      <h2>Google Maps Import</h2>
+    </div>
+
+    <h3>Route aus Google Maps importieren</h3>
+    <p>Du kannst eine bereits gerechnete Route aus Google Maps direkt als Fahrt importieren:</p>
+    <ol class="steps">
+      <li>Öffne <strong>Google Maps</strong> auf deinem iPhone.</li>
+      <li>Berechne deine Route (Startpunkt und Ziel eingeben).</li>
+      <li>Tippe auf das <strong>Teilen</strong>-Symbol (Pfeil nach oben).</li>
+      <li>Wähle <strong>Fahrtkosten</strong> aus der Liste der Apps.</li>
+      <li>Die App öffnet sich und erstellt automatisch eine neue Fahrt mit den Routendaten.</li>
+      <li>Überprüfe die vorausgefüllten Felder und tippe auf <strong>Speichern</strong>.</li>
+    </ol>
+
+    <div class="subsection">
+      <h3>Apple Maps Import</h3>
+      <p>Derselbe Vorgang funktioniert auch mit Apple Maps:</p>
+      <ol class="steps">
+        <li>Route in Apple Maps berechnen.</li>
+        <li>Auf <strong>Teilen</strong> tippen.</li>
+        <li><strong>Fahrtkosten</strong> auswählen.</li>
+      </ol>
+    </div>
+
+    <div class="note">
+      <div class="note-label">Fehlerbehebung in Version 1.14.5</div>
+      In früheren Versionen konnte es vorkommen, dass die Route beim Importieren aus Google Maps verloren ging, wenn die App neu gestartet wurde und der Startbildschirm angezeigt wurde. Dieser Fehler wurde in Version 1.14.5 behoben. Aktualisiere die App, falls du dieses Problem erlebt hast.
+    </div>
+  </div>
+
+  <!-- 5 Apple Watch -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <div class="section-number">5</div>
+      <h2>Apple Watch</h2>
+    </div>
+
+    <h3>Voraussetzungen</h3>
+    <ul>
+      <li>Apple Watch mit watchOS 10 oder neuer</li>
+      <li>iPhone mit Fahrtkosten in Version 1.14.4 oder neuer</li>
+      <li>Die Fahrtkosten Watch App muss auf der Apple Watch installiert sein (erfolgt automatisch über den App Store, sofern „Automatisch installieren" in der Watch-App aktiviert ist)</li>
+    </ul>
+
+    <div class="subsection">
+      <h3>Fahrt von der Apple Watch starten</h3>
+      <ol class="steps">
+        <li>Öffne die <strong>Fahrtkosten App</strong> auf der Apple Watch.</li>
+        <li>Tippe auf <strong>Fahrt starten</strong>.</li>
+        <li>Die Uhr zeigt Startzeit und laufende Fahrzeit an.</li>
+      </ol>
+    </div>
+
+    <div class="subsection">
+      <h3>Fahrt beenden und importieren</h3>
+      <ol class="steps">
+        <li>Tippe auf <strong>Fahrt beenden</strong>.</li>
+        <li>Die App fragt optional nach Startort und Zielort (oder du trägst diese später auf dem iPhone nach).</li>
+        <li>Der Eintrag wird automatisch via WatchConnectivity an die iPhone-App übertragen.</li>
+        <li>Auf dem iPhone erscheint die Fahrt in der Fahrtenliste – bereit zur finalen Bearbeitung.</li>
+      </ol>
+    </div>
+
+    <div class="subsection">
+      <h3>Einschränkungen der Watch App</h3>
+      <ul class="limit-list">
+        <li>GPS-Streckenaufzeichnung ist nicht verfügbar (nur Start/Stopp mit Zeit)</li>
+        <li>Kilometerangaben müssen auf dem iPhone ergänzt werden</li>
+        <li>Synchronisierung erfordert, dass sich iPhone und Apple Watch in Reichweite befinden</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 6 GPS -->
+  <div class="section" id="s6">
+    <div class="section-header">
+      <div class="section-number">6</div>
+      <h2>GPS-Aufzeichnung</h2>
+    </div>
+
+    <h3>Live-Tracking starten</h3>
+    <ol class="steps">
+      <li>Tippe auf den Tab <strong>GPS</strong> im Hauptmenü.</li>
+      <li>Tippe auf <strong>Aufzeichnung starten</strong>.</li>
+      <li>Bestätige den Zugriff auf den Standort (<strong>„Immer erlauben"</strong> empfohlen für zuverlässige Hintergrundaufzeichnung).</li>
+    </ol>
+    <p>Die Aufzeichnung läuft im Hintergrund weiter, auch wenn das Display gesperrt oder eine andere App geöffnet ist. Ein Banner oben in der App zeigt die aktive Aufzeichnung an.</p>
+
+    <div class="subsection">
+      <h3>Automatischer Stopp</h3>
+      <p>Die App erkennt automatisch längere Standzeiten:</p>
+      <ul>
+        <li><strong>Pause:</strong> Nach 5 Minuten Stillstand wird die Aufzeichnung vorübergehend pausiert.</li>
+        <li><strong>Auto-Stop:</strong> Nach 30 Minuten Stillstand wird die Aufzeichnung automatisch beendet und die Fahrt gespeichert.</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3>Fahrt manuell beenden</h3>
+      <p>Tippe auf den <strong>roten Banner</strong> am oberen Bildschirmrand oder öffne den GPS-Tab und tippe auf <strong>Aufzeichnung beenden</strong>.</p>
+    </div>
+
+    <div class="subsection">
+      <h3>CarPlay</h3>
+      <p>Fahrtkosten zeigt den Status der aktiven GPS-Aufzeichnung direkt im CarPlay-Display. Du kannst die Aufzeichnung über CarPlay starten und beenden, ohne das iPhone anfassen zu müssen.</p>
+    </div>
+
+    <div class="note">
+      <div class="note-label">Seit Version 1.14.4</div>
+      Bei GPS-Fahrten wird automatisch nur der Ortsname (z. B. „München") statt der vollständigen Straßenadresse gespeichert. Das ergibt übersichtlichere Einträge in der Fahrtenliste.
+    </div>
+  </div>
+
+  <!-- 7 Export & Backup -->
+  <div class="section" id="s7">
+    <div class="section-header">
+      <div class="section-number">7</div>
+      <h2>Export &amp; Backup</h2>
+    </div>
+
+    <h3>PDF-Export</h3>
+    <ol class="steps">
+      <li>Tippe auf den Tab <strong>Übersicht</strong>.</li>
+      <li>Tippe auf das <strong>Teilen</strong>-Symbol oder das <strong>Export</strong>-Symbol in der Toolbar.</li>
+      <li>Wähle <strong>PDF-Export</strong>.</li>
+      <li>In der Vorschau siehst du das fertige Dokument. Tippe auf <strong>Teilen</strong>, um es weiterzuleiten (E-Mail, AirDrop, Dateien-App, etc.).</li>
+    </ol>
+    <p>Das PDF enthält alle erfassten Kategorien (Fahrten, Arbeitszeit, Übernachtungen, KFZ-Kosten, Spesen) mit Summen und ist für die Einreichung bei der Buchhaltung oder dem Finanzamt geeignet.</p>
+
+    <div class="subsection">
+      <h3>CSV-Export</h3>
+      <p>Wie beim PDF-Export – wähle stattdessen <strong>CSV-Export</strong>. Die CSV-Datei ist mit Semikolon getrennt und direkt in Excel oder Numbers importierbar.</p>
+      <div class="tip">
+        <strong>CSV-Spalten:</strong> Datum · Kategorie · Von · Nach · Kilometer · Spritpreis €/L · Verbrauch L/100km · Verbrauchte Liter · Erstattung € · Notiz
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Backup erstellen</h3>
+      <ol class="steps">
+        <li>Gehe zu <strong>Einstellungen &gt; Backup &amp; Wiederherstellen</strong>.</li>
+        <li>Tippe auf <strong>Backup erstellen &amp; speichern</strong>.</li>
+        <li>Wähle im Share Sheet ein Ziel (iCloud Drive, Google Drive, AirDrop, Dateien-App).</li>
+      </ol>
+      <p>Die Backup-Datei ist eine JSON-Datei im Format <code>Fahrtkosten_Backup_YYYY-MM-DD_HH-mm.json</code> und enthält alle Daten und Einstellungen.</p>
+    </div>
+
+    <div class="subsection">
+      <h3>Backup wiederherstellen</h3>
+      <ol class="steps">
+        <li>Gehe zu <strong>Einstellungen &gt; Backup &amp; Wiederherstellen</strong>.</li>
+        <li>Tippe auf <strong>Backup wiederherstellen</strong>.</li>
+        <li>Wähle die Backup-Datei aus der Dateien-App oder iCloud Drive.</li>
+        <li>Bestätige die Wiederherstellung.</li>
+      </ol>
+      <div class="warning">
+        <strong>Achtung:</strong> Die Wiederherstellung überschreibt alle aktuellen Daten. Erstelle vorher ein neues Backup, wenn du aktuelle Einträge sichern möchtest.
+      </div>
+    </div>
+  </div>
+
+  <!-- 8 Einstellungen -->
+  <div class="section" id="s8">
+    <div class="section-header">
+      <div class="section-number">8</div>
+      <h2>Einstellungen</h2>
+    </div>
+
+    <h3>Kilometerpauschale</h3>
+    <p>Unter <strong>Einstellungen &gt; Fahrten</strong> kannst du den Erstattungssatz pro Kilometer anpassen. Der gesetzliche Standardwert (Stand 2026) beträgt 0,30 € / km.</p>
+
+    <div class="subsection">
+      <h3>Fahrzeug &amp; Kraftstoff</h3>
+      <ul>
+        <li><strong>Fahrzeugtyp:</strong> Benzin/Diesel, Elektro oder Hybrid</li>
+        <li><strong>Verbrauch:</strong> Liter / 100 km (Benzin/Diesel) oder kWh / 100 km (Elektro/Hybrid)</li>
+        <li><strong>Kraftstoffpreis / kWh-Preis:</strong> Manuell hinterlegen oder via Tankerkönig API automatisch abrufen</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3>Verpflegungspauschalen</h3>
+      <p>Unter <strong>Einstellungen &gt; Verpflegung</strong> können die Pauschalen für Inland, Schweiz und Ausland individuell angepasst werden (z. B. für abweichende Firmenregelungen).</p>
+    </div>
+
+    <div class="subsection">
+      <h3>Übernachtungspauschale</h3>
+      <p>Standard: 75,00 € (gesetzliche Pauschale). Kann auf den tatsächlichen Hotelbetrag geändert werden.</p>
+    </div>
+
+    <div class="subsection">
+      <h3>Wischgesten</h3>
+      <p>Unter <strong>Einstellungen &gt; Wischgesten</strong> kannst du für jede Liste separat festlegen:</p>
+      <ul>
+        <li>Welche Aktion beim Wischen nach links / rechts ausgeführt wird</li>
+        <li>Welche Farbe die Wischgeste erhält</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3>Sprache</h3>
+      <p>Unter <strong>Einstellungen &gt; Sprache</strong> kannst du zwischen Deutsch, Englisch, Polnisch und Tschechisch wählen – unabhängig von der iPhone-Systemsprache.</p>
+    </div>
+
+    <div class="subsection">
+      <h3>Diagnoseprotokoll</h3>
+      <p>Unter <strong>Einstellungen &gt; Info &amp; Datenschutz &gt; Diagnoseprotokoll</strong> kannst du das lokale Protokoll aller App-Aktionen einsehen und exportieren. Nützlich zur Fehleranalyse.</p>
+    </div>
+
+    <div class="subsection">
+      <h3>Alle Einträge löschen</h3>
+      <p>Unter <strong>Einstellungen &gt; Daten verwalten &gt; Alle Einträge löschen</strong> kannst du alle erfassten Einträge unwiderruflich löschen. Einstellungen bleiben erhalten. Erstelle vorher ein Backup.</p>
+    </div>
+  </div>
+
+  <!-- 9 FAQ -->
+  <div class="section" id="s9">
+    <div class="section-header">
+      <div class="section-number">9</div>
+      <h2>Häufige Fragen</h2>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Die Fahrt aus Google Maps wurde nicht gespeichert</div>
+      <div class="faq-a">
+        Dieser Fehler trat in Versionen vor 1.14.5 auf. Die URL mit den Routendaten ging verloren, wenn die App neu gestartet wurde und der Startbildschirm angezeigt wurde. <strong>Aktualisiere die App auf Version 1.14.5</strong>, um dieses Problem zu beheben. Seit 1.14.5 wird der Startbildschirm übersprungen, wenn eine Route geteilt wird, und die Fahrt wird zuverlässig gespeichert.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Die Abwesenheitszeit wird falsch berechnet</div>
+      <div class="faq-a">
+        Ab Version 1.14.5 werden nur Fahrten mit <strong>manuell eingetragenen Fahrzeiten</strong> (Abfahrts- und Ankunftszeit) in die Berechnung einbezogen. Fahrten ohne Uhrzeiten oder Fahrten, bei denen die Dauer nur aus Kilometern geschätzt wurde, werden nicht automatisch berücksichtigt. Trage Abfahrts- und Ankunftszeiten in jede Fahrt ein, damit die Berechnung korrekt ist.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Die GPS-Aufzeichnung stoppt unerwartet</div>
+      <div class="faq-a">
+        <p>Prüfe folgende Punkte:</p>
+        <ul style="margin-top:8px;">
+          <li><strong>Standortberechtigung:</strong> Unter <strong>Einstellungen &gt; Datenschutz &gt; Ortungsdienste &gt; Fahrtkosten</strong> muss <strong>„Immer"</strong> ausgewählt sein (nicht nur „Bei Verwendung der App").</li>
+          <li><strong>Energiesparmodus:</strong> Im iPhone-Energiesparmodus kann die Hintergrundlokalisierung eingeschränkt sein.</li>
+          <li><strong>Auto-Stop:</strong> Nach 30 Minuten Stillstand beendet die App die Aufzeichnung automatisch.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Apple Watch zeigt keine Verbindung zur App</div>
+      <div class="faq-a">
+        <ul style="margin-top:0;">
+          <li>Stelle sicher, dass iPhone und Apple Watch sich in Bluetooth-Reichweite befinden.</li>
+          <li>Öffne die <strong>Watch App</strong> auf dem iPhone und prüfe, ob Fahrtkosten unter „Meine Watch" aufgeführt ist.</li>
+          <li>Starte beide Geräte neu, falls die Verbindung nicht hergestellt werden kann.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Tankerkönig-Preise werden nicht geladen</div>
+      <div class="faq-a">
+        Der Dienst benötigt eine aktive Internetverbindung und aktivierten Standortzugriff. Prüfe:
+        <ul style="margin-top:8px;">
+          <li>Internetverbindung (WLAN oder Mobilfunk)</li>
+          <li>Standortberechtigung (mindestens „Bei Verwendung der App")</li>
+          <li>Tankerkönig-API ist ein Drittanbieterdienst – gelegentliche Ausfälle sind möglich</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Wie exportiere ich Daten für die Steuererklärung?</div>
+      <div class="faq-a">
+        Nutze den PDF-Export aus der Übersicht. Das Dokument enthält alle notwendigen Angaben (Datum, Start/Ziel, Kilometer, Erstattungsbetrag) und ist für die Einreichung beim Finanzamt oder der Buchhaltung geeignet. Alternativ steht ein CSV-Export für die Weiterverarbeitung in Excel oder einer Buchhaltungssoftware zur Verfügung.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Wo werden meine Daten gespeichert?</div>
+      <div class="faq-a">
+        Alle Daten werden <strong>ausschließlich lokal auf deinem iPhone</strong> gespeichert. Es gibt keine Cloud-Synchronisierung, keine Registrierung und keine Übertragung von Daten an Dritte. Belegscan und PDF-Import laufen vollständig offline via Apple Vision Framework.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Kontakt &amp; Support</div>
+      <div class="faq-a">
+        <div class="contact-card">
+          Bei weiteren Fragen oder Feedback: <a href="mailto:info@wagner-fahrtkosten.de">info@wagner-fahrtkosten.de</a><br><br>
+          Bitte gib bei Supportanfragen die App-Version (unter <strong>Einstellungen &gt; Info</strong> einsehbar) sowie eine kurze Beschreibung des Problems an. Das integrierte Diagnoseprotokoll (<strong>Einstellungen &gt; Info &amp; Datenschutz &gt; Diagnoseprotokoll</strong>) kann bei der Fehleranalyse helfen – exportiere und füge es ggf. deiner Anfrage bei.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /section FAQ -->
+
+</div><!-- /container -->
+</body>
+</html>

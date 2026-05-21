@@ -28,6 +28,7 @@ SymbolCache.noindex/
 
 # Temporäre Xcode-Projektordner
 Fahrtkosten-*/
+Fahrtkosten_ML/
 
 # Swift Package Manager
 .build/

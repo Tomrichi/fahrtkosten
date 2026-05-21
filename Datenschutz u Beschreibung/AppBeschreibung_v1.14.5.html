@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fahrtkosten – App Beschreibung</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #f5f5f7;
+    color: #1d1d1f;
+    line-height: 1.6;
+    font-size: 16px;
+  }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(160deg, #1c1c1e 0%, #2c2c2e 60%, #1a2a3a 100%);
+    color: #fff;
+    padding: 60px 24px 52px;
+    text-align: center;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 12px;
+  }
+  .hero .tagline {
+    font-size: 1.05rem;
+    color: rgba(255,255,255,0.65);
+    max-width: 560px;
+    margin: 0 auto 28px;
+    line-height: 1.5;
+  }
+  .platform-chips {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .platform-chip {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.75);
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* Section label */
+  .section-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #6e6e73;
+    margin-bottom: 20px;
+  }
+
+  /* Feature grid */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  .feature-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  .feature-icon {
+    font-size: 1.6rem;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .feature-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #1d1d1f;
+  }
+  .feature-card p {
+    font-size: 0.88rem;
+    color: #6e6e73;
+    line-height: 1.55;
+  }
+
+  /* Description block */
+  .desc-block {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    margin-bottom: 32px;
+  }
+  .desc-block h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .desc-block p {
+    font-size: 0.95rem;
+    color: #3a3a3c;
+    margin-bottom: 14px;
+    line-height: 1.65;
+  }
+  .desc-block p:last-child { margin-bottom: 0; }
+  .desc-block strong { color: #1d1d1f; }
+
+  /* Language tabs */
+  .lang-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+  }
+  .lang-tab {
+    background: #f5f5f7;
+    border: 1px solid #e5e5e7;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 0.82rem;
+    color: #3a3a3c;
+    cursor: default;
+  }
+
+  /* Privacy card */
+  .privacy-card {
+    background: linear-gradient(135deg, #f0f7ff 0%, #f5f5f7 100%);
+    border: 1px solid #d0e8ff;
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 32px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .privacy-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .privacy-card h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #1d1d1f;
+  }
+  .privacy-card p {
+    font-size: 0.9rem;
+    color: #3a3a3c;
+    line-height: 1.6;
+  }
+
+  /* What's new */
+  .whats-new {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 32px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    margin-bottom: 32px;
+  }
+  .whats-new h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .version-tag {
+    display: inline-block;
+    background: #1d1d1f;
+    color: #fff;
+    border-radius: 6px;
+    padding: 2px 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  .change-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 14px;
+  }
+  .change-list li {
+    padding: 8px 0;
+    font-size: 0.9rem;
+    color: #3a3a3c;
+    border-bottom: 1px solid #f5f5f7;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .change-list li:last-child { border-bottom: none; }
+  .change-dot {
+    width: 6px;
+    height: 6px;
+    background: #0071e3;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 7px;
+  }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; margin: 14px 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    background: #fafafa;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  thead { background: #f0f0f5; }
+  th {
+    text-align: left;
+    padding: 9px 14px;
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    color: #6e6e73;
+    text-transform: uppercase;
+  }
+  td {
+    padding: 9px 14px;
+    color: #3a3a3c;
+    border-top: 1px solid #f0f0f0;
+  }
+  tr:first-child td { border-top: none; }
+
+  /* Keyword pill row */
+  .keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .kw-pill {
+    background: #f0f0f5;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.82rem;
+    color: #3a3a3c;
+  }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.7rem; }
+    .feature-grid { grid-template-columns: 1fr; }
+    .desc-block { padding: 22px 18px; }
+    .privacy-card { flex-direction: column; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">Version 1.14.5 · Mai 2026</div>
+  <h1>Fahrtkosten</h1>
+  <p class="tagline">Dein digitaler Reisekostenassistent für iPhone, Apple Watch und iPad.</p>
+  <div class="platform-chips">
+    <span class="platform-chip">iPhone</span>
+    <span class="platform-chip">Apple Watch</span>
+    <span class="platform-chip">iPad</span>
+    <span class="platform-chip">CarPlay</span>
+    <span class="platform-chip">Home Screen Widget</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Features -->
+  <div class="section-label">Funktionen</div>
+  <div class="feature-grid">
+
+    <div class="feature-card">
+      <span class="feature-icon">⌚</span>
+      <h3>Apple Watch App</h3>
+      <p>Starte und beende Fahrten direkt vom Handgelenk. Der Eintrag wird automatisch in die iPhone-App importiert – keine manuelle Nachbearbeitung nötig.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">🔲</span>
+      <h3>Home Screen Widget</h3>
+      <p>Das WidgetKit-Widget zeigt den Status der aktiven Fahrt direkt auf dem Home Screen. Aktuelle Einträge immer im Blick, ohne die App zu öffnen.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">📍</span>
+      <h3>GPS-Streckenaufzeichnung</h3>
+      <p>Live-Tracking im Hintergrund, auch bei gesperrtem Display. Intelligente Pausenerkennung: 5 Min. Pause, 30 Min. Auto-Stop. CarPlay-Integration inklusive.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">🗺️</span>
+      <h3>Google Maps &amp; Apple Maps Import</h3>
+      <p>Route in Maps berechnen, Teilen-Symbol antippen, Fahrtkosten auswählen – fertig. Die Fahrt wird mit Start, Ziel und Kilometern automatisch eingetragen.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">🕐</span>
+      <h3>Arbeitszeit &amp; Verpflegungspauschale</h3>
+      <p>Fahrzeit und Arbeitszeit werden automatisch kombiniert. Ab 6 Stunden Gesamtabwesenheit wird die volle Verpflegungspauschale nach §&nbsp;9 EStG angesetzt.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">⚡</span>
+      <h3>Elektro &amp; Hybrid</h3>
+      <p>Neue Fahrzeugtypen mit kWh-basierter Verbrauchserfassung. Abrechnungskonform für Elektro- und Hybridfahrzeuge.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">📄</span>
+      <h3>PDF &amp; CSV-Export</h3>
+      <p>Steuerkonformer PDF-Export mit allen Kategorien – direkt einreichbar bei Buchhaltung oder Finanzamt. CSV-Export für Excel und Buchhaltungssoftware.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">📷</span>
+      <h3>Belegscan – lokal &amp; schnell</h3>
+      <p>Hotelrechnungen per Kamera, Fotobibliothek oder PDF-Import erfassen. Apple Vision Framework liest Betrag, Datum und Name automatisch aus – vollständig offline.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">⛽</span>
+      <h3>Aktuelle Spritpreise</h3>
+      <p>Günstigsten Kraftstoffpreis in der Nähe mit einem Tippen abrufen (Tankerkönig API). Kraftstoffart, Preis und Verbrauch dauerhaft hinterlegbar.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">🌐</span>
+      <h3>Mehrsprachig</h3>
+      <p>Vollständig in vier Sprachen verfügbar. Sprache jederzeit in den Einstellungen wechselbar – unabhängig von der iPhone-Systemsprache.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">💾</span>
+      <h3>Lokales Backup</h3>
+      <p>Vollständiges Backup aller Daten jederzeit via iOS Share Sheet exportieren und wiederherstellen – ohne Cloud, ohne Konto.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">🔧</span>
+      <h3>Diagnoseprotokoll</h3>
+      <p>Lokales Protokoll aller App-Aktionen für schnelle Fehleranalyse. Exportierbar direkt aus den Einstellungen.</p>
+    </div>
+
+  </div>
+
+  <!-- Privacy -->
+  <div class="privacy-card">
+    <div class="privacy-icon">🔒</div>
+    <div>
+      <h3>Datenschutz first</h3>
+      <p>Alle Daten bleiben <strong>ausschließlich lokal auf deinem iPhone</strong>. Keine Registrierung, kein Konto, kein Tracking, keine Werbung. Belegscan und PDF-Import laufen vollständig offline via Apple Vision Framework.</p>
+    </div>
+  </div>
+
+  <!-- App Store Beschreibung DE -->
+  <div class="desc-block">
+    <h2>App Store Beschreibung (Deutsch)</h2>
+    <p>Fahrtkosten – Dein digitaler Reisekostenassistent für iPhone, Apple Watch und iPad.</p>
+    <p>Erfasse alle erstattungsfähigen Kosten einer Dienstreise an einem Ort: Fahrten mit Kilometerpauschale, Arbeitszeiten &amp; Spesen nach gesetzlichen Pauschalsätzen, Übernachtungen und Fahrzeugkosten – alles wird automatisch berechnet, steuerkonform und auf Knopfdruck als PDF oder CSV exportiert.</p>
+    <p><strong>Apple Watch App</strong><br>
+    Starte und beende Fahrten direkt vom Handgelenk. Die Apple Watch App zeigt den aktuellen Fahrt-Status, Startzeit und Kilometerstand. Nach Beenden der Fahrt wird der Eintrag automatisch in die iPhone-App importiert – keine manuelle Nachbearbeitung nötig.</p>
+    <p><strong>Home Screen Widget</strong><br>
+    Das neue WidgetKit-Widget zeigt den Status der aktiven Fahrt direkt auf dem Home Screen. So behältst du deinen aktuellen Eintrag im Blick, ohne die App öffnen zu müssen.</p>
+    <p><strong>Fahrzeit &amp; Kilometerpauschale</strong><br>
+    Trage Datum, Start- und Zielort sowie Kilometer ein – die Erstattung wird sofort berechnet. Abfahrts- und Ankunftszeit werden für die genaue Fahrzeit gespeichert und fließen automatisch in die Verpflegungsberechnung des Tages ein. Gib einfach die Adresse ein und die Kilometer werden via Apple Maps automatisch übernommen.</p>
+    <p><strong>GPS-Streckenaufzeichnung</strong><br>
+    Starte das Live-Tracking direkt aus der App. Die Strecke wird präzise im Hintergrund aufgezeichnet – auch wenn das Display gesperrt ist. Intelligente Pausenerkennung stoppt die Aufzeichnung automatisch bei längerem Stillstand (5 Minuten Pause, 30 Minuten Auto-Stop). CarPlay-Nutzer sehen den Status direkt im Fahrzeugdisplay.</p>
+    <p><strong>Arbeitszeit &amp; Spesen – automatisch kombiniert</strong><br>
+    Erfasse Arbeitszeiten pro Tag. Die App erkennt automatisch Fahrten des gleichen Tages und berechnet die Gesamtarbeitszeit (Fahrzeit + Arbeitszeit). Überschreitet die kombinierte Zeit 6 Stunden, wird automatisch die volle Verpflegungspauschale angesetzt – ohne manuelle Eingabe.</p>
+    <p><strong>Verpflegung, Übernachtung &amp; KFZ-Kosten</strong><br>
+    Verpflegungspauschalen nach Region und Gesamtarbeitszeit (Inland, Schweiz, Ausland). Übernachtungen mit gesetzlicher Pauschale (75 €) oder tatsächlichem Hotelbetrag. KFZ-Kosten in 7 Kategorien, Reisespesen in 8 Kategorien.</p>
+    <p><strong>Mehrsprachige Oberfläche</strong><br>
+    Deutsch 🇩🇪 · Englisch 🇬🇧 · Polnisch 🇵🇱 · Tschechisch 🇨🇿 – Sprache jederzeit in den Einstellungen wechselbar, unabhängig von der Systemsprache des iPhones.</p>
+    <p><strong>Datenschutz first</strong><br>
+    Alle Daten bleiben ausschließlich lokal auf deinem iPhone. Keine Registrierung, kein Konto, kein Tracking, keine Werbung.</p>
+  </div>
+
+  <!-- App Store Beschreibung EN -->
+  <div class="desc-block">
+    <h2>App Store Description (English)</h2>
+    <p>Fahrtkosten – Your digital business travel expense assistant for iPhone, Apple Watch and iPad.</p>
+    <p>Track all reimbursable costs of a business trip in one place: trips with mileage allowance, working hours &amp; meal allowances based on statutory flat rates, overnight stays and vehicle costs – everything is calculated automatically, tax-compliant and exportable as PDF or CSV at the push of a button.</p>
+    <p><strong>Apple Watch App</strong><br>
+    Start and stop trips directly from your wrist. When you finish a trip, the entry is automatically imported into the iPhone app – no manual follow-up needed.</p>
+    <p><strong>GPS Route Recording</strong><br>
+    Start live tracking directly in the app. The route is recorded precisely in the background – even when the display is locked. Smart pause detection stops recording automatically after extended stops (5-minute pause, 30-minute auto-stop). CarPlay users see the status directly on their vehicle display.</p>
+    <p><strong>Working Hours &amp; Expenses – Automatically Combined</strong><br>
+    Log working hours per day. The app automatically detects trips on the same day and calculates total working time (travel time + working hours). If the combined time exceeds 6 hours, the full meal allowance is applied automatically.</p>
+    <p><strong>Privacy First</strong><br>
+    All data stays exclusively on your iPhone. No registration, no account, no tracking, no ads. Receipt scanning and PDF import run completely offline via Apple Vision Framework.</p>
+  </div>
+
+  <!-- What's new -->
+  <div class="whats-new">
+    <h2><span class="version-tag">1.14.5</span> Was ist neu</h2>
+    <ul class="change-list">
+      <li><span class="change-dot"></span><div><strong>Fehlerbehebung: Google Maps Import</strong> – Geteilte Routen aus Google Maps werden jetzt zuverlässig als Fahrt gespeichert</div></li>
+      <li><span class="change-dot"></span><div><strong>Verbesserung: Abwesenheitszeitberechnung</strong> – Bei mehreren Fahrten am gleichen Tag werden nur tatsächlich eingetragene Fahrzeiten berücksichtigt (keine automatischen km-Schätzungen mehr)</div></li>
+      <li><span class="change-dot"></span><div><strong>Kompatibilität: iOS 26</strong> – MapKit-API aktualisiert</div></li>
+      <li><span class="change-dot"></span><div><strong>Intern:</strong> Versionsnummern der App-Erweiterungen synchronisiert</div></li>
+    </ul>
+  </div>
+
+  <!-- Verpflegungspauschalen -->
+  <div class="desc-block">
+    <h2>Verpflegungspauschalen (§ 9 Abs. 4a EStG)</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Region</th><th>Unter 3 Std.</th><th>3 bis 6 Std.</th><th>Ab 6 Std.</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Inland</td><td>0,00 €</td><td>14,00 €</td><td>28,00 €</td></tr>
+          <tr><td>Schweiz / Ausland</td><td>0,00 €</td><td>20,00 €</td><td>35,00 €</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:12px; font-size:0.85rem; color:#6e6e73;">Gesamtarbeitszeit = Fahrzeit der Fahrten des Tages + eingetragene Arbeitszeit</p>
+
+    <div style="margin-top:24px;">
+      <h3 style="font-size:0.95rem; font-weight:600; margin-bottom:12px;">Gesetzliche Standardwerte (Stand 2026)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Kategorie</th><th>Betrag</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Kilometerpauschale</td><td>0,30 € / km</td></tr>
+            <tr><td>Übernachtungspauschale</td><td>75,00 €</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:10px; font-size:0.82rem; color:#6e6e73;">Alle Werte basieren auf § 9 EStG (Deutschland) und sind in der App individuell anpassbar.</p>
+    </div>
+  </div>
+
+  <!-- Keywords -->
+  <div class="desc-block">
+    <h2>App Store Keywords</h2>
+    <div class="keywords">
+      <span class="kw-pill">Reisekosten</span>
+      <span class="kw-pill">Fahrtenbuch</span>
+      <span class="kw-pill">Kilometerpauschale</span>
+      <span class="kw-pill">Dienstreise</span>
+      <span class="kw-pill">Spesen</span>
+      <span class="kw-pill">GPS</span>
+      <span class="kw-pill">Watch</span>
+      <span class="kw-pill">Widget</span>
+      <span class="kw-pill">Steuer</span>
+      <span class="kw-pill">Abrechnung</span>
+    </div>
+    <div style="margin-top:20px;">
+      <p style="font-size:0.85rem; color:#6e6e73; margin-bottom:4px;"><strong style="color:#1d1d1f;">Untertitel</strong></p>
+      <p style="font-size:0.95rem;">Dienstreisen smart abrechnen</p>
+    </div>
+    <div style="margin-top:16px;">
+      <p style="font-size:0.85rem; color:#6e6e73; margin-bottom:4px;"><strong style="color:#1d1d1f;">Promotional Text</strong></p>
+      <p style="font-size:0.92rem;">Neu 1.14.5: Google Maps Import-Fix &amp; präzisere Abwesenheitszeitberechnung. Apple Watch App, Widget &amp; CarPlay. Alle Daten lokal, keine Cloud.</p>
+    </div>
+  </div>
+
+</div><!-- /container -->
+</body>
+</html>
