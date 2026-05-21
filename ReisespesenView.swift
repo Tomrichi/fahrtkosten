@@ -84,7 +84,34 @@ struct KFZKostenView: View {
                                                 .foregroundColor(.secondary)
                                         }
                                         Spacer()
-                                        if items.isEmpty {
+                                        if kat == .verpflegung {
+                                            let ausgaben = items.reduce(0) { $0 + $1.amount }
+                                            let pauschale = mealAllowanceInPeriod
+                                            let netto = pauschale - ausgaben
+                                            VStack(alignment: .trailing, spacing: 1) {
+                                                if ausgaben > 0 {
+                                                    Text("−\(ausgaben.euroFormatted)")
+                                                        .font(.system(size: 11, weight: .regular, design: .monospaced))
+                                                        .foregroundColor(.red)
+                                                }
+                                                if pauschale > 0 {
+                                                    Text("+\(pauschale.euroFormatted)")
+                                                        .font(.system(size: 11, weight: .regular, design: .monospaced))
+                                                        .foregroundColor(.iosGreen)
+                                                }
+                                                if ausgaben > 0 || pauschale > 0 {
+                                                    Text(netto >= 0
+                                                         ? "+\(netto.euroFormatted)"
+                                                         : "−\(abs(netto).euroFormatted)")
+                                                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                                                        .foregroundColor(netto >= 0 ? .iosGreen : .red)
+                                                } else {
+                                                    Text("–")
+                                                        .font(.system(size: 13, weight: .regular, design: .monospaced))
+                                                        .foregroundColor(.secondary)
+                                                }
+                                            }
+                                        } else if items.isEmpty {
                                             Text("–")
                                                 .font(.system(size: 13, weight: .regular, design: .monospaced))
                                                 .foregroundColor(.secondary)
@@ -154,6 +181,7 @@ struct KFZKostenView: View {
                 KFZKategorieDetailView(
                     kategorie: kat,
                     items: (grouped[kat] ?? []).sorted(by: { $0.date > $1.date }),
+                    mealAllowance: kat == .verpflegung ? mealAllowanceInPeriod : nil,
                     onEdit: { _ in },
                     onDelete: { id in store.deleteReiseSpese(id) }
                 )
@@ -175,6 +203,13 @@ struct KFZKostenView: View {
                 }
             }
         }
+    }
+
+    // Verpflegungspauschale im gefilterten Zeitraum
+    private var mealAllowanceInPeriod: Double {
+        store.meals
+            .filter { inPeriod($0.date) }
+            .reduce(0) { $0 + store.adjustedMealAllowance(for: $1) }
     }
 
     private func kfzColor(_ kat: ReisespesenKategorie) -> Color {
@@ -239,6 +274,7 @@ struct KFZKategorieDetailView: View {
     @EnvironmentObject var lm: LocalizationManager
     let kategorie: ReisespesenKategorie
     let items: [ReiseSpese]
+    var mealAllowance: Double? = nil   // nur für .verpflegung gesetzt
     let onEdit: (ReiseSpese) -> Void
     let onDelete: (UUID) -> Void
 
@@ -252,15 +288,53 @@ struct KFZKategorieDetailView: View {
             List {
                 // Summen-Header
                 Section {
-                    HStack {
-                        Label(kategorie.localizedName, systemImage: kategorie.icon)
-                            .font(.subheadline)
-                        Spacer()
-                        Text(total.euroFormatted)
-                            .font(.system(size: 17, weight: .regular, design: .monospaced))
-                            .foregroundColor(.iosOrange)
+                    if let allowance = mealAllowance {
+                        // ── Verpflegung Balance-Karte ──
+                        let netto = allowance - total
+                        VStack(spacing: 10) {
+                            HStack {
+                                Label("Ausgaben", systemImage: "fork.knife")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                Text("−\(total.euroFormatted)")
+                                    .font(.system(size: 15, weight: .regular, design: .monospaced))
+                                    .foregroundColor(.red)
+                            }
+                            HStack {
+                                Label("Verpflegungspauschale", systemImage: "eurosign.circle.fill")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                Text("+\(allowance.euroFormatted)")
+                                    .font(.system(size: 15, weight: .regular, design: .monospaced))
+                                    .foregroundColor(.iosGreen)
+                            }
+                            Divider()
+                            HStack {
+                                Text("Netto")
+                                    .font(.subheadline)
+                                    .fontWeight(.regular)
+                                Spacer()
+                                Text(netto >= 0
+                                     ? "+\(netto.euroFormatted)"
+                                     : "−\(abs(netto).euroFormatted)")
+                                    .font(.system(size: 17, weight: .semibold, design: .monospaced))
+                                    .foregroundColor(netto >= 0 ? .iosGreen : .red)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    } else {
+                        HStack {
+                            Label(kategorie.localizedName, systemImage: kategorie.icon)
+                                .font(.subheadline)
+                            Spacer()
+                            Text(total.euroFormatted)
+                                .font(.system(size: 17, weight: .regular, design: .monospaced))
+                                .foregroundColor(.iosOrange)
+                        }
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
                 }
 
                 // Einträge
