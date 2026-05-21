@@ -134,11 +134,27 @@ Fahrtkosten/
 
 ---
 
-## Changelog
+## Versionshistorie
 
-Alle Versionen und Änderungen: **[CHANGES.md](CHANGES.md)**
+Vollständiges Protokoll: **[CHANGES.md](CHANGES.md)**
 
-Aktuell: **Version 1.15.0** – Live Activity, Wiederkehrende Fahrten, Watch-GPS ohne iPhone
+| Version | Highlights |
+|---|---|
+| **1.15.0** *(Mai 2026)* | Live Activity & Dynamic Island · Wiederkehrende Fahrten · Watch-GPS ohne iPhone · Haptisches Feedback · Verpflegung-Bilanz |
+| **1.14.5** *(Mai 2026)* | Google Maps Import-Fix · präzisere Abwesenheitszeitberechnung · iOS 26 Kompatibilität |
+| **1.14.4** *(Mai 2026)* | Apple Watch App · Home Screen Widget · CarPlay-Integration · GPS Stadterkennung |
+| **1.14.3** *(Mai 2026)* | iCloud-Synchronisation · Siri Shortcuts · Statistiken & Auswertungen |
+| **1.14.2** *(Mai 2026)* | Spritpreisabfrage verbessert · PDF-Vorschau Fix |
+| **1.14.1** *(Mai 2026)* | Globale Suche · eigene Tab-Leiste |
+| **1.13.3** *(Mai 2026)* | Zeitfilter KFZ-Kosten · Splash Screen überarbeitet |
+| **1.13.2** *(Mai 2026)* | Zeitfilter · Einstellungen kompakter · KFZ-Kosten Verbesserungen |
+| **1.13.1** *(April 2026)* | Diagnoseprotokoll · mehrsprachige Oberfläche (DE/EN/PL/CZ) |
+| **1.13.0** *(April 2026)* | Elektro & Hybrid · Collapsible Cards · Wischgesten · lokales Backup |
+| **1.12.25** *(April 2026)* | Elektrofahrzeug & Hybrid · Strompreis · Einmalkauf |
+| **1.12.24** *(April 2026)* | Fahrzeit & Arbeitszeit kombiniert · Live-Spritpreise · Belegscan OCR |
+| **1.12.23** *(April 2026)* | Belegscan · KFZ-Kosten Tab · CarPlay · Übernachtungs-Datumsbereich |
+| **1.10 – 1.11** *(April 2026)* | GPS-Streckenaufzeichnung · Apple Maps Integration · Auslandsregion |
+| **1.0** *(April 2026)* | Erstveröffentlichung – Fahrten, Erstattung, KFZ-Kosten |
 
 ---
 
