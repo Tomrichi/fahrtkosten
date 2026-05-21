@@ -1,80 +1,175 @@
-//
-//  FahrtkostenWidgetLiveActivity.swift
-//  FahrtkostenWidget
-//
-//  Created by Thomas Wagner on 12.05.26.
-//
-
 import ActivityKit
 import WidgetKit
 import SwiftUI
 
+// MARK: - Activity Attributes
+// WICHTIG: Diese Struct muss denselben activityType-String haben wie in LiveActivityManager.swift
 struct FahrtkostenWidgetAttributes: ActivityAttributes {
     public struct ContentState: Codable, Hashable {
-        // Dynamic stateful properties about your activity go here!
-        var emoji: String
+        var km: Double
+        var elapsedSeconds: Int
+        var speedKmh: Double
     }
+    var startedAt: Date
 
-    // Fixed non-changing properties about your activity go here!
-    var name: String
+    // Gemeinsamer Identifier damit App & Widget-Extension zusammenpassen
+    static var activityType: String { "de.tommwagner.fahrtkosten.gpstrip" }
 }
 
+// MARK: - Live Activity Widget
 struct FahrtkostenWidgetLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: FahrtkostenWidgetAttributes.self) { context in
-            // Lock screen/banner UI goes here
-            VStack {
-                Text("Hello \(context.state.emoji)")
+
+            // ── Lock Screen / Notification Banner ──
+            HStack(spacing: 16) {
+                // Icon
+                ZStack {
+                    Circle()
+                        .fill(Color.orange.opacity(0.15))
+                        .frame(width: 44, height: 44)
+                    Image(systemName: "car.fill")
+                        .foregroundColor(.orange)
+                        .font(.system(size: 20))
+                }
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("GPS Fahrt läuft")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.primary)
+                    HStack(spacing: 12) {
+                        Label(String(format: "%.1f km", context.state.km),
+                              systemImage: "road.lanes")
+                            .font(.caption)
+                            .foregroundColor(.orange)
+                        Label(elapsedString(context.state.elapsedSeconds),
+                              systemImage: "timer")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        if context.state.speedKmh > 2 {
+                            Label(String(format: "%.0f km/h", context.state.speedKmh),
+                                  systemImage: "speedometer")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                Spacer()
             }
-            .activityBackgroundTint(Color.cyan)
-            .activitySystemActionForegroundColor(Color.black)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .activityBackgroundTint(Color(.systemBackground))
 
         } dynamicIsland: { context in
             DynamicIsland {
-                // Expanded UI goes here.  Compose the expanded UI through
-                // various regions, like leading/trailing/center/bottom
+
+                // ── Expanded ──
                 DynamicIslandExpandedRegion(.leading) {
-                    Text("Leading")
+                    VStack(alignment: .leading, spacing: 2) {
+                        Image(systemName: "road.lanes")
+                            .font(.caption2)
+                            .foregroundColor(.orange)
+                        Text(String(format: "%.1f", context.state.km))
+                            .font(.system(size: 20, weight: .bold, design: .monospaced))
+                            .foregroundColor(.orange)
+                            .minimumScaleFactor(0.7)
+                        Text("km")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.leading, 4)
                 }
+
                 DynamicIslandExpandedRegion(.trailing) {
-                    Text("Trailing")
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Image(systemName: "timer")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        Text(elapsedString(context.state.elapsedSeconds))
+                            .font(.system(size: 18, weight: .semibold, design: .monospaced))
+                            .foregroundColor(.primary)
+                            .minimumScaleFactor(0.7)
+                        Text("Zeit")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.trailing, 4)
                 }
+
                 DynamicIslandExpandedRegion(.bottom) {
-                    Text("Bottom \(context.state.emoji)")
-                    // more content
+                    HStack {
+                        Image(systemName: "car.fill")
+                            .foregroundColor(.orange)
+                            .font(.caption)
+                        Text("Fahrt aktiv")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        if context.state.speedKmh > 2 {
+                            Label(String(format: "%.0f km/h", context.state.speedKmh),
+                                  systemImage: "speedometer")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding(.bottom, 4)
                 }
+
             } compactLeading: {
-                Text("L")
+                // Kleines Auto + km
+                HStack(spacing: 3) {
+                    Image(systemName: "car.fill")
+                        .foregroundColor(.orange)
+                        .font(.system(size: 11))
+                    Text(String(format: "%.1f", context.state.km))
+                        .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                        .foregroundColor(.orange)
+                }
+
             } compactTrailing: {
-                Text("T \(context.state.emoji)")
+                // Zeit
+                Text(elapsedString(context.state.elapsedSeconds))
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .foregroundColor(.primary)
+
             } minimal: {
-                Text(context.state.emoji)
+                Image(systemName: "car.fill")
+                    .foregroundColor(.orange)
+                    .font(.system(size: 14))
             }
-            .widgetURL(URL(string: "http://www.apple.com"))
-            .keylineTint(Color.red)
+            .widgetURL(URL(string: "fahrtkosten://gps"))
+            .keylineTint(.orange)
         }
     }
-}
 
-extension FahrtkostenWidgetAttributes {
-    fileprivate static var preview: FahrtkostenWidgetAttributes {
-        FahrtkostenWidgetAttributes(name: "World")
+    private func elapsedString(_ secs: Int) -> String {
+        let h = secs / 3600
+        let m = (secs % 3600) / 60
+        let s = secs % 60
+        return h > 0
+            ? String(format: "%d:%02d:%02d", h, m, s)
+            : String(format: "%d:%02d", m, s)
     }
 }
 
+// MARK: - Previews
+extension FahrtkostenWidgetAttributes {
+    fileprivate static var preview: FahrtkostenWidgetAttributes {
+        FahrtkostenWidgetAttributes(startedAt: Date())
+    }
+}
 extension FahrtkostenWidgetAttributes.ContentState {
-    fileprivate static var smiley: FahrtkostenWidgetAttributes.ContentState {
-        FahrtkostenWidgetAttributes.ContentState(emoji: "😀")
-     }
-     
-     fileprivate static var starEyes: FahrtkostenWidgetAttributes.ContentState {
-         FahrtkostenWidgetAttributes.ContentState(emoji: "🤩")
-     }
+    fileprivate static var driving: FahrtkostenWidgetAttributes.ContentState {
+        .init(km: 14.3, elapsedSeconds: 1945, speedKmh: 72)
+    }
+    fileprivate static var start: FahrtkostenWidgetAttributes.ContentState {
+        .init(km: 0.0, elapsedSeconds: 0, speedKmh: 0)
+    }
 }
 
 #Preview("Notification", as: .content, using: FahrtkostenWidgetAttributes.preview) {
-   FahrtkostenWidgetLiveActivity()
+    FahrtkostenWidgetLiveActivity()
 } contentStates: {
-    FahrtkostenWidgetAttributes.ContentState.smiley
-    FahrtkostenWidgetAttributes.ContentState.starEyes
+    FahrtkostenWidgetAttributes.ContentState.start
+    FahrtkostenWidgetAttributes.ContentState.driving
 }

@@ -928,7 +928,8 @@ struct TripFormView: View {
     @State private var isLocatingStart   = false
     @State private var isLocatingEnd     = false
     @State private var showFuelSheet     = false
-    @State private var showLocationConfirm = false
+    @State private var showLocationConfirm   = false
+    @State private var showRecurringManager = false
     @AppStorage("homeAddress")            private var homeAddress: String = ""
     @AppStorage("defaultFuelType")       private var defaultFuelTypeKey: String = "e10"
     @AppStorage("defaultFuelPrice.e5")      private var defaultPriceE5: String = ""
@@ -1061,6 +1062,69 @@ struct TripFormView: View {
                                 }
                             }
                         }
+                    }
+                }
+
+                // ── Wiederkehrende Fahrten (Vorschläge für heute) ──
+                if !isEdit && !isGPS {
+                    let suggestions = store.todaysRecurringTrips()
+                    if !suggestions.isEmpty {
+                        Section {
+                            ForEach(suggestions) { rec in
+                                Button {
+                                    from     = rec.from
+                                    to       = rec.to
+                                    kmString = String(Int(rec.km.rounded()))
+                                } label: {
+                                    HStack(spacing: 10) {
+                                        ZStack {
+                                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                                .fill(Color.purple.opacity(0.12))
+                                                .frame(width: 34, height: 34)
+                                            Image(systemName: "repeat.circle.fill")
+                                                .foregroundColor(.purple)
+                                                .font(.system(size: 16))
+                                        }
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text("\(rec.from) → \(rec.to)")
+                                                .font(.subheadline)
+                                                .foregroundStyle(.primary)
+                                            HStack(spacing: 6) {
+                                                Text(rec.km.kmFormatted)
+                                                    .font(.caption)
+                                                    .foregroundStyle(.secondary)
+                                                Text("·")
+                                                    .foregroundStyle(.secondary)
+                                                    .font(.caption)
+                                                Text(rec.weekdayLabel)
+                                                    .font(.caption)
+                                                    .foregroundStyle(.purple)
+                                            }
+                                        }
+                                        Spacer()
+                                        Image(systemName: "arrow.right.circle.fill")
+                                            .foregroundColor(.purple.opacity(0.4))
+                                            .font(.system(size: 18))
+                                    }
+                                    .padding(.vertical, 4)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        } header: {
+                            HStack {
+                                Label("Heute üblich", systemImage: "repeat.circle.fill")
+                                    .foregroundColor(.purple)
+                                Spacer()
+                                Button {
+                                    showRecurringManager = true
+                                } label: {
+                                    Text("Verwalten")
+                                        .font(.caption)
+                                        .foregroundColor(.purple)
+                                }
+                            }
+                        }
+                        .listRowBackground(Color.purple.opacity(0.04))
                     }
                 }
 
@@ -1317,6 +1381,11 @@ struct TripFormView: View {
                     .disabled(!isValid)
                     .fontWeight(.regular)
                 }
+            }
+            .sheet(isPresented: $showRecurringManager) {
+                RecurringTripManagerView()
+                    .environmentObject(store)
+                    .environmentObject(lm)
             }
             .onAppear { prefill() }
             .task {

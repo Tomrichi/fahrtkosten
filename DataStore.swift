@@ -18,6 +18,7 @@ class DataStore: ObservableObject {
     @Published var reiseSpesen:     [ReiseSpese]     = [] { didSet { save(reiseSpesen,     key: "reiseSpesen") } }
     @Published var privateExpenses: [PrivateExpense] = [] { didSet { save(privateExpenses, key: "privateExpenses") } }
     @Published var favorites:       [FavoriteTrip]   = [] { didSet { saveFavorites() } }
+    @Published var recurringTrips:  [RecurringTrip]  = [] { didSet { save(recurringTrips, key: "recurringTrips") } }
 
     // MARK: - Einstellungen (lokal in UserDefaults)
     @Published var kmRate: Double { didSet { local.set(kmRate, forKey: "kmRate") } }
@@ -57,7 +58,8 @@ class DataStore: ObservableObject {
 
         // SCHRITT 2: Sofort lokale Daten laden (UserDefaults – immer verfügbar)
         loadFromLocal()
-        favorites = loadLocal(key: "favorites") ?? []
+        favorites      = loadLocal(key: "favorites")      ?? []
+        recurringTrips = loadLocal(key: "recurringTrips") ?? []
         
         // TEMPORÄR DEBUG
         let ag = UserDefaults(suiteName: "group.de.tommwagner.fahrtkosten")
@@ -291,6 +293,29 @@ class DataStore: ObservableObject {
     private func saveFavorites() {
         guard let data = try? JSONEncoder().encode(favorites) else { return }
         local.set(data, forKey: "favorites")
+    }
+
+    // MARK: - Wiederkehrende Fahrten
+    func addRecurringTrip(_ trip: RecurringTrip) {
+        recurringTrips.append(trip)
+        AppLogger.shared.logData("Wiederkehrende Fahrt hinzugefügt: \(trip.from) → \(trip.to)")
+    }
+    func updateRecurringTrip(_ trip: RecurringTrip) {
+        if let i = recurringTrips.firstIndex(where: { $0.id == trip.id }) {
+            recurringTrips[i] = trip
+        }
+    }
+    func deleteRecurringTrip(_ id: UUID) {
+        recurringTrips.removeAll { $0.id == id }
+    }
+    func toggleRecurringTrip(_ id: UUID) {
+        if let i = recurringTrips.firstIndex(where: { $0.id == id }) {
+            recurringTrips[i].isActive.toggle()
+        }
+    }
+    /// Gibt alle aktiven Fahrten zurück, die auf den heutigen Wochentag passen
+    func todaysRecurringTrips() -> [RecurringTrip] {
+        recurringTrips.filter { $0.matchesToday() }
     }
 
     func resetMealRatesToDefaults() {

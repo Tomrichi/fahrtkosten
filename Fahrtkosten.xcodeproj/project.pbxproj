@@ -33,6 +33,7 @@
 		4AAB58402FBE602F00B12F04 /* .storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4AAB583A2FBE602F00B12F04 /* .storyboard */; };
 		4AAB58412FBE602F00B12F04 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AAB583D2FBE602F00B12F04 /* ShareViewController.swift */; };
 		4AAB58422FBE608200B12F04 /* ReisespesenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A5874452F8DFD3700B46E99 /* ReisespesenView.swift */; };
+		BE0F0001CAFECAFE /* RecurringTripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0F0002CAFECAFE /* RecurringTripView.swift */; };
 		4AE9A9472FB367AF003B89DF /* ActiveTripBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE9A9452FB367AF003B89DF /* ActiveTripBanner.swift */; };
 		4AE9A9482FB367AF003B89DF /* FahrtkostenIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE9A9462FB367AF003B89DF /* FahrtkostenIntents.swift */; };
 		4AE9A94A2FB36C80003B89DF /* StatistikView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE9A9492FB36C80003B89DF /* StatistikView.swift */; };
@@ -100,6 +101,7 @@
 		4A5874432F8DFD3700B46E99 /* ReceiptParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptParser.swift; sourceTree = "<group>"; };
 		4A5874442F8DFD3700B46E99 /* ReceiptScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptScannerView.swift; sourceTree = "<group>"; };
 		4A5874452F8DFD3700B46E99 /* ReisespesenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReisespesenView.swift; sourceTree = "<group>"; };
+		BE0F0002CAFECAFE /* RecurringTripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringTripView.swift; sourceTree = "<group>"; };
 		4A8674972F82E1CD00885EED /* Fahrtkosten.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Fahrtkosten.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A8674C22F82E6AC00885EED /* DataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
 		4A8674C42F82E6AC00885EED /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
@@ -218,6 +220,7 @@
 				4A5874432F8DFD3700B46E99 /* ReceiptParser.swift */,
 				4A5874442F8DFD3700B46E99 /* ReceiptScannerView.swift */,
 				4A5874452F8DFD3700B46E99 /* ReisespesenView.swift */,
+				BE0F0002CAFECAFE /* RecurringTripView.swift */,
 				4AAB583E2FBE602F00B12F04 /* FahrtkostenShareExtension */,
 				4A8674992F82E1CD00885EED /* Fahrtkosten */,
 				4AE9A9552FB37022003B89DF /* FahrtkostenWidget */,
@@ -512,6 +515,7 @@
 				4AE9A94A2FB36C80003B89DF /* StatistikView.swift in Sources */,
 				4A8674E72F82E6AC00885EED /* FeedbackView.swift in Sources */,
 				4AAB58422FBE608200B12F04 /* ReisespesenView.swift in Sources */,
+				BE0F0001CAFECAFE /* RecurringTripView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

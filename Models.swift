@@ -125,6 +125,32 @@ struct FavoriteTrip: Identifiable, Codable {
     var km   : Double
 }
 
+// MARK: - Wiederkehrende Fahrt
+struct RecurringTrip: Identifiable, Codable {
+    var id       = UUID()
+    var from     : String
+    var to       : String
+    var km       : Double
+    var weekdays : [Int]    // Calendar.weekday: 1=So 2=Mo 3=Di 4=Mi 5=Do 6=Fr 7=Sa
+    var note     : String   = ""
+    var isActive : Bool     = true
+
+    static let weekdayNames = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
+
+    var weekdayLabel: String {
+        weekdays
+            .sorted()
+            .map { $0 >= 1 && $0 <= 7 ? Self.weekdayNames[$0 - 1] : "?" }
+            .joined(separator: ", ")
+    }
+
+    func matchesToday() -> Bool {
+        guard isActive else { return false }
+        let wd = Calendar.current.component(.weekday, from: Date())
+        return weekdays.contains(wd)
+    }
+}
+
 // MARK: - Meal Model
 struct MealEntry: Identifiable, Codable {
     var id = UUID()

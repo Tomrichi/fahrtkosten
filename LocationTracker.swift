@@ -3,6 +3,51 @@ import CoreLocation
 import Combine
 import MapKit
 import UIKit
+import ActivityKit
+
+// MARK: - Live Activity Attributes
+// activityType-String muss mit FahrtkostenWidgetLiveActivity.swift übereinstimmen
+struct FahrtkostenGPSAttributes: ActivityAttributes {
+    struct ContentState: Codable, Hashable {
+        var km: Double
+        var elapsedSeconds: Int
+        var speedKmh: Double
+    }
+    var startedAt: Date
+    static var activityType: String { "de.tommwagner.fahrtkosten.gpstrip" }
+}
+
+// MARK: - Live Activity Manager
+@MainActor
+final class LiveActivityManager {
+    static let shared = LiveActivityManager()
+    private init() {}
+    private var currentActivity: Activity<FahrtkostenGPSAttributes>?
+
+    func start() {
+        guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
+        guard currentActivity == nil else { return }
+        let attrs   = FahrtkostenGPSAttributes(startedAt: Date())
+        let state   = FahrtkostenGPSAttributes.ContentState(km: 0, elapsedSeconds: 0, speedKmh: 0)
+        let content = ActivityContent(state: state, staleDate: nil)
+        currentActivity = try? Activity.request(attributes: attrs, content: content, pushType: nil)
+    }
+
+    func update(km: Double, elapsedSeconds: Int, speedKmh: Double) {
+        guard let activity = currentActivity else { return }
+        let state   = FahrtkostenGPSAttributes.ContentState(km: km, elapsedSeconds: elapsedSeconds, speedKmh: speedKmh)
+        let content = ActivityContent(state: state, staleDate: nil)
+        Task { await activity.update(content) }
+    }
+
+    func stop() {
+        guard let activity = currentActivity else { return }
+        currentActivity = nil
+        Task { await activity.end(nil, dismissalPolicy: .immediate) }
+    }
+}
+
+// MARK: - LocationTracker
 
 // Kein Equatable → kein MainActor-Isolations-Konflikt in Swift 6
 enum LocationTrackerPhase {
@@ -14,6 +59,7 @@ final class LocationTracker: NSObject, ObservableObject {
     @Published var phase: LocationTrackerPhase = .idle
     @Published var totalKm: Double             = 0
     @Published var elapsedSeconds: Int         = 0
+    @Published var currentSpeedKmh: Double     = 0
     @Published var authStatus: CLAuthorizationStatus = .notDetermined
     @Published var errorMessage: String?
     @Published var currentLocation: CLLocation?
@@ -82,6 +128,8 @@ final class LocationTracker: NSObject, ObservableObject {
         let endLoc   = locations.last
         phase        = .geocoding
 
+        LiveActivityManager.shared.stop()
+
         bgTaskID = UIApplication.shared.beginBackgroundTask(withName: "Geocoding") { [weak self] in
             guard let self else { return }
             UIApplication.shared.endBackgroundTask(self.bgTaskID)
@@ -118,6 +166,7 @@ final class LocationTracker: NSObject, ObservableObject {
         manager.startUpdatingHeading()
         startTimer()
         startCarPlayUpdates()
+        Task { @MainActor in LiveActivityManager.shared.start() }
         AppLogger.shared.log("GPS-Aufzeichnung gestartet")
     }
 
@@ -188,6 +237,11 @@ final class LocationTracker: NSObject, ObservableObject {
         ud.set(recording,      forKey: "gpsIsRecording")
         ud.set(totalKm,        forKey: "gpsKm")
         ud.set(elapsedSeconds, forKey: "gpsElapsed")
+        // Live Activity aktualisieren
+        if recording {
+            Task { @MainActor in LiveActivityManager.shared.update(
+                km: self.totalKm, elapsedSeconds: self.elapsedSeconds, speedKmh: self.currentSpeedKmh) }
+        }
     }
 }
 
@@ -207,6 +261,7 @@ extension LocationTracker: CLLocationManagerDelegate {
         // Pause-Logik: Stillstand > 5 Min → pausieren, Bewegung → weiterfahren
         if let lastLocation = valid.last {
             let speedKmh = max(0, lastLocation.speed) * 3.6
+            DispatchQueue.main.async { self.currentSpeedKmh = speedKmh }
 
             if speedKmh > 2.0 {
                 // Bewegung erkannt

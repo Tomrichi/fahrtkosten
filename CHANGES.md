@@ -2,6 +2,20 @@
 
 ---
 
+## Version 1.15.0 (21. Mai 2026)
+
+- **Neu: Live Activity / Dynamic Island** – Die GPS-Aufzeichnung erscheint jetzt als Live Activity im Dynamic Island und auf dem Sperrbildschirm. Angezeigt werden: gefahrene Kilometer, vergangene Zeit und aktuelle Geschwindigkeit – in Echtzeit aktualisiert.
+- **Neu: Wiederkehrende Fahrten** – Häufige Routen (Von/Nach/km) mit Wochentagen hinterlegen. Passende Routen erscheinen beim Anlegen einer neuen Fahrt automatisch als Vorschlag zum direkten Eintippen.
+- **Neu: Watch – Hintergrund-GPS** – Die Apple Watch App zeichnet GPS-Strecken jetzt auch bei gesperrtem Display auf (WKExtendedRuntimeSession). Ein iPhone in der Nähe ist nicht mehr notwendig.
+- **Neu: Watch – Live-Geschwindigkeit** – Die Watch zeigt während der GPS-Aufzeichnung die aktuelle Geschwindigkeit in km/h an.
+- **Neu: Watch – Haptisches Feedback** – Start, Stopp und Fehler werden mit den nativen Watch-Vibrationen quittiert.
+- **Neu: Watch – Heimatadresse als Schnellziel** – Die in den Einstellungen hinterlegte Heimatadresse erscheint als erstes Schnellziel auf der Watch.
+- **Neu: Watch – Dynamische Favoriten** – Gespeicherte Favoriten aus der iPhone-App sind jetzt direkt als Schnellziele auf der Watch auswählbar.
+- **Neu: Verpflegung Bilanz in Reisespesen** – Die Kategorie Verpflegung zeigt jetzt Ausgaben (rot) vs. Verpflegungspauschale (grün) und den Nettosaldo auf einen Blick.
+- **Fehlerbehebung: Verpflegungsberechnung** – Die Vorschau der Verpflegungspauschale und der angezeigte Betrag basieren jetzt einheitlich auf den gleichen Zeiten (Abfahrtszeit der frühesten Fahrt des Tages).
+
+---
+
 ## Version 1.14.5 (19. Mai 2026)
 
 - **Fehlerbehebung: Google Maps Import** – Fahrten, die über das Teilen-Symbol in Google Maps importiert werden, werden jetzt korrekt gespeichert. Bisher ging die Route während des Startbildschirms verloren.

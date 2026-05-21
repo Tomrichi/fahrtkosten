@@ -51,7 +51,7 @@
       <img class="hero-icon" src="https://impro.usercontent.one/appid/oneComWsb/domain/wagner-fahrtkosten.de/media/wagner-fahrtkosten.de/onewebmedia/icon-ios-64x64%403x.png?etag=W%2F%224010-19e2bedcf90%22&sourceContentType=image%2Fpng&ignoreAspectRatio&resize=192%2B192" alt="Fahrtkosten App Icon">
       <div>
         <h1>Fahrtkosten – App Beschreibung</h1>
-        <p class="subtitle">Version 1.14.5 · Mai 2026 &nbsp;·&nbsp; Digitaler Reisekostenassistent für iPhone, Apple Watch und iPad</p>
+        <p class="subtitle">Version 1.15.0 · Mai 2026 &nbsp;·&nbsp; Digitaler Reisekostenassistent für iPhone, Apple Watch und iPad</p>
       </div>
     </div>
   </header>
@@ -63,8 +63,9 @@
       <h2>Inhaltsverzeichnis</h2>
       <ol>
         <li><a href="#fahrten">Fahrten erfassen</a></li>
+        <li><a href="#recurring">Wiederkehrende Fahrten</a></li>
         <li><a href="#watch">Apple Watch &amp; Widget</a></li>
-        <li><a href="#gps">GPS-Aufzeichnung &amp; CarPlay</a></li>
+        <li><a href="#gps">GPS-Aufzeichnung, Live Activity &amp; CarPlay</a></li>
         <li><a href="#arbeitszeit">Arbeitszeit &amp; Verpflegungspauschale</a></li>
         <li><a href="#kfz">KFZ-Kosten &amp; Spesen</a></li>
         <li><a href="#export">Export &amp; Backup</a></li>
@@ -105,20 +106,56 @@
       </div>
     </section>
 
-    <!-- 2. Apple Watch & Widget -->
-    <section class="section" id="watch">
+    <!-- 2. Wiederkehrende Fahrten -->
+    <section class="section" id="recurring">
       <div class="section-header">
         <div class="section-number">2</div>
+        <div class="section-icon">🔁</div>
+        <h2>Wiederkehrende Fahrten</h2>
+      </div>
+
+      <h3>Häufige Routen als Vorlage</h3>
+      <p>Hinterlege regelmäßige Routen mit <strong>Von, Nach, Kilometern und Wochentagen</strong>. Stimmt der heutige Wochentag mit einer gespeicherten Route überein, erscheint sie beim Anlegen einer neuen Fahrt automatisch als Vorschlag im Abschnitt <strong>„Heute üblich"</strong> – ein Tippen übernimmt alle Felder.</p>
+
+      <div class="subsection">
+        <h3>Route verwalten</h3>
+        <ul>
+          <li><strong>Anlegen:</strong> Im Fahrten-Tab auf das Wiederholungssymbol tippen → <em>+</em></li>
+          <li><strong>Pausieren:</strong> Wischgeste links → <em>Pausieren</em> – Route bleibt gespeichert, aber ohne Vorschlag</li>
+          <li><strong>Löschen:</strong> Wischgeste links → <em>Löschen</em></li>
+          <li><strong>Bearbeiten:</strong> Eintrag antippen</li>
+        </ul>
+      </div>
+
+      <div class="tip">
+        <strong>Tipp:</strong> Für Pendler mit festen Arbeitszeiten lassen sich Mo–Fr-Routen hinterlegen. An Wochenenden erscheinen sie nicht als Vorschlag.
+      </div>
+    </section>
+
+    <!-- 3. Apple Watch & Widget -->
+    <section class="section" id="watch">
+      <div class="section-header">
+        <div class="section-number">3</div>
         <div class="section-icon">⌚</div>
         <h2>Apple Watch &amp; Widget</h2>
       </div>
 
-      <h3>Fahrt vom Handgelenk</h3>
-      <p>Mit der Fahrtkosten Watch-App lässt sich eine Fahrt direkt von der Apple Watch aus <strong>starten und beenden</strong> – ohne das iPhone in die Hand nehmen zu müssen. Nach dem Beenden wird die Fahrt automatisch via <strong>WatchConnectivity</strong> ans iPhone übertragen und dort gespeichert.</p>
+      <h3>Fahrt vom Handgelenk – auch ohne iPhone</h3>
+      <p>Die Fahrtkosten Watch-App startet und beendet Fahrten direkt von der Apple Watch. Dank <strong>WKExtendedRuntimeSession</strong> läuft die GPS-Aufzeichnung auch bei gesperrtem Display weiter – ein iPhone in der Nähe ist nicht mehr nötig. Nach dem Beenden wird die Fahrt automatisch via <strong>WatchConnectivity</strong> ans iPhone übertragen.</p>
+
+      <div class="subsection">
+        <h3>Live-Geschwindigkeit &amp; Haptisches Feedback</h3>
+        <p>Während der GPS-Aufzeichnung zeigt die Watch die <strong>aktuelle Geschwindigkeit in km/h</strong> an. Start, Stopp und Fehlermeldungen werden mit den nativen Watch-Vibrationen quittiert.</p>
+      </div>
+
+      <div class="subsection">
+        <h3>Schnellziele: Heimatadresse &amp; Favoriten</h3>
+        <p>Die in den Einstellungen hinterlegte <strong>Heimatadresse</strong> erscheint als erstes Schnellziel auf der Watch (Haus-Symbol). Gespeicherte <strong>Favoriten</strong> aus der iPhone-App sind ebenfalls direkt auf der Watch auswählbar – ohne Tipp-Aufwand.</p>
+      </div>
 
       <div class="subsection">
         <h3>Home Screen Widget</h3>
-        <p>Das <strong>Home Screen Widget</strong> zeigt den Status einer aktiven Fahrt direkt auf dem Sperrbildschirm oder Home Screen an – ohne die App öffnen zu müssen. So ist auf einen Blick ersichtlich, ob eine Aufzeichnung läuft.</p>
+        <p>Das <strong>Home Screen Widget</strong> zeigt den Status einer aktiven Fahrt direkt auf dem Sperrbildschirm oder Home Screen an.</p>
       </div>
 
       <div class="note">
@@ -127,39 +164,50 @@
       </div>
     </section>
 
-    <!-- 3. GPS-Aufzeichnung & CarPlay -->
+    <!-- 4. GPS-Aufzeichnung, Live Activity & CarPlay -->
     <section class="section" id="gps">
       <div class="section-header">
-        <div class="section-number">3</div>
+        <div class="section-number">4</div>
         <div class="section-icon">📍</div>
-        <h2>GPS-Aufzeichnung &amp; CarPlay</h2>
+        <h2>GPS-Aufzeichnung, Live Activity &amp; CarPlay</h2>
       </div>
 
       <h3>Live-Tracking im Hintergrund</h3>
-      <p>Die GPS-Aufzeichnung läuft als <strong>Hintergrundprozess</strong> – auch bei gesperrtem Display. Start und Ziel werden als Ortsnamen gespeichert (nicht als vollständige Adresse), was zu übersichtlicheren Einträgen führt.</p>
+      <p>Die GPS-Aufzeichnung läuft als <strong>Hintergrundprozess</strong> – auch bei gesperrtem Display. Start und Ziel werden als Ortsnamen gespeichert, was zu übersichtlicheren Einträgen führt.</p>
+
+      <div class="subsection">
+        <h3>Live Activity &amp; Dynamic Island</h3>
+        <p>Mit dem Start der GPS-Aufzeichnung erscheint automatisch eine <strong>Live Activity</strong>:</p>
+        <ul>
+          <li><strong>Dynamic Island</strong> (iPhone 14 Pro und neuer): Kompakte Ansicht mit km und Zeit; aufgeklappt: km links, Zeit rechts, Geschwindigkeit unten.</li>
+          <li><strong>Sperrbildschirm:</strong> Fahrzeug-Icon, gefahrene km, vergangene Zeit und aktuelle Geschwindigkeit – in Echtzeit.</li>
+          <li><strong>Minimal:</strong> Fahrzeug-Icon, wenn eine andere App ebenfalls eine Live Activity aktiv hat.</li>
+        </ul>
+        <p>Die Live Activity endet automatisch beim Stopp der Aufzeichnung.</p>
+      </div>
 
       <div class="subsection">
         <h3>Intelligente Automatik</h3>
         <ul>
           <li><strong>Pausenerkennung</strong> ab 5 Minuten Stillstand</li>
-          <li><strong>Auto-Stop</strong> nach 30 Minuten Stillstand – die Fahrt wird automatisch beendet und gespeichert</li>
+          <li><strong>Auto-Stop</strong> nach 30 Minuten Stillstand – Fahrt wird automatisch beendet und gespeichert</li>
         </ul>
       </div>
 
       <div class="subsection">
         <h3>CarPlay</h3>
-        <p>Das CarPlay-Dashboard zeigt am <strong>Fahrzeugdisplay</strong> eine Übersicht mit der aktuellen Monatserstattung, Gesamtkilometer und Fahrtanzahl. Läuft eine aktive Siri-Fahrt, wird diese angezeigt und kann direkt über CarPlay beendet werden. Die GPS-Aufzeichnung selbst wird über die iPhone-App gesteuert.</p>
+        <p>Das CarPlay-Dashboard zeigt am <strong>Fahrzeugdisplay</strong> Monatserstattung, Gesamtkilometer und Fahrtanzahl. Der GPS-Aufzeichnungsstatus ist sichtbar und kann über CarPlay gesteuert werden.</p>
       </div>
 
       <div class="tip">
-        <strong>Hinweis:</strong> Es wird ausschließlich der Ortsname gespeichert, keine vollständige Adresse. So bleiben die Einträge kompakt und datenschutzfreundlich.
+        <strong>Hinweis:</strong> Es wird ausschließlich der Ortsname gespeichert, keine vollständige Adresse – kompakt und datenschutzfreundlich.
       </div>
     </section>
 
-    <!-- 4. Arbeitszeit & Verpflegungspauschale -->
+    <!-- 5. Arbeitszeit & Verpflegungspauschale -->
     <section class="section" id="arbeitszeit">
       <div class="section-header">
-        <div class="section-number">4</div>
+        <div class="section-number">5</div>
         <div class="section-icon">⏱</div>
         <h2>Arbeitszeit &amp; Verpflegungspauschale</h2>
       </div>
@@ -203,12 +251,17 @@
         <div class="note-label">Hinweis – ab Version 1.14.5</div>
         Nur manuell eingetragene Fahrzeiten fließen in die Berechnung der Verpflegungspauschale ein. GPS-aufgezeichnete Zeiten werden separat ausgewiesen.
       </div>
+
+      <div class="subsection">
+        <h3>Verpflegung Bilanz (neu in 1.15.0)</h3>
+        <p>In der Übersicht zeigt die Kategorie <strong>Verpflegung</strong> jetzt auf einen Blick: eigene Ausgaben (rot), angerechnete Pauschale (grün) und den Nettosaldo in der entsprechenden Farbe.</p>
+      </div>
     </section>
 
-    <!-- 5. KFZ-Kosten & Spesen -->
+    <!-- 6. KFZ-Kosten & Spesen -->
     <section class="section" id="kfz">
       <div class="section-header">
-        <div class="section-number">5</div>
+        <div class="section-number">6</div>
         <div class="section-icon">🔧</div>
         <h2>KFZ-Kosten &amp; Spesen</h2>
       </div>
@@ -236,10 +289,10 @@
       </div>
     </section>
 
-    <!-- 6. Export & Backup -->
+    <!-- 7. Export & Backup -->
     <section class="section" id="export">
       <div class="section-header">
-        <div class="section-number">6</div>
+        <div class="section-number">7</div>
         <div class="section-icon">📤</div>
         <h2>Export &amp; Backup</h2>
       </div>
@@ -265,10 +318,10 @@
       </div>
     </section>
 
-    <!-- 7. Belegscan & Spritpreise -->
+    <!-- 8. Belegscan & Spritpreise -->
     <section class="section" id="beleg">
       <div class="section-header">
-        <div class="section-number">7</div>
+        <div class="section-number">8</div>
         <div class="section-icon">📷</div>
         <h2>Belegscan &amp; Spritpreise</h2>
       </div>
@@ -294,10 +347,10 @@
       </div>
     </section>
 
-    <!-- 8. Einstellungen & Datenschutz -->
+    <!-- 9. Einstellungen & Datenschutz -->
     <section class="section" id="einstellungen">
       <div class="section-header">
-        <div class="section-number">8</div>
+        <div class="section-number">9</div>
         <div class="section-icon">⚙️</div>
         <h2>Einstellungen &amp; Datenschutz</h2>
       </div>
@@ -339,7 +392,7 @@
 
     <!-- Footer -->
     <div class="footer-card">
-      <p>Fahrtkosten App · Version 1.14.5 · Mai 2026 · Thomas Wagner</p>
+      <p>Fahrtkosten App · Version 1.15.0 · Mai 2026 · Thomas Wagner</p>
       <p><a href="mailto:info@wagner-fahrtkosten.de">info@wagner-fahrtkosten.de</a></p>
     </div>
 
