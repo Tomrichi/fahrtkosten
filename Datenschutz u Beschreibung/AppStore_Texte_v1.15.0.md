@@ -62,7 +62,7 @@ During GPS recording, driven kilometres, elapsed time and current speed appear a
 Save frequent routes with from, to, kilometres and weekdays. Matching routes appear automatically as suggestions when creating a new trip – one tap to apply.
 
 **Apple Watch App**
-Start and stop trips directly from your wrist – including GPS recording using the Watch's own GPS chip, no iPhone needed. The Watch shows live speed and provides haptic feedback on start and stop. Favourites and home address are available as quick destinations directly on the Watch. When finished, the trip is automatically imported into the iPhone app.
+Start and stop trips directly from your wrist – including GPS recording using the Watch's own GPS chip, no iPhone needed. The Watch shows live speed and average speed, and provides haptic feedback on start and stop. Favourites and home address are available as quick destinations directly on the Watch. When finished, the trip is automatically imported into the iPhone app.
 
 **Home Screen Widget**
 The WidgetKit widget shows the active trip status directly on your Home Screen.
