@@ -29,6 +29,8 @@ Fahrtkosten entstand aus dem eigenen Alltag als Außendienstmitarbeiter – frü
 ### 🔁 Wiederkehrende Fahrten *(neu in 1.15.0)*
 - Häufige Routen mit Wochentagen hinterlegen
 - Passende Routen erscheinen beim Anlegen einer neuen Fahrt automatisch als Vorschlag
+- Direkter Zugriff über das Menü (⋯) in der Fahrtenliste
+- iCloud-Sync zwischen Geräten
 
 ### 🔴 Live Activity & Dynamic Island *(neu in 1.15.0)*
 - GPS-Aufzeichnung live im Dynamic Island und auf dem Sperrbildschirm
@@ -42,8 +44,8 @@ Fahrtkosten entstand aus dem eigenen Alltag als Außendienstmitarbeiter – frü
 ### ⌚ Apple Watch App
 - Fahrten starten und beenden direkt vom Handgelenk
 - **Hintergrund-GPS** ohne iPhone in der Nähe (`WKExtendedRuntimeSession`)
-- Live-Geschwindigkeit, haptisches Feedback
-- Heimatadresse und App-Favoriten als Schnellziele auf der Watch
+- Live-Geschwindigkeit und Durchschnittsgeschwindigkeit (⌀ km/h), haptisches Feedback
+- Heimatadresse und App-Favoriten als Schnellziele auf der Watch (iCloud-synchronisiert)
 
 ### 🚙 CarPlay
 - Aufzeichnungsstatus direkt im Fahrzeugdisplay
@@ -140,7 +142,7 @@ Vollständiges Protokoll: **[CHANGES.md](CHANGES.md)**
 
 | Version | Highlights |
 |---|---|
-| **1.15.0** *(Mai 2026)* | Live Activity & Dynamic Island · Wiederkehrende Fahrten · Watch-GPS ohne iPhone · Haptisches Feedback · Verpflegung-Bilanz |
+| **1.15.0** *(Mai 2026)* | Live Activity & Dynamic Island · Wiederkehrende Fahrten · Watch-GPS · Watch-Durchschnittsgeschwindigkeit · iCloud-Sync Favoriten & Wiederkehrende · Haptisches Feedback · Verpflegung-Bilanz |
 | **1.14.5** *(Mai 2026)* | Google Maps Import-Fix · präzisere Abwesenheitszeitberechnung · iOS 26 Kompatibilität |
 | **1.14.4** *(Mai 2026)* | Apple Watch App · Home Screen Widget · CarPlay-Integration · GPS Stadterkennung |
 | **1.14.3** *(Mai 2026)* | iCloud-Synchronisation · Siri Shortcuts · Statistiken & Auswertungen |
