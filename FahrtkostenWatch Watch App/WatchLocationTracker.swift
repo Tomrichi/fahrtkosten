@@ -8,8 +8,7 @@ final class WatchLocationTracker: NSObject, ObservableObject {
 
     @Published var km: Double = 0
     @Published var elapsed: Int = 0
-    @Published var speed: Double = 0         // km/h (aktuell)
-    @Published var averageSpeed: Double = 0  // km/h (Durchschnitt)
+    @Published var speed: Double = 0      // km/h
     @Published var isTracking = false
     @Published var authStatus: CLAuthorizationStatus = .notDetermined
     @Published var errorMessage: String? = nil
@@ -37,7 +36,6 @@ final class WatchLocationTracker: NSObject, ObservableObject {
         km = 0
         elapsed = 0
         speed = 0
-        averageSpeed = 0
         errorMessage = nil
         startTime = Date()
         startedAt = Date()
@@ -73,7 +71,6 @@ final class WatchLocationTracker: NSObject, ObservableObject {
         extendedSession = nil
         isTracking = false
         speed = 0
-        averageSpeed = 0
         let start = startCoordinate
         let end = endCoordinate
         return GPSResult(
@@ -115,46 +112,18 @@ extension WatchLocationTracker: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations newLocations: [CLLocation]) {
         let valid = newLocations.filter { $0.horizontalAccuracy > 0 && $0.horizontalAccuracy < 65 }
         guard !valid.isEmpty else { return }
-
-        // Geschwindigkeit berechnen BEVOR neue Locations hinzugefügt werden
-        var speedKmh: Double = 0
-
-        // 1. Versuch: CLLocation.speed (nativ, wenn verfügbar)
-        let rawSpeed = valid.last?.speed ?? -1
-        if rawSpeed >= 0 {
-            speedKmh = rawSpeed * 3.6
-        }
-        // 2. Fallback: Geschwindigkeit aus letzten zwei Punkten berechnen
-        //    (auf watchOS liefert CLLocation.speed oft -1)
-        else if let prev = locations.last, let curr = valid.last {
-            let timeDiff = curr.timestamp.timeIntervalSince(prev.timestamp)
-            if timeDiff > 0.5 && timeDiff < 30 {
-                let distance = curr.distance(from: prev)
-                speedKmh = (distance / timeDiff) * 3.6
-                // Unrealistische Werte filtern (> 250 km/h)
-                if speedKmh > 250 { speedKmh = 0 }
-            }
-        }
-
         locations.append(contentsOf: valid)
 
         var dist = 0.0
         for i in 1..<locations.count { dist += locations[i].distance(from: locations[i-1]) }
 
-        // Durchschnittsgeschwindigkeit: Gesamtstrecke / Gesamtzeit
-        let distKm = dist / 1000.0
-        var avgKmh: Double = 0
-        if let start = startedAt {
-            let totalHours = Date().timeIntervalSince(start) / 3600.0
-            if totalHours > 0.001 { // mind. ~4 Sekunden
-                avgKmh = distKm / totalHours
-            }
-        }
+        // Geschwindigkeit aus letztem validen Fix (m/s → km/h)
+        let rawSpeed = valid.last?.speed ?? -1
+        let speedKmh = rawSpeed >= 0 ? rawSpeed * 3.6 : 0
 
         DispatchQueue.main.async {
-            self.km = distKm
+            self.km = dist / 1000.0
             self.speed = speedKmh
-            self.averageSpeed = avgKmh
         }
     }
 

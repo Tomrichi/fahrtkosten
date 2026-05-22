@@ -144,7 +144,6 @@ struct FahrtenView: View {
     @State private var showAdd           = false
     @State private var editTrip: Trip?
     @State private var showGPSSheet      = false
-    @State private var showRecurringManager = false
     @State private var importMode: TripFormMode? = nil
     
 
@@ -425,12 +424,6 @@ struct FahrtenView: View {
                         } label: {
                             Label("GPS-Aufzeichnung", systemImage: "location.circle.fill")
                         }
-                        Button {
-                            AppLogger.shared.logTap("Wiederkehrende Fahrten (Menü)")
-                            showRecurringManager = true
-                        } label: {
-                            Label("Wiederkehrende Fahrten", systemImage: "repeat.circle.fill")
-                        }
                         Divider()
                         Button {
                             AppLogger.shared.logTap("Einstellungen (Menü)")
@@ -487,12 +480,6 @@ struct FahrtenView: View {
                 let travelTime = note.userInfo?["travelTime"] as? Int ?? 0
                 let km         = note.userInfo?["km"] as? Double ?? 0
                 importMode = .importFromMaps(from: from, to: to, travelTime: travelTime, km: km)
-            }
-            // Wiederkehrende Fahrten verwalten (aus dem Hauptmenü)
-            .sheet(isPresented: $showRecurringManager) {
-                RecurringTripManagerView()
-                    .environmentObject(store)
-                    .environmentObject(lm)
             }
         }
     }
@@ -1080,7 +1067,65 @@ struct TripFormView: View {
 
                 // ── Wiederkehrende Fahrten (Vorschläge für heute) ──
                 if !isEdit && !isGPS {
-                    recurringTripsSuggestionSection
+                    let suggestions = store.todaysRecurringTrips()
+                    if !suggestions.isEmpty {
+                        Section {
+                            ForEach(suggestions) { rec in
+                                Button {
+                                    from     = rec.from
+                                    to       = rec.to
+                                    kmString = String(Int(rec.km.rounded()))
+                                } label: {
+                                    HStack(spacing: 10) {
+                                        ZStack {
+                                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                                .fill(Color.purple.opacity(0.12))
+                                                .frame(width: 34, height: 34)
+                                            Image(systemName: "repeat.circle.fill")
+                                                .foregroundColor(.purple)
+                                                .font(.system(size: 16))
+                                        }
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text("\(rec.from) → \(rec.to)")
+                                                .font(.subheadline)
+                                                .foregroundStyle(.primary)
+                                            HStack(spacing: 6) {
+                                                Text(rec.km.kmFormatted)
+                                                    .font(.caption)
+                                                    .foregroundStyle(.secondary)
+                                                Text("·")
+                                                    .foregroundStyle(.secondary)
+                                                    .font(.caption)
+                                                Text(rec.weekdayLabel)
+                                                    .font(.caption)
+                                                    .foregroundStyle(.purple)
+                                            }
+                                        }
+                                        Spacer()
+                                        Image(systemName: "arrow.right.circle.fill")
+                                            .foregroundColor(.purple.opacity(0.4))
+                                            .font(.system(size: 18))
+                                    }
+                                    .padding(.vertical, 4)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        } header: {
+                            HStack {
+                                Label("Heute üblich", systemImage: "repeat.circle.fill")
+                                    .foregroundColor(.purple)
+                                Spacer()
+                                Button {
+                                    showRecurringManager = true
+                                } label: {
+                                    Text("Verwalten")
+                                        .font(.caption)
+                                        .foregroundColor(.purple)
+                                }
+                            }
+                        }
+                        .listRowBackground(Color.purple.opacity(0.04))
+                    }
                 }
 
                 // ── Route ──
@@ -1407,130 +1452,6 @@ struct TripFormView: View {
                 Button(lm.t("trips.apple.maps")) { MapsService.openInAppleMaps(from: from, to: to) }
                 Button(lm.t("trips.google.maps"))  { MapsService.openInGoogleMaps(from: from, to: to) }
                 Button(lm.t("action.cancel"), role: .cancel) {}
-            }
-        }
-    }
-
-    // MARK: - Wiederkehrende Fahrten Section
-
-    @ViewBuilder
-    private var recurringTripsSuggestionSection: some View {
-        let suggestions = store.todaysRecurringTrips()
-        if !suggestions.isEmpty {
-            Section {
-                ForEach(suggestions) { rec in
-                    Button {
-                        from     = rec.from
-                        to       = rec.to
-                        kmString = String(Int(rec.km.rounded()))
-                    } label: {
-                        HStack(spacing: 10) {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                    .fill(Color.purple.opacity(0.12))
-                                    .frame(width: 34, height: 34)
-                                Image(systemName: "repeat.circle.fill")
-                                    .foregroundColor(.purple)
-                                    .font(.system(size: 16))
-                            }
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("\(rec.from) → \(rec.to)")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.primary)
-                                HStack(spacing: 6) {
-                                    Text(rec.km.kmFormatted)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                    Text("·")
-                                        .foregroundStyle(.secondary)
-                                        .font(.caption)
-                                    Text(rec.weekdayLabel)
-                                        .font(.caption)
-                                        .foregroundStyle(.purple)
-                                }
-                            }
-                            Spacer()
-                            Image(systemName: "arrow.right.circle.fill")
-                                .foregroundColor(.purple.opacity(0.4))
-                                .font(.system(size: 18))
-                        }
-                        .padding(.vertical, 4)
-                    }
-                    .buttonStyle(.plain)
-                }
-            } header: {
-                recurringTripsHeader
-            }
-            .listRowBackground(Color.purple.opacity(0.04))
-        } else if !store.recurringTrips.isEmpty {
-            // Wiederkehrende Fahrten existieren, aber keiner passt heute
-            Section {
-                HStack(spacing: 10) {
-                    Image(systemName: "calendar.badge.clock")
-                        .foregroundColor(.secondary)
-                        .font(.system(size: 16))
-                    Text("Keine passenden Routen für heute")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    Button {
-                        showRecurringManager = true
-                    } label: {
-                        Text("Verwalten")
-                            .font(.caption)
-                            .foregroundColor(.purple)
-                    }
-                }
-            } header: {
-                Label("Wiederkehrende Fahrten", systemImage: "repeat.circle.fill")
-                    .foregroundColor(.purple)
-            }
-        } else {
-            // Noch keine wiederkehrenden Fahrten → Hinweis + Erstellen-Button
-            Section {
-                Button {
-                    showRecurringManager = true
-                } label: {
-                    HStack(spacing: 10) {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .fill(Color.purple.opacity(0.08))
-                                .frame(width: 34, height: 34)
-                            Image(systemName: "plus.circle.fill")
-                                .foregroundColor(.purple)
-                                .font(.system(size: 16))
-                        }
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Häufige Route anlegen")
-                                .font(.subheadline)
-                                .foregroundStyle(.primary)
-                            Text("Automatische Vorschläge je Wochentag")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                    }
-                    .padding(.vertical, 4)
-                }
-                .buttonStyle(.plain)
-            } header: {
-                Label("Wiederkehrende Fahrten", systemImage: "repeat.circle.fill")
-                    .foregroundColor(.purple)
-            }
-        }
-    }
-
-    private var recurringTripsHeader: some View {
-        HStack {
-            Label("Heute üblich", systemImage: "repeat.circle.fill")
-                .foregroundColor(.purple)
-            Spacer()
-            Button {
-                showRecurringManager = true
-            } label: {
-                Text("Verwalten")
-                    .font(.caption)
-                    .foregroundColor(.purple)
             }
         }
     }
