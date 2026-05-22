@@ -1,5 +1,5 @@
 # Fahrtkosten – App Store Texte
-Version 1.15.0 · Build 6 · Thomas Wagner · 21. Mai 2026
+Version 1.15.0 · Build 7 · Thomas Wagner · 22. Mai 2026
 
 ---
 
@@ -14,10 +14,10 @@ Erfasse alle erstattungsfähigen Kosten einer Dienstreise an einem Ort: Fahrten 
 Während der GPS-Aufzeichnung erscheinen gefahrene Kilometer, vergangene Zeit und aktuelle Geschwindigkeit als Live Activity im Dynamic Island und auf dem Sperrbildschirm – immer im Blick, ohne die App zu öffnen.
 
 **Wiederkehrende Fahrten**
-Hinterlege häufige Routen mit Von, Nach, Kilometer und Wochentagen. Passende Routen erscheinen beim Anlegen einer neuen Fahrt automatisch als Vorschlag – ein Tippen genügt zum Übernehmen.
+Hinterlege häufige Routen mit Von, Nach, Kilometer und Wochentagen. Passende Routen erscheinen beim Anlegen einer neuen Fahrt automatisch als Vorschlag – ein Tippen genügt zum Übernehmen. Die Verwaltung ist auch direkt über das Menü in der Fahrtenliste erreichbar. Wiederkehrende Fahrten und Favoriten werden automatisch via iCloud zwischen Geräten synchronisiert.
 
 **Apple Watch App**
-Starte und beende Fahrten direkt vom Handgelenk – auch als GPS-Aufzeichnung mit eigenem Watch-GPS, ohne iPhone. Die Watch zeigt Live-Geschwindigkeit und quittiert Start und Stopp mit haptischem Feedback. Favoriten und Heimatadresse sind als Schnellziele direkt auf der Watch verfügbar. Nach Beenden wird die Fahrt automatisch in die iPhone-App importiert.
+Starte und beende Fahrten direkt vom Handgelenk – auch als GPS-Aufzeichnung mit eigenem Watch-GPS, ohne iPhone. Die Watch zeigt Live-Geschwindigkeit und Durchschnittsgeschwindigkeit und quittiert Start und Stopp mit haptischem Feedback. Favoriten und Heimatadresse sind als Schnellziele direkt auf der Watch verfügbar. Nach Beenden wird die Fahrt automatisch in die iPhone-App importiert.
 
 **Home Screen Widget**
 Das WidgetKit-Widget zeigt den Status der aktiven Fahrt direkt auf dem Home Screen. So behältst du deinen aktuellen Eintrag im Blick, ohne die App öffnen zu müssen.
@@ -154,13 +154,16 @@ Dienstreisen smart abrechnen
 ## Promotional Text (170 Zeichen)
 
 ```
-Neu 1.15.0: Live Activity im Dynamic Island, wiederkehrende Fahrten & Watch-GPS ohne iPhone. Alle Daten lokal, keine Cloud.
+Neu 1.15.0: Watch-Durchschnittsgeschwindigkeit, iCloud-Sync für Favoriten & wiederkehrende Fahrten. Live Activity, Watch-GPS ohne iPhone.
 ```
 
 ---
 
-## Was ist neu – Version 1.15.0 (Build 6)
+## Was ist neu – Version 1.15.0 (Build 7)
 
+• Neu: Watch – Durchschnittsgeschwindigkeit (⌀ km/h) live während der GPS-Aufzeichnung
+• Neu: Wiederkehrende Fahrten – Shortcut direkt im Hauptmenü (⋯) der Fahrtenliste
+• Neu: iCloud-Sync für wiederkehrende Fahrten & Favoriten – automatische Synchronisation zwischen Geräten
 • Neu: Live Activity – GPS-Aufzeichnung live im Dynamic Island und auf dem Sperrbildschirm (km, Zeit, Geschwindigkeit)
 • Neu: Wiederkehrende Fahrten – häufige Routen mit Wochentagen als automatischer Vorschlag beim Anlegen
 • Neu: Watch – Hintergrund-GPS (WKExtendedRuntimeSession), kein iPhone nötig

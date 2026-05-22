@@ -2,8 +2,11 @@
 
 ---
 
-## Version 1.15.0 (21. Mai 2026)
+## Version 1.15.0 (22. Mai 2026)
 
+- **Neu: Watch – Durchschnittsgeschwindigkeit** – Die Watch zeigt während der GPS-Aufzeichnung jetzt zusätzlich zur aktuellen Geschwindigkeit auch die Durchschnittsgeschwindigkeit (⌀ km/h) in Echtzeit an.
+- **Neu: Wiederkehrende Fahrten – Hauptmenü-Shortcut** – Wiederkehrende Fahrten sind jetzt direkt über das Menü (⋯) in der Fahrtenliste erreichbar — ohne eine neue Fahrt anlegen zu müssen.
+- **Neu: iCloud-Sync für wiederkehrende Fahrten & Favoriten** – Beide Datentypen werden jetzt automatisch via iCloud zwischen Geräten synchronisiert und sicher gemergt.
 - **Neu: Live Activity / Dynamic Island** – Die GPS-Aufzeichnung erscheint jetzt als Live Activity im Dynamic Island und auf dem Sperrbildschirm. Angezeigt werden: gefahrene Kilometer, vergangene Zeit und aktuelle Geschwindigkeit – in Echtzeit aktualisiert.
 - **Neu: Wiederkehrende Fahrten** – Häufige Routen (Von/Nach/km) mit Wochentagen hinterlegen. Passende Routen erscheinen beim Anlegen einer neuen Fahrt automatisch als Vorschlag zum direkten Eintippen.
 - **Neu: Watch – Hintergrund-GPS** – Die Apple Watch App zeichnet GPS-Strecken jetzt auch bei gesperrtem Display auf (WKExtendedRuntimeSession). Ein iPhone in der Nähe ist nicht mehr notwendig.
