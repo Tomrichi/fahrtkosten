@@ -17,7 +17,7 @@ class DataStore: ObservableObject {
     @Published var vehicleCosts:    [VehicleCost]    = [] { didSet { save(vehicleCosts,    key: "vehicleCosts") } }
     @Published var reiseSpesen:     [ReiseSpese]     = [] { didSet { save(reiseSpesen,     key: "reiseSpesen") } }
     @Published var privateExpenses: [PrivateExpense] = [] { didSet { save(privateExpenses, key: "privateExpenses") } }
-    @Published var favorites:       [FavoriteTrip]   = [] { didSet { saveFavorites() } }
+    @Published var favorites:       [FavoriteTrip]   = [] { didSet { save(favorites, key: "favorites"); saveFavoritesToAppGroup() } }
     @Published var recurringTrips:  [RecurringTrip]  = [] { didSet { save(recurringTrips, key: "recurringTrips") } }
 
     // MARK: - Einstellungen (lokal in UserDefaults)
@@ -153,7 +153,7 @@ class DataStore: ObservableObject {
     // MARK: - iCloud-Daten zusammenführen (nach 2 Sek. beim Start)
     private func mergeFromiCloud() {
         // Lokale Daten zu iCloud hochladen falls iCloud leer
-        let keys = ["trips", "meals", "hotels", "vehicleCosts", "reiseSpesen", "privateExpenses"]
+        let keys = ["trips", "meals", "hotels", "vehicleCosts", "reiseSpesen", "privateExpenses", "recurringTrips", "favorites"]
         for key in keys {
             if icloud.data(forKey: key) == nil, let localData = local.data(forKey: key) {
                 icloud.set(localData, forKey: key)
@@ -169,8 +169,10 @@ class DataStore: ObservableObject {
         if let remote: [VehicleCost]    = loadiCloud(key: "vehicleCosts"),    !remote.isEmpty { vehicleCosts    = merge(local: vehicleCosts,    remote: remote) }
         if let remote: [ReiseSpese]     = loadiCloud(key: "reiseSpesen"),     !remote.isEmpty { reiseSpesen     = merge(local: reiseSpesen,     remote: remote) }
         if let remote: [PrivateExpense] = loadiCloud(key: "privateExpenses"), !remote.isEmpty { privateExpenses = merge(local: privateExpenses, remote: remote) }
+        if let remote: [RecurringTrip]  = loadiCloud(key: "recurringTrips"),  !remote.isEmpty { recurringTrips  = merge(local: recurringTrips,  remote: remote) }
+        if let remote: [FavoriteTrip]   = loadiCloud(key: "favorites"),       !remote.isEmpty { favorites       = merge(local: favorites,       remote: remote) }
 
-        AppLogger.shared.logData("iCloud-Merge abgeschlossen: \(trips.count) Fahrten")
+        AppLogger.shared.logData("iCloud-Merge abgeschlossen: \(trips.count) Fahrten, \(recurringTrips.count) wiederkehrende")
     }
 
     /// Zusammenführen: alle eindeutigen IDs aus beiden Listen behalten
@@ -195,6 +197,8 @@ class DataStore: ObservableObject {
             if keys.contains("vehicleCosts"),    let r: [VehicleCost]    = self.loadiCloud(key: "vehicleCosts")    { self.vehicleCosts    = self.merge(local: self.vehicleCosts,    remote: r) }
             if keys.contains("reiseSpesen"),     let r: [ReiseSpese]     = self.loadiCloud(key: "reiseSpesen")     { self.reiseSpesen     = self.merge(local: self.reiseSpesen,     remote: r) }
             if keys.contains("privateExpenses"), let r: [PrivateExpense] = self.loadiCloud(key: "privateExpenses") { self.privateExpenses = self.merge(local: self.privateExpenses, remote: r) }
+            if keys.contains("recurringTrips"),  let r: [RecurringTrip]  = self.loadiCloud(key: "recurringTrips")  { self.recurringTrips  = self.merge(local: self.recurringTrips,  remote: r) }
+            if keys.contains("favorites"),       let r: [FavoriteTrip]   = self.loadiCloud(key: "favorites")       { self.favorites       = self.merge(local: self.favorites,       remote: r) }
         }
     }
 
@@ -290,8 +294,10 @@ class DataStore: ObservableObject {
         favorites.removeAll { $0.id == id }
         AppLogger.shared.logData("Favorit gelöscht")
     }
-    private func saveFavorites() {
+    /// Favoriten zusätzlich unter dem Watch-lesbaren Key speichern
+    private func saveFavoritesToAppGroup() {
         guard let data = try? JSONEncoder().encode(favorites) else { return }
+        // Watch liest Favoriten direkt aus App Group (legacy Key beibehalten)
         local.set(data, forKey: "favorites")
     }
 

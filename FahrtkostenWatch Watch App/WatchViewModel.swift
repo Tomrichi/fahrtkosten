@@ -23,7 +23,8 @@ final class WatchViewModel: NSObject, ObservableObject {
     @Published var isGPSTracking: Bool   = false
     @Published var gpsKm:         Double = 0
     @Published var gpsElapsed:    Int    = 0
-    @Published var gpsSpeed:      Double = 0   // km/h
+    @Published var gpsSpeed:      Double = 0   // km/h (aktuell)
+    @Published var gpsAvgSpeed:   Double = 0   // km/h (Durchschnitt)
 
     // UI State
     @Published var isLoading:     Bool   = false
@@ -52,9 +53,15 @@ final class WatchViewModel: NSObject, ObservableObject {
         gpsTracker.$speed.receive(on: DispatchQueue.main)
             .sink { [weak self] v in self?.gpsSpeed = v }
             .store(in: &cancellables)
+        gpsTracker.$averageSpeed.receive(on: DispatchQueue.main)
+            .sink { [weak self] v in self?.gpsAvgSpeed = v }
+            .store(in: &cancellables)
         gpsTracker.$errorMessage.receive(on: DispatchQueue.main)
             .compactMap { $0 }
-            .sink { [weak self] msg in self?.errorMessage = msg }
+            .sink { [weak self] msg in
+                self?.errorMessage = msg
+                WKInterfaceDevice.current().play(.failure)
+            }
             .store(in: &cancellables)
     }
 
@@ -141,6 +148,7 @@ final class WatchViewModel: NSObject, ObservableObject {
             DispatchQueue.main.async {
                 self?.isLoading    = false
                 self?.errorMessage = "Verbindungsfehler"
+                WKInterfaceDevice.current().play(.failure)
             }
         })
     }

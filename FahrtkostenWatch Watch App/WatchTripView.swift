@@ -100,7 +100,7 @@ struct WatchTripView: View {
                     .font(.headline)
                     .foregroundColor(.green)
 
-                // Live-Werte: km / Zeit / Tempo
+                // Live-Werte: km / Zeit
                 HStack(spacing: 8) {
                     liveStatTile(
                         icon: "road.lanes",
@@ -115,12 +115,21 @@ struct WatchTripView: View {
                         color: .orange
                     )
                 }
-                liveStatTile(
-                    icon: "speedometer",
-                    value: String(format: "%.0f", model.gpsSpeed),
-                    unit: "km/h",
-                    color: .green
-                )
+                // Tempo: aktuell / Durchschnitt
+                HStack(spacing: 8) {
+                    liveStatTile(
+                        icon: "speedometer",
+                        value: String(format: "%.0f", model.gpsSpeed),
+                        unit: "km/h",
+                        color: .green
+                    )
+                    liveStatTile(
+                        icon: "gauge.with.dots.needle.33percent",
+                        value: String(format: "%.0f", model.gpsAvgSpeed),
+                        unit: "⌀ km/h",
+                        color: .cyan
+                    )
+                }
 
                 if model.isLoading {
                     ProgressView()
