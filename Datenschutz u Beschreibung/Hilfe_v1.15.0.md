@@ -90,7 +90,7 @@ Mit wiederkehrenden Fahrten kannst du häufige Routen (Von, Nach, Kilometer) zus
 
 ### Route anlegen
 
-1. Tippe im Fahrten-Tab oben auf **Wiederkehrende Fahrten** (Wiederholungssymbol).
+1. Tippe im Fahrten-Tab oben rechts auf **⋯** und wähle **Wiederkehrende Fahrten** — oder tippe beim Anlegen einer neuen Fahrt auf das Wiederholungssymbol.
 2. Tippe auf **+**.
 3. Fülle **Von**, **Nach** und **Kilometer** aus.
 4. Wähle die üblichen **Wochentage** (Chips in der unteren Hälfte).
@@ -175,7 +175,7 @@ Derselbe Vorgang funktioniert auch mit Apple Maps.
 ### Neue Funktionen ab Version 1.15.0
 
 - **Hintergrund-GPS:** Die Watch zeichnet GPS-Strecken auch bei gesperrtem Display auf – ein iPhone in der Nähe ist nicht mehr nötig.
-- **Live-Geschwindigkeit:** Aktuelle Geschwindigkeit in km/h wird während der Aufzeichnung angezeigt.
+- **Live-Geschwindigkeit & Durchschnittsgeschwindigkeit:** Aktuelle Geschwindigkeit und ⌀-Geschwindigkeit (km/h) werden während der Aufzeichnung in Echtzeit angezeigt.
 - **Haptisches Feedback:** Start, Stopp und Fehler werden mit Vibration quittiert.
 - **Heimatadresse als Schnellziel:** Tippe auf das Haus-Symbol, um die in den Einstellungen hinterlegte Heimatadresse direkt als Ziel zu übernehmen.
 - **Dynamische Favoriten:** Gespeicherte Favoriten aus der iPhone-App erscheinen als Schnellziele auf der Watch.
@@ -184,7 +184,7 @@ Derselbe Vorgang funktioniert auch mit Apple Maps.
 
 1. Öffne die **Fahrtkosten App** auf der Apple Watch.
 2. Tippe auf **Fahrt starten** (manuelle Eingabe) oder **GPS starten** (GPS-Aufzeichnung).
-3. Die Uhr zeigt Startzeit, laufende Fahrzeit und bei GPS-Fahrten die aktuelle Geschwindigkeit an.
+3. Die Uhr zeigt Startzeit, laufende Fahrzeit sowie bei GPS-Fahrten aktuelle und durchschnittliche Geschwindigkeit an.
 
 ### Fahrt beenden und importieren
 
