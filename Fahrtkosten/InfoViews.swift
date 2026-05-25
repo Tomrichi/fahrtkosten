@@ -164,7 +164,7 @@ private let impressumHTML = #"""
 <p>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr">ec.europa.eu/consumers/odr</a></p>
 <p>Zur Teilnahme an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle bin ich nicht verpflichtet und nicht bereit.</p>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.14.4 · Thomas Wagner · Mai 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.0 · Thomas Wagner · 23. Mai 2026</p>
 
 </body>
 </html>
@@ -233,7 +233,7 @@ private let datenschutzHTML_de = #"""
 <body>
 
 <h1>Datenschutzerklärung</h1>
-<p class="meta">Fahrtkosten App · Version 1.14.4 · Stand Mai 2026 · Build 1<br>
+<p class="meta">Fahrtkosten App · Version 1.15.0 · Stand 23. Mai 2026 · Build 8<br>
 Entwickler: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>Auf einen Blick</h2>
@@ -382,7 +382,7 @@ Entwickler: Thomas Wagner · info@wagner-fahrtkosten.de</p>
   Anfragen werden innerhalb von 30 Tagen beantwortet.
 </div>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.14.4 · Thomas Wagner · Mai 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.0 · Thomas Wagner · 23. Mai 2026</p>
 
 </body>
 </html>
@@ -440,7 +440,7 @@ private let datenschutzHTML_en = #"""
 <body>
 
 <h1>Privacy Policy</h1>
-<p class="meta">Fahrtkosten App · Version 1.14.4 · May 2026<br>
+<p class="meta">Fahrtkosten App · Version 1.15.0 · May 23, 2026<br>
 Developer: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>At a Glance</h2>
@@ -589,7 +589,7 @@ Developer: Thomas Wagner · info@wagner-fahrtkosten.de</p>
   Enquiries will be answered within 30 days.
 </div>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.14.4 · Thomas Wagner · May 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.0 · Thomas Wagner · May 23, 2026</p>
 
 </body>
 </html>
@@ -644,7 +644,7 @@ private let datenschutzHTML_pl = #"""
 <body>
 
 <h1>Polityka prywatności</h1>
-<p class="meta">Fahrtkosten App · Wersja 1.14.4 · Maj 2026<br>
+<p class="meta">Fahrtkosten App · Wersja 1.15.0 · 23 Maj 2026<br>
 Deweloper: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>W skrócie</h2>
@@ -793,7 +793,7 @@ Deweloper: Thomas Wagner · info@wagner-fahrtkosten.de</p>
   Zapytania będą odpowiedzone w ciągu 30 dni.
 </div>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Wersja 1.14.4 · Thomas Wagner · Maj 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Wersja 1.15.0 · Thomas Wagner · 23 Maj 2026</p>
 
 </body>
 </html>
@@ -848,7 +848,7 @@ private let datenschutzHTML_cs = #"""
 <body>
 
 <h1>Zásady ochrany osobních údajů</h1>
-<p class="meta">Fahrtkosten App · Verze 1.14.4 · Květen 2026<br>
+<p class="meta">Fahrtkosten App · Verze 1.15.0 · 23. května 2026<br>
 Vývojář: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>Stručný přehled</h2>
@@ -997,7 +997,7 @@ Vývojář: Thomas Wagner · info@wagner-fahrtkosten.de</p>
   Dotazy budou zodpovězeny do 30 dnů.
 </div>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Verze 1.14.4 · Thomas Wagner · Květen 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Verze 1.15.0 · Thomas Wagner · 23. května 2026</p>
 
 </body>
 </html>
@@ -1066,7 +1066,7 @@ private let hilfeHTML = #"""
 
 <h1>Fahrtkosten</h1>
 <p class="subtitle">Dienstreisen professionell, korrekt &amp; steuerkonform abrechnen.</p>
-<p><span class="version">Version 1.14.5</span></p>
+<p><span class="version">Version 1.15.0</span></p>
 
 <p>Fahrtkosten ist dein digitaler Reisekostenassistent für iPhone und iPad. Die App erfasst alle erstattungsfähigen Kosten einer Dienstreise – Fahrten, Verpflegung, Übernachtungen und Fahrzeugkosten – an einem Ort, berechnet alles automatisch nach den aktuellen gesetzlichen Pauschalsätzen und erstellt auf Knopfdruck eine fertige Abrechnung.</p>
 
@@ -1236,7 +1236,7 @@ private let hilfeHTML = #"""
   </div>
 </details>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.14.5 · Thomas Wagner · Mai 2026<br>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.0 · Thomas Wagner · 23. Mai 2026<br>
 Kontakt: <a href="mailto:info@wagner-fahrtkosten.de">info@wagner-fahrtkosten.de</a></p>
 
 </body>
@@ -1315,13 +1315,42 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.14.5 – aktuell -->
+<!-- 1.15.0 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.14.5
+        Version 1.15.0
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">Watch Geschwindigkeit · iCloud-Sync · Siri App Intents · Live Activity</div>
+    </div>
+    <span class="build-info">23. Mai 2026 · Build 8</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEU</span> <strong>Apple Watch – Durchschnittsgeschwindigkeit:</strong> Die Watch zeigt während einer GPS-Fahrt jetzt Live-Geschwindigkeit und Durchschnittsgeschwindigkeit an.</li>
+      <li><span class="badge-new">NEU</span> <strong>Watch GPS ohne iPhone:</strong> GPS-Fahrten auf der Watch funktionieren jetzt auch wenn das iPhone nicht in Reichweite ist. Die Daten werden automatisch übertragen sobald die Verbindung wiederhergestellt ist.</li>
+      <li><span class="badge-new">NEU</span> <strong>iCloud-Sync für wiederkehrende Fahrten &amp; Favoriten:</strong> Wiederkehrende Fahrten und Favoriten werden automatisch über iCloud auf allen deinen Apple-Geräten synchronisiert.</li>
+      <li><span class="badge-new">NEU</span> <strong>Menü-Shortcut für wiederkehrende Fahrten:</strong> Über das ⋯-Menü in der Hauptliste kannst du wiederkehrende Fahrten jetzt direkt aufrufen.</li>
+      <li><span class="badge-new">NEU</span> <strong>Siri App Intents:</strong> „Hey Siri, starte eine Fahrt", „Wie viel km habe ich diesen Monat?" – die App unterstützt jetzt Siri-Kurzbefehle. In den Systemeinstellungen unter Kurzbefehle auffindbar.</li>
+      <li><span class="badge-new">NEU</span> <strong>Live Activity:</strong> Während einer laufenden Fahrt wird eine Live Activity im Sperrbildschirm und in der Dynamic Island angezeigt.</li>
+      <li><span class="badge-fix">FIX</span> <strong>Siri Intents – Datenzugriff:</strong> Siri-Kurzbefehle hatten keinen Zugriff auf App-Daten (falscher UserDefaults-Container). Jetzt vollständig behoben.</li>
+      <li><span class="badge-fix">FIX</span> <strong>Watch – Haptisches Feedback:</strong> Die Watch gibt jetzt ein deutliches haptisches Signal wenn eine GPS-Fahrt gestartet oder gestoppt wird.</li>
+      <li><span class="badge-change">ÄNDERUNG</span> <strong>Build-Nummer vereinheitlicht:</strong> Widget und Share Extension verwenden jetzt dieselbe Build-Nummer wie die Haupt-App (Build 8).</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.14.5 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.14.5
       </div>
       <div class="preview-text">Watch GPS · KFZ-Belege · Mehrsprachiger Datenschutz · Übersicht</div>
     </div>
