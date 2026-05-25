@@ -5,7 +5,7 @@
 [![Platform](https://img.shields.io/badge/Platform-iOS%2016%2B-blue?logo=apple)](https://apps.apple.com)
 [![watchOS](https://img.shields.io/badge/watchOS-10%2B-blue?logo=apple)](https://apps.apple.com)
 [![Swift](https://img.shields.io/badge/Swift-5.9-orange?logo=swift)](https://swift.org)
-[![Version](https://img.shields.io/badge/Version-1.15.0-green)](CHANGES.md)
+[![Version](https://img.shields.io/badge/Version-1.15.1-green)](CHANGES.md)
 [![License](https://img.shields.io/badge/License-Proprietary-lightgrey)](LICENSE)
 
 ---
@@ -26,13 +26,13 @@ Fahrtkosten entstand aus dem eigenen Alltag als Außendienstmitarbeiter – frü
 - Import direkt aus **Google Maps** oder **Apple Maps** (Teilen-Funktion)
 - Erstattungsberechnung nach § 9 EStG (0,30 €/km, anpassbar)
 
-### 🔁 Wiederkehrende Fahrten *(neu in 1.15.0)*
+### 🔁 Wiederkehrende Fahrten *(neu in 1.15.1)*
 - Häufige Routen mit Wochentagen hinterlegen
 - Passende Routen erscheinen beim Anlegen einer neuen Fahrt automatisch als Vorschlag
 - Direkter Zugriff über das Menü (⋯) in der Fahrtenliste
 - iCloud-Sync zwischen Geräten
 
-### 🔴 Live Activity & Dynamic Island *(neu in 1.15.0)*
+### 🔴 Live Activity & Dynamic Island *(neu in 1.15.1)*
 - GPS-Aufzeichnung live im Dynamic Island und auf dem Sperrbildschirm
 - Gefahrene Kilometer, vergangene Zeit und aktuelle Geschwindigkeit in Echtzeit
 
@@ -142,7 +142,7 @@ Vollständiges Protokoll: **[CHANGES.md](CHANGES.md)**
 
 | Version | Highlights |
 |---|---|
-| **1.15.0** *(Mai 2026)* | Live Activity & Dynamic Island · Wiederkehrende Fahrten · Watch-GPS · Watch-Durchschnittsgeschwindigkeit · iCloud-Sync Favoriten & Wiederkehrende · Haptisches Feedback · Verpflegung-Bilanz |
+| **1.15.1** *(Mai 2026)* | Live Activity & Dynamic Island · Wiederkehrende Fahrten · Watch-GPS · Watch-Durchschnittsgeschwindigkeit · iCloud-Sync Favoriten & Wiederkehrende · Haptisches Feedback · Verpflegung-Bilanz |
 | **1.14.5** *(Mai 2026)* | Google Maps Import-Fix · präzisere Abwesenheitszeitberechnung · iOS 26 Kompatibilität |
 | **1.14.4** *(Mai 2026)* | Apple Watch App · Home Screen Widget · CarPlay-Integration · GPS Stadterkennung |
 | **1.14.3** *(Mai 2026)* | iCloud-Synchronisation · Siri Shortcuts · Statistiken & Auswertungen |

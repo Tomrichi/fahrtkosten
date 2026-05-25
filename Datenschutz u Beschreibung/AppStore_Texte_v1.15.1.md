@@ -1,5 +1,5 @@
 # Fahrtkosten – App Store Texte
-Version 1.15.0 · Build 7 · Thomas Wagner · 23. Mai 2026
+Version 1.15.1 · Build 7 · Thomas Wagner · 23. Mai 2026
 
 ---
 
@@ -154,12 +154,12 @@ Dienstreisen smart abrechnen
 ## Promotional Text (170 Zeichen)
 
 ```
-Neu 1.15.0: Watch-Durchschnittsgeschwindigkeit, iCloud-Sync für Favoriten & wiederkehrende Fahrten. Live Activity, Watch-GPS ohne iPhone.
+Neu 1.15.1: Watch-Durchschnittsgeschwindigkeit, iCloud-Sync für Favoriten & wiederkehrende Fahrten. Live Activity, Watch-GPS ohne iPhone.
 ```
 
 ---
 
-## Was ist neu – Version 1.15.0 (Build 7)
+## Was ist neu – Version 1.15.1 (Build 7)
 
 • Neu: Watch – Durchschnittsgeschwindigkeit (⌀ km/h) live während der GPS-Aufzeichnung
 • Neu: Wiederkehrende Fahrten – Shortcut direkt im Hauptmenü (⋯) der Fahrtenliste

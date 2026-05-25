@@ -1,5 +1,5 @@
 # Fahrtkosten – Hilfe & Bedienungsanleitung
-Version 1.15.0 · 23. Mai 2026
+Version 1.15.1 · 23. Mai 2026
 
 ---
 
@@ -127,7 +127,7 @@ Die Summe ergibt die Gesamtabwesenheitszeit, die für die Verpflegungspauschale 
 | Inland | 0,00 € | 14,00 € | 28,00 € |
 | Schweiz / Ausland | 0,00 € | 20,00 € | 35,00 € |
 
-### Verpflegung Bilanz (neu in 1.15.0)
+### Verpflegung Bilanz (neu in 1.15.1)
 
 In der Übersicht → Reisespesen → Verpflegung siehst du jetzt auf einen Blick:
 
@@ -172,7 +172,7 @@ Derselbe Vorgang funktioniert auch mit Apple Maps.
 - Apple Watch mit watchOS 10 oder neuer
 - Fahrtkosten ab Version 1.14.4
 
-### Neue Funktionen ab Version 1.15.0
+### Neue Funktionen ab Version 1.15.1
 
 - **Hintergrund-GPS:** Die Watch zeichnet GPS-Strecken auch bei gesperrtem Display auf – ein iPhone in der Nähe ist nicht mehr nötig.
 - **Live-Geschwindigkeit & Durchschnittsgeschwindigkeit:** Aktuelle Geschwindigkeit und ⌀-Geschwindigkeit (km/h) werden während der Aufzeichnung in Echtzeit angezeigt.
@@ -204,7 +204,7 @@ Derselbe Vorgang funktioniert auch mit Apple Maps.
 
 Die Aufzeichnung läuft im Hintergrund weiter, auch wenn das Display gesperrt ist.
 
-### Live Activity & Dynamic Island (neu in 1.15.0)
+### Live Activity & Dynamic Island (neu in 1.15.1)
 
 Während der GPS-Aufzeichnung wird automatisch eine **Live Activity** gestartet:
 
@@ -330,7 +330,7 @@ Unter **Einstellungen** > **Info & Datenschutz** > **Diagnoseprotokoll** kannst 
 
 ### Die Fahrt aus Google Maps wurde nicht gespeichert
 
-**Antwort:** Dieser Fehler trat in Versionen vor 1.14.5 auf. Aktualisiere die App auf Version 1.15.0.
+**Antwort:** Dieser Fehler trat in Versionen vor 1.14.5 auf. Aktualisiere die App auf Version 1.15.1.
 
 ---
 

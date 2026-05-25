@@ -2,7 +2,7 @@
 
 ---
 
-## Version 1.15.0 (22. Mai 2026)
+## Version 1.15.1 (22. Mai 2026)
 
 - **Neu: Watch – Durchschnittsgeschwindigkeit** – Die Watch zeigt während der GPS-Aufzeichnung jetzt zusätzlich zur aktuellen Geschwindigkeit auch die Durchschnittsgeschwindigkeit (⌀ km/h) in Echtzeit an.
 - **Neu: Wiederkehrende Fahrten – Hauptmenü-Shortcut** – Wiederkehrende Fahrten sind jetzt direkt über das Menü (⋯) in der Fahrtenliste erreichbar — ohne eine neue Fahrt anlegen zu müssen.
