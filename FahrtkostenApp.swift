@@ -1,4 +1,5 @@
 import SwiftUI
+import AppIntents
 
 @main
 struct FahrtkostenApp: App {
@@ -25,6 +26,9 @@ struct FahrtkostenApp: App {
             "iOS \(device.systemVersion) · \(device.model) · App \(version) (\(build))",
             level: .info
         )
+
+        // Siri-Shortcuts bei jedem App-Start registrieren
+        FahrtkostenShortcuts.updateAppShortcutParameters()
     }
 
     var body: some Scene {

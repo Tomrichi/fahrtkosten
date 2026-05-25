@@ -1,5 +1,5 @@
 # Fahrtkosten – App Store Texte
-Version 1.15.0 · Build 7 · Thomas Wagner · 22. Mai 2026
+Version 1.15.0 · Build 7 · Thomas Wagner · 23. Mai 2026
 
 ---
 

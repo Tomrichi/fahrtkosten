@@ -123,7 +123,7 @@ final class WatchViewModel: NSObject, ObservableObject {
         WKInterfaceDevice.current().play(.success)
         isLoading = true
 
-        let message: [String: Any] = [
+        let payload: [String: Any] = [
             "action":    "stopGPSTripWithCoords",
             "startLat":  result.startLat,
             "startLon":  result.startLon,
@@ -132,17 +132,31 @@ final class WatchViewModel: NSObject, ObservableObject {
             "km":        result.km,
             "startTime": result.startTime.timeIntervalSince1970
         ]
-        session.sendMessage(message, replyHandler: { [weak self] _ in
+
+        if session.isReachable {
+            // iPhone erreichbar → direkt senden
+            session.sendMessage(payload, replyHandler: { [weak self] _ in
+                DispatchQueue.main.async {
+                    self?.isLoading     = false
+                    self?.hasActiveTrip = false
+                }
+            }, errorHandler: { [weak self] _ in
+                // sendMessage fehlgeschlagen → in Queue einreihen
+                self?.session.transferUserInfo(payload)
+                DispatchQueue.main.async {
+                    self?.isLoading     = false
+                    self?.hasActiveTrip = false
+                }
+            })
+        } else {
+            // iPhone nicht erreichbar (z. B. Watch-GPS ohne iPhone) → Queue
+            // wird automatisch übermittelt, sobald iPhone wieder verbunden ist
+            session.transferUserInfo(payload)
             DispatchQueue.main.async {
-                self?.isLoading     = false
-                self?.hasActiveTrip = false
+                self.isLoading     = false
+                self.hasActiveTrip = false
             }
-        }, errorHandler: { [weak self] _ in
-            DispatchQueue.main.async {
-                self?.isLoading    = false
-                self?.errorMessage = "Verbindungsfehler"
-            }
-        })
+        }
     }
 
     // MARK: - Update anfordern

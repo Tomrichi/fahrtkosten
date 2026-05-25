@@ -1,5 +1,5 @@
 # Fahrtkosten – Hilfe & Bedienungsanleitung
-Version 1.15.0 · Mai 2026
+Version 1.15.0 · 23. Mai 2026
 
 ---
 

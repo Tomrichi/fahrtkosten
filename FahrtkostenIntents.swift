@@ -4,7 +4,8 @@ import Foundation
 // MARK: - Shared DataStore Zugriff für Intents
 @MainActor
 private struct IntentDataAccess {
-    static let local = UserDefaults.standard
+    // App Group – selbe Daten wie Haupt-App, Widget und Watch
+    static let local = UserDefaults(suiteName: "group.de.tommwagner.fahrtkosten") ?? .standard
 
     static func loadTrips() -> [Trip] {
         guard let data = local.data(forKey: "trips") else { return [] }

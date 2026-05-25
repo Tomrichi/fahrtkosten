@@ -243,6 +243,11 @@ extension WatchSessionManager: WCSessionDelegate {
             self.handleMessage(message, replyHandler: replyHandler)
         }
     }
+
+    // Queued transfers (z. B. Watch-GPS-Fahrt ohne iPhone in der Nähe)
+    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
+        DispatchQueue.main.async { self.handleMessage(userInfo) }
+    }
 }
 
 // MARK: - Notification
