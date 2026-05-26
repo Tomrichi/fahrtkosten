@@ -835,6 +835,7 @@ struct FahrzeugwaescheFormView: View {
                 ToolbarItem(placement: .navigationBarLeading) { Button("Fertig") { dismiss() } }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button { showAdd = true } label: { Image(systemName: "plus") }
+                        .accessibilityLabel("Neuen Eintrag hinzufügen")
                 }
             }
             .sheet(isPresented: $showAdd) {
@@ -992,6 +993,7 @@ struct PrivateAusgabenView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button { showAdd = true } label: { Image(systemName: "plus") }
+                        .accessibilityLabel("Neue private Ausgabe hinzufügen")
                 }
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Fertig") { dismiss() }

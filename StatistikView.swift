@@ -48,9 +48,13 @@ struct StatistikView: View {
                 Image(systemName: "chevron.left")
                     .foregroundColor(availableYears.contains(where: { $0 < selectedYear }) ? .primary : .secondary.opacity(0.3))
             }
+            .accessibilityLabel("Vorheriges Jahr")
+            .accessibilityHint("Wechselt zu \(selectedYear - 1)")
+            .disabled(!availableYears.contains(where: { $0 < selectedYear }))
             Spacer()
             Text(String(selectedYear))
                 .font(.title3.bold())
+                .accessibilityLabel("Jahr \(selectedYear)")
             Spacer()
             Button {
                 if let next = availableYears.first(where: { $0 > selectedYear }) {
@@ -60,6 +64,9 @@ struct StatistikView: View {
                 Image(systemName: "chevron.right")
                     .foregroundColor(availableYears.contains(where: { $0 > selectedYear }) ? .primary : .secondary.opacity(0.3))
             }
+            .accessibilityLabel("Nächstes Jahr")
+            .accessibilityHint("Wechselt zu \(selectedYear + 1)")
+            .disabled(!availableYears.contains(where: { $0 > selectedYear }))
         }
         .padding(.horizontal, 8)
         .padding(.top, 8)
@@ -83,6 +90,7 @@ struct StatistikView: View {
             Image(systemName: icon)
                 .font(.system(size: 20))
                 .foregroundColor(color)
+                .accessibilityHidden(true)
             Text(value)
                 .font(.system(size: 16, weight: .bold, design: .rounded))
             Text(label)
@@ -93,6 +101,8 @@ struct StatistikView: View {
         .padding(.vertical, 16)
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 14))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(label): \(value)")
     }
 
     // MARK: - Tab Picker
@@ -100,11 +110,12 @@ struct StatistikView: View {
         HStack(spacing: 0) {
             ForEach(StatTab.allCases) { tab in
                 Button {
-                    withAnimation(.easeInOut(duration: 0.2)) { selectedTab = tab }
+                    withOptionalAnimation(.easeInOut(duration: 0.2)) { selectedTab = tab }
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: tab.icon)
                             .font(.system(size: 12))
+                            .accessibilityHidden(true)
                         Text(tab.label)
                             .font(.system(size: 13, weight: .medium))
                     }
@@ -118,11 +129,13 @@ struct StatistikView: View {
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
+                .accessibilityAddTraits(selectedTab == tab ? [.isSelected] : [])
             }
         }
         .padding(4)
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 14))
+        .accessibilityLabel("Ansicht wählen")
     }
 
     // MARK: - Monats-Chart
@@ -173,6 +186,7 @@ struct StatistikView: View {
                 if let best = data.max(by: { $0.euro < $1.euro }), best.euro > 0 {
                     HStack {
                         Image(systemName: "trophy.fill").foregroundColor(.orange)
+                            .accessibilityHidden(true)
                         Text("Bester Monat: **\(best.month)** mit \(best.euro.euroFormatted)")
                             .font(.subheadline)
                     }
@@ -180,6 +194,7 @@ struct StatistikView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(Color.orange.opacity(0.1))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .accessibilityElement(children: .combine)
                 }
             }
         }
@@ -289,10 +304,12 @@ struct StatistikView: View {
                 Image(systemName: "info.circle")
                     .foregroundColor(.secondary)
                     .font(.footnote)
+                    .accessibilityHidden(true)
                 Text("Diese Auswertung dient als Orientierung. Bitte prüfe die Beträge mit deinem Steuerberater oder Steuerprogramm.")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
+            .accessibilityElement(children: .combine)
         }
         .padding(16)
         .background(Color(.secondarySystemGroupedBackground))

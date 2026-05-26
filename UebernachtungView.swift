@@ -87,7 +87,7 @@ struct UebernachtungView: View {
                                         .datePickerStyle(.compact)
                                     Spacer()
                                     Button {
-                                        withAnimation(.easeInOut(duration: 0.2)) { selectedDate = Date() }
+                                        withOptionalAnimation(.easeInOut(duration: 0.2)) { selectedDate = Date() }
                                     } label: {
                                         Text("Heute")
                                             .font(.caption)
@@ -334,9 +334,12 @@ struct HotelFormView: View {
                             }
                             Spacer()
                             Image(systemName: "chevron.right").font(.caption).foregroundColor(.secondary)
+                                .accessibilityHidden(true)
                         }
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel("Rechnung scannen")
+                    .accessibilityHint("Öffnet Kamera oder Fotoauswahl, Datum, Hotelname und Betrag werden automatisch erkannt")
                 }
 
                 // ── Aufenthaltszeitraum (NEU) ──

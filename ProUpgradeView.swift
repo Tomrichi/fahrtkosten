@@ -21,6 +21,7 @@ struct ProUpgradeView: View {
                         Image(systemName: "star.circle.fill")
                             .font(.system(size: 64))
                             .foregroundStyle(.yellow, .orange)
+                            .accessibilityHidden(true)
                         Text("Fahrtkosten Pro")
                             .font(.title.bold())
                         Text("Alles was du für die perfekte Abrechnung brauchst")
@@ -43,6 +44,7 @@ struct ProUpgradeView: View {
                                         .foregroundColor(color)
                                         .font(.system(size: 17))
                                 }
+                                .accessibilityHidden(true)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(title).font(.system(size: 15, weight: .semibold))
                                     Text(desc).font(.caption).foregroundColor(.secondary)
@@ -50,9 +52,12 @@ struct ProUpgradeView: View {
                                 Spacer()
                                 Image(systemName: "checkmark.circle.fill")
                                     .foregroundColor(.iosGreen)
+                                    .accessibilityHidden(true)
                             }
                             .padding(.horizontal, 20)
                             .padding(.vertical, 12)
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel("\(title). \(desc)")
                             if features.last?.1 != title {
                                 Divider().padding(.leading, 74)
                             }
@@ -91,6 +96,8 @@ struct ProUpgradeView: View {
                     .buttonStyle(.borderedProminent)
                     .tint(.blue)
                     .padding(.horizontal)
+                    .accessibilityLabel("Fahrtkosten Pro kaufen, \(selectedPlan == "monthly" ? "4,99 Euro pro Monat" : "39,99 Euro pro Jahr")")
+                    .accessibilityHint("Startet den In-App-Kauf")
 
                     Text("Abonnement über Apple In-App-Käufe.\nJederzeit in den Einstellungen kündbar.")
                         .font(.caption2)
@@ -138,6 +145,7 @@ struct PlanCard: View {
             Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                 .font(.title2)
                 .foregroundColor(isSelected ? .blue : .secondary)
+                .accessibilityHidden(true)
         }
         .padding(16)
         .background(Color(.secondarySystemGroupedBackground))
@@ -146,5 +154,8 @@ struct PlanCard: View {
             RoundedRectangle(cornerRadius: 13)
                 .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(name), \(price) \(unit). \(desc)\(isBest ? ". Bestes Angebot." : "")")
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 }

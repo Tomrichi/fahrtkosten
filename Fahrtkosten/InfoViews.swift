@@ -164,7 +164,7 @@ private let impressumHTML = #"""
 <p>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr">ec.europa.eu/consumers/odr</a></p>
 <p>Zur Teilnahme an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle bin ich nicht verpflichtet und nicht bereit.</p>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.1 · Thomas Wagner · 23. Mai 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.2 · Thomas Wagner · 26. Mai 2026</p>
 
 </body>
 </html>
@@ -233,7 +233,7 @@ private let datenschutzHTML_de = #"""
 <body>
 
 <h1>Datenschutzerklärung</h1>
-<p class="meta">Fahrtkosten App · Version 1.15.1 · Stand 23. Mai 2026 · Build 8<br>
+<p class="meta">Fahrtkosten App · Version 1.15.2 · Stand 26. Mai 2026 · Build 9<br>
 Entwickler: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>Auf einen Blick</h2>
@@ -382,7 +382,7 @@ Entwickler: Thomas Wagner · info@wagner-fahrtkosten.de</p>
   Anfragen werden innerhalb von 30 Tagen beantwortet.
 </div>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.1 · Thomas Wagner · 23. Mai 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.2 · Thomas Wagner · 26. Mai 2026</p>
 
 </body>
 </html>
@@ -440,7 +440,7 @@ private let datenschutzHTML_en = #"""
 <body>
 
 <h1>Privacy Policy</h1>
-<p class="meta">Fahrtkosten App · Version 1.15.1 · May 23, 2026<br>
+<p class="meta">Fahrtkosten App · Version 1.15.2 · May 26, 2026<br>
 Developer: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>At a Glance</h2>
@@ -589,7 +589,7 @@ Developer: Thomas Wagner · info@wagner-fahrtkosten.de</p>
   Enquiries will be answered within 30 days.
 </div>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.1 · Thomas Wagner · May 23, 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.2 · Thomas Wagner · May 26, 2026</p>
 
 </body>
 </html>
@@ -644,7 +644,7 @@ private let datenschutzHTML_pl = #"""
 <body>
 
 <h1>Polityka prywatności</h1>
-<p class="meta">Fahrtkosten App · Wersja 1.15.1 · 23 Maj 2026<br>
+<p class="meta">Fahrtkosten App · Wersja 1.15.2 · 26 Maj 2026<br>
 Deweloper: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>W skrócie</h2>
@@ -793,7 +793,7 @@ Deweloper: Thomas Wagner · info@wagner-fahrtkosten.de</p>
   Zapytania będą odpowiedzone w ciągu 30 dni.
 </div>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Wersja 1.15.1 · Thomas Wagner · 23 Maj 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Wersja 1.15.2 · Thomas Wagner · 26 Maj 2026</p>
 
 </body>
 </html>
@@ -848,7 +848,7 @@ private let datenschutzHTML_cs = #"""
 <body>
 
 <h1>Zásady ochrany osobních údajů</h1>
-<p class="meta">Fahrtkosten App · Verze 1.15.1 · 23. května 2026<br>
+<p class="meta">Fahrtkosten App · Verze 1.15.2 · 26. května 2026<br>
 Vývojář: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>Stručný přehled</h2>
@@ -997,7 +997,7 @@ Vývojář: Thomas Wagner · info@wagner-fahrtkosten.de</p>
   Dotazy budou zodpovězeny do 30 dnů.
 </div>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Verze 1.15.1 · Thomas Wagner · 23. května 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Verze 1.15.2 · Thomas Wagner · 26. května 2026</p>
 
 </body>
 </html>
@@ -1066,7 +1066,7 @@ private let hilfeHTML = #"""
 
 <h1>Fahrtkosten</h1>
 <p class="subtitle">Dienstreisen professionell, korrekt &amp; steuerkonform abrechnen.</p>
-<p><span class="version">Version 1.15.1</span></p>
+<p><span class="version">Version 1.15.2</span></p>
 
 <p>Fahrtkosten ist dein digitaler Reisekostenassistent für iPhone und iPad. Die App erfasst alle erstattungsfähigen Kosten einer Dienstreise – Fahrten, Verpflegung, Übernachtungen und Fahrzeugkosten – an einem Ort, berechnet alles automatisch nach den aktuellen gesetzlichen Pauschalsätzen und erstellt auf Knopfdruck eine fertige Abrechnung.</p>
 
@@ -1236,7 +1236,7 @@ private let hilfeHTML = #"""
   </div>
 </details>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.1 · Thomas Wagner · 23. Mai 2026<br>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.2 · Thomas Wagner · 26. Mai 2026<br>
 Kontakt: <a href="mailto:info@wagner-fahrtkosten.de">info@wagner-fahrtkosten.de</a></p>
 
 </body>
@@ -1315,13 +1315,36 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.15.1 – aktuell -->
+<!-- 1.15.2 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.15.1
+        Version 1.15.2
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">Bedienungshilfen · VoiceOver · Reduzierte Bewegung · Sprachsteuerung</div>
+    </div>
+    <span class="build-info">26. Mai 2026 · Build 9</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEU</span> <strong>VoiceOver-Unterstützung:</strong> Alle wichtigen Elemente der App – Fahrten, Statistik, Übersicht, KFZ-Kosten, Verpflegung, Übernachtungen u.&nbsp;v.&nbsp;m. – sind jetzt vollständig mit VoiceOver-Labels, Hinweisen und Rollen ausgestattet.</li>
+      <li><span class="badge-new">NEU</span> <strong>Reduzierte Bewegung:</strong> Alle Animationen der App respektieren jetzt die iOS-Einstellung „Bewegung reduzieren" (Einstellungen → Bedienungshilfen). Wer auf Bewegungseffekte sensibel reagiert, kann sie damit deaktivieren.</li>
+      <li><span class="badge-new">NEU</span> <strong>Sprachsteuerung (Voice Control):</strong> Alle Schaltflächen und interaktiven Elemente sind korrekt benannt – die App lässt sich vollständig per Sprachbefehl steuern.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.15.1 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.15.1
       </div>
       <div class="preview-text">Watch Geschwindigkeit · iCloud-Sync · Siri App Intents · Live Activity</div>
     </div>

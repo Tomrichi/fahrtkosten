@@ -88,6 +88,7 @@ struct FahrzeugkostenView: View {
                         AppLogger.shared.logTap("KFZ-Kosten: Neuer Eintrag")
                         showAdd = true
                     } label: { Image(systemName: "plus") }
+                    .accessibilityLabel("Neuen KFZ-Kosteneintrag hinzufügen")
                 }
             }
             .sheet(isPresented: $showAdd)  { VehicleCostFormView(mode: .add) }
@@ -152,6 +153,7 @@ struct VehicleCostRow: View {
                     .foregroundColor(categoryColor)
                     .font(.system(size: 15, weight: .regular))
             }
+            .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 3) {
                 Text(cost.title.isEmpty ? cost.category.localizedName : cost.title)
                     .font(.system(size: 15, weight: .regular))
@@ -175,6 +177,16 @@ struct VehicleCostRow: View {
                 .foregroundColor(categoryColor)
         }
         .padding(.vertical, 5)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel({
+            var parts = [cost.title.isEmpty ? cost.category.localizedName : cost.title]
+            parts.append(cost.date.shortDateShort)
+            if let km = cost.mileage { parts.append("\(km) km") }
+            if !cost.note.isEmpty { parts.append(cost.note) }
+            parts.append(cost.amount.euroFormatted)
+            return parts.joined(separator: ", ")
+        }())
+        .accessibilityHint("Tippen zum Bearbeiten")
     }
 
     private var categoryColor: Color {

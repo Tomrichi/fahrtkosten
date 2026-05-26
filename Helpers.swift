@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import UIKit
 
 // MARK: - Formatters
 extension Double {
@@ -63,6 +64,16 @@ extension Color {
     static let iosPurple = Color(red: 175/255, green: 82/255,  blue: 222/255)
     static let iosIndigo = Color(red: 88/255,  green: 86/255,  blue: 214/255)
     static let iosTeal   = Color(red: 90/255,  green: 200/255, blue: 250/255)
+}
+
+// MARK: - Accessibility: Reduce Motion
+@discardableResult
+func withOptionalAnimation<R>(_ animation: Animation? = .default, _ body: () throws -> R) rethrows -> R {
+    if UIAccessibility.isReduceMotionEnabled {
+        return try body()
+    } else {
+        return try withAnimation(animation, body)
+    }
 }
 
 // MARK: - Currency input helper

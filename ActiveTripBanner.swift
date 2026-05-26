@@ -17,7 +17,7 @@ struct ActiveTripBanner: View {
     var body: some View {
         if let trip = activeTrip {
             HStack(spacing: 12) {
-                // Pulsierende Aufnahme-Anzeige
+                // Pulsierende Aufnahme-Anzeige (dekorativ)
                 ZStack {
                     Circle()
                         .fill(Color.red.opacity(0.25))
@@ -26,6 +26,7 @@ struct ActiveTripBanner: View {
                         .fill(Color.red)
                         .frame(width: 10, height: 10)
                 }
+                .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Fahrt läuft · \(elapsed)")
@@ -49,10 +50,15 @@ struct ActiveTripBanner: View {
                         .background(Color.white.opacity(0.25))
                         .clipShape(Capsule())
                 }
+                .accessibilityLabel("Fahrt stoppen")
+                .accessibilityHint("Öffnet das Formular zum Beenden der aktuellen Fahrt")
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
             .background(Color.red.gradient)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Aktive Fahrt nach \(trip.to), läuft seit \(elapsed)")
+            .accessibilityAddTraits(.isHeader)
             .onAppear { startTimer(from: trip.startTime ?? Date()) }
             .onDisappear { timer?.invalidate() }
             .sheet(isPresented: $showStopSheet) {
@@ -97,9 +103,12 @@ struct StopTripSheet: View {
                         Spacer()
                         Image(systemName: "arrow.right")
                             .foregroundColor(.secondary)
+                            .accessibilityHidden(true)
                         Spacer()
                         Label(trip.to, systemImage: "mappin.fill")
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Von \(trip.from) nach \(trip.to)")
                     if let start = trip.startTime {
                         LabeledContent("Gestartet") {
                             Text(start, style: .time)

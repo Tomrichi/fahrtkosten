@@ -59,7 +59,7 @@ struct FahrtkostenApp: App {
 
                 if showSplash {
                     SplashScreenView {
-                        withAnimation(.easeInOut(duration: 0.3)) {
+                        withOptionalAnimation(.easeInOut(duration: 0.3)) {
                             showSplash = false
                         }
                     }
@@ -107,7 +107,7 @@ struct FahrtkostenApp: App {
             pendingImportTo         = to
             pendingImportTravelTime = travelTime
             pendingImportKm         = km
-            withAnimation(.easeInOut(duration: 0.3)) { showSplash = false }
+            withOptionalAnimation(.easeInOut(duration: 0.3)) { showSplash = false }
         } else {
             NotificationCenter.default.post(
                 name: .importFromMaps,

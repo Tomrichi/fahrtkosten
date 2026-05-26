@@ -49,6 +49,7 @@ struct RecurringTripManagerView: View {
                     Button { showAdd = true } label: {
                         Image(systemName: "plus")
                     }
+                    .accessibilityLabel("Neue Wiederkehrende Fahrt hinzufügen")
                 }
             }
             .sheet(isPresented: $showAdd) {

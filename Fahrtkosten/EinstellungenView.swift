@@ -414,7 +414,7 @@ struct EinstellungenView: View {
         Section {
             // ── Aufklapp-Header ──
             Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                withOptionalAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                     expandBackup.toggle()
                 }
             } label: {
@@ -512,7 +512,7 @@ struct EinstellungenView: View {
             DisclosureGroup(isExpanded: $expandLang) {
                 ForEach(AppLanguage.allCases.filter { ["de","en","pl","cs"].contains($0.rawValue) }) { lang in
                     Button {
-                        withAnimation(.easeInOut(duration: 0.2)) {
+                        withOptionalAnimation(.easeInOut(duration: 0.2)) {
                             lm.language = lang
                             expandLang = false
                         }
@@ -555,7 +555,7 @@ struct EinstellungenView: View {
         @ViewBuilder private var infoSection: some View {
         Section {
             Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                withOptionalAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                     expandInfo.toggle()
                 }
             } label: {
@@ -633,7 +633,7 @@ struct EinstellungenView: View {
     @ViewBuilder private var protokollSection: some View {
         Section {
             Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                withOptionalAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                     expandProto.toggle()
                 }
             } label: {
@@ -725,7 +725,7 @@ struct EinstellungenView: View {
                          ("Dunkel", "moon.fill",              "dark")],
                         id: \.2) { label, icon, key in
                     Button {
-                        withAnimation(.easeInOut(duration: 0.2)) { colorSchemePref = key }
+                        withOptionalAnimation(.easeInOut(duration: 0.2)) { colorSchemePref = key }
                     } label: {
                         VStack(spacing: 4) {
                             Image(systemName: icon)
@@ -758,7 +758,7 @@ struct EinstellungenView: View {
         Section {
             // ── Aufklapp-Header ──
             Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                withOptionalAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                     expandSwipe.toggle()
                 }
             } label: {
@@ -1151,7 +1151,7 @@ struct SavedBackupListView: View {
                 .transition(.move(edge: .top).combined(with: .opacity))
                     .onAppear {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                            withAnimation { showBanner = false }
+                            withOptionalAnimation { showBanner = false }
                         }
                     }
             }

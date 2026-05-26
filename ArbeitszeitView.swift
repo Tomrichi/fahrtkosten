@@ -145,6 +145,7 @@ struct ArbeitszeitView: View {
                         } label: {
                             Image(systemName: "plus")
                         }
+                        .accessibilityLabel("Neuen Arbeitszeiteneintrag hinzufügen")
                     }
                 }
                 .confirmationDialog("Exportieren", isPresented: $showExport, titleVisibility: .visible) {
@@ -253,7 +254,7 @@ struct ArbeitszeitView: View {
                             .datePickerStyle(.compact)
                         Spacer()
                         Button {
-                            withAnimation(.easeInOut(duration: 0.2)) { selectedDate = Date() }
+                            withOptionalAnimation(.easeInOut(duration: 0.2)) { selectedDate = Date() }
                         } label: {
                             Text("Heute")
                                 .font(.caption.bold())
@@ -322,7 +323,7 @@ struct ArbeitszeitView: View {
                     totalH: store.totalWorkHours(for: meal),
                     isExpanded: expandedMeals.contains(meal.id),
                     onToggle: {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        withOptionalAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                             if expandedMeals.contains(meal.id) {
                                 expandedMeals.remove(meal.id)
                             } else {
@@ -333,7 +334,7 @@ struct ArbeitszeitView: View {
                 )
                 .contentShape(Rectangle())
                 .onTapGesture {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                    withOptionalAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                         if expandedMeals.contains(meal.id) {
                             expandedMeals.remove(meal.id)
                         } else {

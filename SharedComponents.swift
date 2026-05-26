@@ -17,6 +17,7 @@ struct EmptyStateRow: View {
                     .font(.system(size: 26, weight: .regular))
                     .foregroundColor(color.opacity(0.7))
             }
+            .accessibilityHidden(true)
             Text(title)
                 .font(.subheadline)
             Text(subtitle)
@@ -27,6 +28,7 @@ struct EmptyStateRow: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 36)
         .listRowBackground(Color.clear)
+        .accessibilityElement(children: .combine)
     }
 }
 
@@ -103,7 +105,7 @@ struct CollapsibleSummaryCard<Content: View>: View {
         VStack(spacing: 0) {
             // ── Header (immer sichtbar) ──
             Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                withOptionalAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                     isExpanded.toggle()
                 }
             } label: {
@@ -131,11 +133,15 @@ struct CollapsibleSummaryCard<Content: View>: View {
                     Image(systemName: isExpanded ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
                         .font(.system(size: 22))
                         .foregroundColor(isDark ? .white.opacity(0.4) : Color(.tertiaryLabel))
+                        .accessibilityHidden(true)
                 }
                 .padding(.horizontal, 18)
                 .padding(.vertical, 16)
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("\(title), \(total.euroFormatted)")
+            .accessibilityHint(isExpanded ? "Tippen zum Einklappen" : "Tippen zum Ausklappen")
+            .accessibilityAddTraits(isExpanded ? [.isButton] : [.isButton])
 
             // ── Aufgeklappter Inhalt ──
             if isExpanded {
@@ -202,12 +208,15 @@ struct HeroTotalCard: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .shadow(color: .black.opacity(0.25), radius: 10, x: 0, y: 5)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Gesamterstattung \(total.euroFormatted). \(tripCount) Fahrten, \(mealCount) Verpflegungseinträge, \(hotelCount) Übernachtungen.")
     }
 
     @ViewBuilder
     private func label(_ icon: String, _ text: String) -> some View {
         HStack(spacing: 4) {
             Image(systemName: icon).font(.system(size: 10))
+                .accessibilityHidden(true)
             Text(text).font(.system(size: 11))
         }
         .foregroundColor(.white.opacity(0.6))
@@ -309,6 +318,7 @@ struct StatTile: View {
                     .font(.system(size: 14, weight: .regular))
                     .foregroundColor(color)
             }
+            .accessibilityHidden(true)
             Spacer()
             Text(amount.euroFormatted)
                 .font(.system(size: 14, weight: .regular, design: .monospaced))
@@ -327,6 +337,8 @@ struct StatTile: View {
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(label): \(amount.euroFormatted). \(detail)")
     }
 }
 
@@ -379,6 +391,7 @@ struct ListHeaderCard: View {
                     .font(.system(size: 18, weight: .regular))
                     .foregroundColor(color)
             }
+            .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.subheadline)
@@ -393,6 +406,8 @@ struct ListHeaderCard: View {
         }
         .padding(.vertical, 12)
         .padding(.horizontal, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title), \(countLabel), Erstattung \(total.euroFormatted)")
     }
 }
 
@@ -446,12 +461,14 @@ struct InfoBox: View {
                 .foregroundColor(.primary)
                 .font(.subheadline)
                 .padding(.top, 1)
+                .accessibilityHidden(true)
             Text(text)
                 .font(.footnote)
                 .foregroundColor(.secondary)
         }
         .padding(.vertical, 4)
         .listRowBackground(Color(.systemGray6))
+        .accessibilityElement(children: .combine)
     }
 }
 
@@ -467,7 +484,7 @@ struct FilterChipBar<Filter: RawRepresentable & CaseIterable & Hashable>: View w
                 let isActive = selection == filter
                 let label = labelFor?(filter) ?? filter.rawValue
                 Button {
-                    withAnimation(.spring(response: 0.25, dampingFraction: 0.7)) {
+                    withOptionalAnimation(.spring(response: 0.25, dampingFraction: 0.7)) {
                         selection = filter
                     }
                 } label: {
@@ -476,6 +493,7 @@ struct FilterChipBar<Filter: RawRepresentable & CaseIterable & Hashable>: View w
                             Circle()
                                 .fill(Color.white)
                                 .frame(width: 5, height: 5)
+                                .accessibilityHidden(true)
                         }
                         Text(label)
                             .font(.system(size: 13, weight: isActive ? .semibold : .regular))
@@ -494,6 +512,7 @@ struct FilterChipBar<Filter: RawRepresentable & CaseIterable & Hashable>: View w
                     .shadow(color: isActive ? Color(red: 0.0, green: 0.38, blue: 0.75).opacity(0.35) : .clear, radius: 4, x: 0, y: 2)
                 }
                 .buttonStyle(.plain)
+                .accessibilityAddTraits(isActive ? [.isSelected] : [])
             }
             Spacer()
         }
@@ -516,6 +535,7 @@ struct ScanButtonRow: View {
                         .font(.system(size: 14, weight: .regular))
                         .foregroundColor(color)
                 }
+                .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Beleg scannen")
                         .font(.system(size: 15, weight: .regular))
@@ -528,9 +548,12 @@ struct ScanButtonRow: View {
                 Image(systemName: "chevron.right")
                     .font(.caption)
                     .foregroundColor(.secondary)
+                    .accessibilityHidden(true)
             }
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("Beleg scannen")
+        .accessibilityHint("Öffnet Kamera oder Fotoauswahl um Belegdaten automatisch zu übernehmen")
     }
 }
 

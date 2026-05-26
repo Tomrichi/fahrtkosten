@@ -220,6 +220,7 @@ struct FahrtenView: View {
                                 Image(systemName: "location.circle.fill")
                                     .font(.system(size: 26))
                                     .foregroundColor(.iosGreen)
+                                    .accessibilityHidden(true)
                                 Text(lm.t("trips.gps.tile"))
                                     .font(.caption)
                                     .multilineTextAlignment(.center)
@@ -236,6 +237,8 @@ struct FahrtenView: View {
                             )
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel("GPS-Aufzeichnung starten")
+                        .accessibilityHint("Startet die automatische Kilometererfassung per GPS")
 
                         // Kachel 2: Neue Fahrt (immer sichtbar und nutzbar)
                         Button {
@@ -246,6 +249,7 @@ struct FahrtenView: View {
                                 Image(systemName: "plus.circle.fill")
                                     .font(.system(size: 26))
                                     .foregroundColor(.blue)
+                                    .accessibilityHidden(true)
                                 Text(lm.t("trips.new.tile"))
                                     .font(.caption)
                                     .multilineTextAlignment(.center)
@@ -262,6 +266,8 @@ struct FahrtenView: View {
                             )
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel("Neue Fahrt manuell eingeben")
+                        .accessibilityHint("Öffnet das Formular zur manuellen Eingabe einer Fahrt")
                     }
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
@@ -298,7 +304,7 @@ struct FahrtenView: View {
 
                                     // Heute-Button
                                     Button {
-                                        withAnimation(.easeInOut(duration: 0.2)) {
+                                        withOptionalAnimation(.easeInOut(duration: 0.2)) {
                                             selectedDate = Date()
                                         }
                                     } label: {
@@ -434,6 +440,8 @@ struct FahrtenView: View {
                     } label: {
                         Image(systemName: "ellipsis.circle").foregroundColor(.blue)
                     }
+                    .accessibilityLabel("Aktionen")
+                    .accessibilityHint("Öffnet Menü für neue Fahrt, GPS-Aufzeichnung und Einstellungen")
                 }
             }
             // Manuell hinzufügen
@@ -569,6 +577,7 @@ struct GPSTripSheet: View {
         VStack(spacing: 20) {
             ProgressView()
                 .scaleEffect(1.5)
+                .accessibilityLabel("Warte auf Standortfreigabe")
             Text(lm.t("trips.gps.permission"))
                 .font(.subheadline)
                 .multilineTextAlignment(.center)
@@ -746,6 +755,7 @@ struct GPSTripSheet: View {
         VStack(spacing: 22) {
             ProgressView()
                 .scaleEffect(1.8)
+                .accessibilityLabel("Adressen werden ermittelt")
             Text(lm.t("trips.gps.geocoding"))
                 .font(.title3)
             Text(lm.t("trips.gps.geocoding.wait"))
@@ -753,6 +763,7 @@ struct GPSTripSheet: View {
                 .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .accessibilityElement(children: .combine)
     }
 
     // ── Fehler-Banner ──
@@ -788,6 +799,7 @@ struct PulsingDot: View {
         Circle()
             .fill(color)
             .frame(width: 10, height: 10)
+            .accessibilityHidden(true)
     }
 }
 
@@ -808,6 +820,18 @@ struct TripRow: View {
             .replacingOccurrences(of: ".", with: ",")
     }
 
+    private var accessibilityDescription: String {
+        let dateStr = trip.date.formatted(.dateTime.day().month(.wide))
+        var parts = ["Fahrt am \(dateStr), von \(trip.from) nach \(trip.to)"]
+        parts.append(trip.km.kmFormatted)
+        if let dur = trip.fahrzeitText ?? trip.durationText { parts.append(dur) }
+        parts.append("Erstattung \((trip.km * kmRate).euroFormatted)")
+        if let fuelCost = trip.fuelCost {
+            parts.append("Spritkosten \(String(format: "%.2f €", fuelCost))")
+        }
+        return parts.joined(separator: ", ")
+    }
+
     var body: some View {
         HStack(spacing: 10) {
             // Datum
@@ -820,6 +844,7 @@ struct TripRow: View {
                     .foregroundStyle(.secondary)
             }
             .frame(width: 30)
+            .accessibilityHidden(true)
 
             // Hauptinhalt
             VStack(alignment: .leading, spacing: 4) {
@@ -829,6 +854,7 @@ struct TripRow: View {
                         Image(systemName: "house.fill")
                             .font(.system(size: 9))
                             .foregroundStyle(.orange)
+                            .accessibilityHidden(true)
                     }
                     Text(trip.from)
                         .font(.system(size: 14, weight: .regular))
@@ -837,6 +863,7 @@ struct TripRow: View {
                     Image(systemName: "arrow.right")
                         .font(.system(size: 8, weight: .regular))
                         .foregroundStyle(Color(.tertiaryLabel))
+                        .accessibilityHidden(true)
                     Text(trip.to)
                         .font(.system(size: 14, weight: .regular))
                         .foregroundStyle(Color(.label))
@@ -845,6 +872,7 @@ struct TripRow: View {
                         Image(systemName: "house.fill")
                             .font(.system(size: 9))
                             .foregroundStyle(.orange)
+                            .accessibilityHidden(true)
                     }
                 }
 
@@ -883,6 +911,9 @@ struct TripRow: View {
             }
         }
         .padding(.vertical, 6)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityDescription)
+        .accessibilityHint("Tippen zum Bearbeiten, wischen für weitere Optionen")
     }
 }
 

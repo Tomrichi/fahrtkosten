@@ -219,27 +219,27 @@ struct SplashScreenView: View {
     private func startAnimation() {
 
         // Phase 1: Opacity sofort sichtbar machen
-        withAnimation(.easeIn(duration: 0.15).delay(0.1)) {
+        withOptionalAnimation(.easeIn(duration: 0.15).delay(0.1)) {
             logoOpacity = 1.0
         }
 
         // Phase 1: Tiefenflug – scale 0.05 → 1.0 mit Federwirkung
-        withAnimation(.spring(response: 0.75, dampingFraction: 0.60).delay(0.1)) {
+        withOptionalAnimation(.spring(response: 0.75, dampingFraction: 0.60).delay(0.1)) {
             logoScale = 1.0
         }
 
         // Phase 1: Y-Rotation – -90° → 0° (dreht sich aus der Tiefe rein)
-        withAnimation(.spring(response: 0.80, dampingFraction: 0.68).delay(0.12)) {
+        withOptionalAnimation(.spring(response: 0.80, dampingFraction: 0.68).delay(0.12)) {
             logoRotationY = 0
         }
 
         // Phase 1: X-Tilt – 20° → 0° (richtet sich auf, minimal später)
-        withAnimation(.spring(response: 0.65, dampingFraction: 0.72).delay(0.18)) {
+        withOptionalAnimation(.spring(response: 0.65, dampingFraction: 0.72).delay(0.18)) {
             logoRotationX = 0
         }
 
         // Phase 2: Glow erscheint nach Landung
-        withAnimation(.easeOut(duration: 0.5).delay(0.75)) {
+        withOptionalAnimation(.easeOut(duration: 0.5).delay(0.75)) {
             glowRadius  = 22
             glowOpacity = 1.0
         }
@@ -252,25 +252,25 @@ struct SplashScreenView: View {
         }
 
         // Phase 4: Shimmer über das Logo
-        withAnimation(.easeInOut(duration: 0.75).delay(0.95)) {
+        withOptionalAnimation(.easeInOut(duration: 0.75).delay(0.95)) {
             shimmerOffset = 200
         }
 
         // Phase 5: App-Name gleitet herein
-        withAnimation(.easeOut(duration: 0.45).delay(1.05)) {
+        withOptionalAnimation(.easeOut(duration: 0.45).delay(1.05)) {
             nameOpacity = 1.0
             nameOffset  = 0
         }
 
         // Phase 6: Tagline + Ladeindikator
-        withAnimation(.easeOut(duration: 0.35).delay(1.30)) {
+        withOptionalAnimation(.easeOut(duration: 0.35).delay(1.30)) {
             taglineOpacity = 1.0
             taglineOffset  = 0
         }
 
         // Phase 7: Ausblenden & App öffnen
         DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
-            withAnimation(.easeInOut(duration: 0.40)) {
+            withOptionalAnimation(.easeInOut(duration: 0.40)) {
                 bgOpacity = 0
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.40) {
@@ -284,7 +284,7 @@ struct SplashScreenView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             scale.wrappedValue   = 1.0
             opacity.wrappedValue = 1.0
-            withAnimation(.easeOut(duration: 0.90)) {
+            withOptionalAnimation(.easeOut(duration: 0.90)) {
                 scale.wrappedValue   = 4.5
                 opacity.wrappedValue = 0.0
             }

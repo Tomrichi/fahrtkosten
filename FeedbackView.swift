@@ -154,7 +154,7 @@ Diese Daten werden streng vertraulich behandelt und nicht an Dritte weitergegebe
                 // ── Protokoll-Viewer ─────────────────────────────────────
                 Section {
                     Button {
-                        withAnimation { showLogSection.toggle() }
+                        withOptionalAnimation { showLogSection.toggle() }
                     } label: {
                         HStack {
                             Label("Protokoll anzeigen", systemImage: "doc.text.magnifyingglass")
@@ -168,8 +168,11 @@ Diese Daten werden streng vertraulich behandelt und nicht an Dritte weitergegebe
                             Image(systemName: showLogSection ? "chevron.up" : "chevron.down")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
+                                .accessibilityHidden(true)
                         }
                     }
+                    .accessibilityLabel("Protokoll anzeigen")
+                    .accessibilityHint(showLogSection ? "Tippen zum Einklappen" : "Tippen zum Aufklappen")
 
                     if showLogSection {
                         let logContent = AppLogger.shared.logFileContents

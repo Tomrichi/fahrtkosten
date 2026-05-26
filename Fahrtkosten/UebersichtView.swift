@@ -611,7 +611,7 @@ struct UebersichtView: View {
     ) -> some View {
         VStack(spacing: 0) {
             Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                withOptionalAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                     isExpanded.wrappedValue.toggle()
                 }
             } label: {

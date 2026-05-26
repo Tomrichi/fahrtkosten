@@ -114,7 +114,7 @@ struct CloudBackupListView: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
                     .onAppear {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                            withAnimation { showBanner = false }
+                            withOptionalAnimation { showBanner = false }
                         }
                     }
             }

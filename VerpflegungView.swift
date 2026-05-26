@@ -126,7 +126,7 @@ struct VerpflegungView: View {
                                         .datePickerStyle(.compact)
                                     Spacer()
                                     Button {
-                                        withAnimation(.easeInOut(duration: 0.2)) { selectedDate = Date() }
+                                        withOptionalAnimation(.easeInOut(duration: 0.2)) { selectedDate = Date() }
                                     } label: {
                                         Text("Heute")
                                             .font(.caption)
@@ -168,7 +168,7 @@ struct VerpflegungView: View {
                                 VStack(spacing: 8) {
                                     Image(systemName: "magnifyingglass")
                                         .font(.system(size: 32))
-                                        .foregroundColor(.secondary.opacity(0.5))
+                                        .foregroundColor(.secondary.opacity(0.6))
                                     Text("Keine Einträge im gewählten Zeitraum")
                                         .font(.subheadline)
                                         .foregroundColor(.secondary)
@@ -211,6 +211,7 @@ struct VerpflegungView: View {
                         } label: {
                             Image(systemName: "square.and.arrow.up")
                         }
+                        .accessibilityLabel("Exportieren")
                         // Drei Punkte Menü
                         Menu {
                             Button { showAdd = true } label: {
