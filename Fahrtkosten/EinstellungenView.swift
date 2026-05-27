@@ -23,10 +23,11 @@ struct EinstellungenView: View {
     @State private var showResetAlert       = false
     @State private var showDeleteAllAlert   = false
     @State private var showRestoreAlert     = false
-    @State private var showDatenschutz      = false
-    @State private var showAppInfo          = false
-    @State private var showImpressum        = false
-    @State private var showVersionHistory   = false
+    @State private var showDatenschutz          = false
+    @State private var showAppInfo              = false
+    @State private var showImpressum            = false
+    @State private var showVersionHistory       = false
+    @State private var showBedienungshilfen     = false
     @State private var showBackupPicker     = false
     @State private var showBackupShareSheet = false
     @State private var showFeedback         = false
@@ -600,6 +601,14 @@ struct EinstellungenView: View {
                 }
                 .foregroundStyle(.primary)
                 .sheet(isPresented: $showAppInfo) { HilfeView() }
+
+                Button {
+                    showBedienungshilfen = true
+                } label: {
+                    Label("Bedienungshilfen", systemImage: "accessibility.fill")
+                }
+                .foregroundStyle(.primary)
+                .sheet(isPresented: $showBedienungshilfen) { BedienungshilfenView() }
 
                 Button {
                     showImpressum = true

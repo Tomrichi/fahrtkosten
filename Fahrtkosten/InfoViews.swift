@@ -47,6 +47,17 @@ struct HilfeView: View {
     }
 }
 
+// MARK: - Bedienungshilfen View
+struct BedienungshilfenView: View {
+    var body: some View {
+        NavigationStack {
+            HTMLWebView(html: bedienungshilfenHTML)
+                .navigationTitle("Bedienungshilfen")
+                .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
+
 // MARK: - WebKit Wrapper
 struct HTMLWebView: UIViewRepresentable {
     let html: String
@@ -164,7 +175,7 @@ private let impressumHTML = #"""
 <p>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr">ec.europa.eu/consumers/odr</a></p>
 <p>Zur Teilnahme an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle bin ich nicht verpflichtet und nicht bereit.</p>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.2 · Thomas Wagner · 26. Mai 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.3 · Thomas Wagner · 26. Mai 2026</p>
 
 </body>
 </html>
@@ -233,7 +244,7 @@ private let datenschutzHTML_de = #"""
 <body>
 
 <h1>Datenschutzerklärung</h1>
-<p class="meta">Fahrtkosten App · Version 1.15.2 · Stand 26. Mai 2026 · Build 9<br>
+<p class="meta">Fahrtkosten App · Version 1.15.3 · Stand 26. Mai 2026 · Build 9<br>
 Entwickler: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>Auf einen Blick</h2>
@@ -382,7 +393,7 @@ Entwickler: Thomas Wagner · info@wagner-fahrtkosten.de</p>
   Anfragen werden innerhalb von 30 Tagen beantwortet.
 </div>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.2 · Thomas Wagner · 26. Mai 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.3 · Thomas Wagner · 26. Mai 2026</p>
 
 </body>
 </html>
@@ -440,7 +451,7 @@ private let datenschutzHTML_en = #"""
 <body>
 
 <h1>Privacy Policy</h1>
-<p class="meta">Fahrtkosten App · Version 1.15.2 · May 26, 2026<br>
+<p class="meta">Fahrtkosten App · Version 1.15.3 · May 26, 2026<br>
 Developer: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>At a Glance</h2>
@@ -589,7 +600,7 @@ Developer: Thomas Wagner · info@wagner-fahrtkosten.de</p>
   Enquiries will be answered within 30 days.
 </div>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.2 · Thomas Wagner · May 26, 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.3 · Thomas Wagner · May 26, 2026</p>
 
 </body>
 </html>
@@ -644,7 +655,7 @@ private let datenschutzHTML_pl = #"""
 <body>
 
 <h1>Polityka prywatności</h1>
-<p class="meta">Fahrtkosten App · Wersja 1.15.2 · 26 Maj 2026<br>
+<p class="meta">Fahrtkosten App · Wersja 1.15.3 · 26 Maj 2026<br>
 Deweloper: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>W skrócie</h2>
@@ -793,7 +804,7 @@ Deweloper: Thomas Wagner · info@wagner-fahrtkosten.de</p>
   Zapytania będą odpowiedzone w ciągu 30 dni.
 </div>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Wersja 1.15.2 · Thomas Wagner · 26 Maj 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Wersja 1.15.3 · Thomas Wagner · 26 Maj 2026</p>
 
 </body>
 </html>
@@ -848,7 +859,7 @@ private let datenschutzHTML_cs = #"""
 <body>
 
 <h1>Zásady ochrany osobních údajů</h1>
-<p class="meta">Fahrtkosten App · Verze 1.15.2 · 26. května 2026<br>
+<p class="meta">Fahrtkosten App · Verze 1.15.3 · 26. května 2026<br>
 Vývojář: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>Stručný přehled</h2>
@@ -997,7 +1008,7 @@ Vývojář: Thomas Wagner · info@wagner-fahrtkosten.de</p>
   Dotazy budou zodpovězeny do 30 dnů.
 </div>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Verze 1.15.2 · Thomas Wagner · 26. května 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Verze 1.15.3 · Thomas Wagner · 26. května 2026</p>
 
 </body>
 </html>
@@ -1066,9 +1077,16 @@ private let hilfeHTML = #"""
 
 <h1>Fahrtkosten</h1>
 <p class="subtitle">Dienstreisen professionell, korrekt &amp; steuerkonform abrechnen.</p>
-<p><span class="version">Version 1.15.2</span></p>
+<p><span class="version">Version 1.15.3</span></p>
 
-<p>Fahrtkosten ist dein digitaler Reisekostenassistent für iPhone und iPad. Die App erfasst alle erstattungsfähigen Kosten einer Dienstreise – Fahrten, Verpflegung, Übernachtungen und Fahrzeugkosten – an einem Ort, berechnet alles automatisch nach den aktuellen gesetzlichen Pauschalsätzen und erstellt auf Knopfdruck eine fertige Abrechnung.</p>
+<p>Fahrtkosten ist dein digitaler Reisekostenassistent für iPhone, iPad und Mac. Die App erfasst alle erstattungsfähigen Kosten einer Dienstreise – Fahrten, Verpflegung, Übernachtungen und Fahrzeugkosten – an einem Ort, berechnet alles automatisch nach den aktuellen gesetzlichen Pauschalsätzen und erstellt auf Knopfdruck eine fertige Abrechnung.</p>
+
+<h2>Verfügbare Plattformen</h2>
+<div class="feature">📱 <strong>iPhone &amp; iPad</strong> – Vollständiger Funktionsumfang inkl. GPS-Aufzeichnung, Live Activity, CarPlay und Apple Watch-Verbindung. Erfordert iOS 17 oder neuer.</div>
+<div class="feature">💻 <strong>Mac (Apple Silicon)</strong> – Fahrtkosten läuft als „Designed for iPad" nativ auf Macs mit M1 oder neuer (macOS 14+). Alle Datenverwaltungsfunktionen verfügbar. GPS-Aufzeichnung, Live Activity, Dynamic Island und CarPlay sind iPhone-spezifisch und auf dem Mac nicht verfügbar.</div>
+<div class="feature">⌚ <strong>Apple Watch</strong> – GPS-Fahrten direkt vom Handgelenk starten und stoppen. Erfordert watchOS 10 oder neuer.</div>
+
+<hr>
 
 <h2>Alle Features auf einen Blick</h2>
 <div class="feature">🚗 <strong>Fahrten &amp; Kilometerpauschale</strong> – automatisch berechnet nach § 9 EStG (0,30 €/km, anpassbar)</div>
@@ -1107,8 +1125,9 @@ private let hilfeHTML = #"""
 <div class="tip">💡 Einträge per Swipe oder Langdruck duplizieren – praktisch für regelmäßige Strecken.</div>
 
 <h2>GPS-Aufzeichnung</h2>
-<p>Starte die Live-Aufzeichnung über die GPS-Kachel in der Fahrten-Ansicht. Die App zeichnet die Strecke präzise im Hintergrund auf – auch wenn du das iPhone weglегst oder der Bildschirm gesperrt ist. Nach dem Stopp werden Kilometer und Fahrzeit automatisch ins Fahrtformular übernommen.</p>
+<p>Starte die Live-Aufzeichnung über die GPS-Kachel in der Fahrten-Ansicht. Die App zeichnet die Strecke präzise im Hintergrund auf – auch wenn du das iPhone weglegest oder der Bildschirm gesperrt ist. Nach dem Stopp werden Kilometer und Fahrzeit automatisch ins Fahrtformular übernommen.</p>
 <div class="note">ℹ️ Für die Hintergrundaufzeichnung ist der Standortzugriff „Immer erlauben" erforderlich: Einstellungen → Datenschutz → Ortungsdienste → Fahrtkosten.</div>
+<div class="note">ℹ️ GPS-Aufzeichnung, Live Activity und CarPlay sind iPhone-spezifische Funktionen und auf dem Mac nicht verfügbar.</div>
 <div class="tip">💡 Intelligente Automatik: Stillstand über 5 Minuten → Aufzeichnung pausiert. Nach 30 Minuten Stillstand → Aufzeichnung stoppt automatisch.</div>
 <div class="tip">🚘 CarPlay-Nutzer sehen den Aufzeichnungsstatus direkt im Fahrzeugdisplay.</div>
 
@@ -1236,7 +1255,7 @@ private let hilfeHTML = #"""
   </div>
 </details>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.2 · Thomas Wagner · 26. Mai 2026<br>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.3 · Thomas Wagner · 26. Mai 2026<br>
 Kontakt: <a href="mailto:info@wagner-fahrtkosten.de">info@wagner-fahrtkosten.de</a></p>
 
 </body>
@@ -1315,17 +1334,40 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.15.2 – aktuell -->
+<!-- 1.15.3 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.15.2
+        Version 1.15.3
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">Mac-Unterstützung · Bedienungshilfen-Seite in App · Plattform-Info</div>
+    </div>
+    <span class="build-info">26. Mai 2026 · Build 13</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEU</span> <strong>Mac-Verfügbarkeit:</strong> Fahrtkosten läuft als „Designed for iPad" nativ auf Macs mit Apple Silicon (M1+, macOS 14+). Die App-Beschreibung und die Hilfeseite informieren jetzt vollständig darüber – inkl. Hinweis welche Funktionen iPhone-spezifisch sind (GPS, Live Activity, CarPlay).</li>
+      <li><span class="badge-new">NEU</span> <strong>Bedienungshilfen-Seite in der App:</strong> Unter Einstellungen → Info → Bedienungshilfen gibt es jetzt eine eigene Seite mit Erklärungen zu VoiceOver, Reduzierter Bewegung, Dynamic Type und weiteren iOS-Bedienungshilfen.</li>
+      <li><span class="badge-change">INFO</span> <strong>Plattformen:</strong> iPhone &amp; iPad (iOS 17+) · Mac mit Apple Silicon (macOS 14+) · Apple Watch (watchOS 10+).</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.15.2 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.15.2
       </div>
       <div class="preview-text">Bedienungshilfen · VoiceOver · Reduzierte Bewegung · Sprachsteuerung</div>
     </div>
-    <span class="build-info">26. Mai 2026 · Build 9</span>
+    <span class="build-info">26. Mai 2026 · Build 10</span>
     <span class="chevron">›</span>
   </summary>
   <div class="detail-content">
@@ -1437,7 +1479,7 @@ private let versionHistoryHTML = #"""
   </summary>
   <div class="detail-content">
     <ul>
-      <li><span class="badge-new">NEU</span> <strong>iCloud-Synchronisation:</strong> Alle Fahrtenbuch-Daten synchronisieren automatisch zwischen iPhone und iPad. Kein manueller Schritt nötig – Merge-Logik verhindert Datenverlust.</li>
+      <li><span class="badge-new">NEU</span> <strong>iCloud-Synchronisation:</strong> Alle Fahrtenbuch-Daten synchronisieren automatisch zwischen iPhone, iPad und Mac. Kein manueller Schritt nötig – Merge-Logik verhindert Datenverlust.</li>
       <li><span class="badge-new">NEU</span> <strong>Siri Shortcuts:</strong> Fahrten per Sprachbefehl starten und stoppen, Monatssumme abfragen oder Eintrag diktieren. Shortcuts erscheinen automatisch in der iOS Shortcuts-App. Laufende Fahrt wird als roter Banner in der App angezeigt.</li>
       <li><span class="badge-new">NEU</span> <strong>Statistiken & Auswertungen:</strong> Neuer Statistik-Tab in der Übersicht mit Monatschart, häufigsten Strecken und Jahres-Steuerauswertung für die Anlage N.</li>
       <li><span class="badge-new">NEU</span> <strong>Home Screen Widget:</strong> Monatssumme, Kilometeranzahl und Jahresvergleich direkt auf dem Homescreen – in drei Größen (klein, mittel, groß). Aktualisierung alle 30 Minuten.</li>
@@ -1662,6 +1704,228 @@ private let versionHistoryHTML = #"""
 
 <p class="meta" style="margin-top:24px;">Fahrtkosten · Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
+</body>
+</html>
+"""#
+
+// MARK: - Bedienungshilfen HTML
+private let bedienungshilfenHTML = #"""
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #f5f5f7; color: #1d1d1f; line-height: 1.6; font-size: 16px;
+  }
+  .container { max-width: 820px; margin: 0 auto; padding: 24px 18px 60px; }
+  .intro-card {
+    background: linear-gradient(135deg, #4a7fa5 0%, #3d6e8f 100%);
+    border-radius: 16px; padding: 22px 24px; margin-bottom: 16px;
+    color: white; box-shadow: 0 4px 20px rgba(74,127,165,0.3);
+  }
+  .intro-card h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+  .intro-card p { color: rgba(255,255,255,0.85); font-size: 0.9rem; margin: 0; }
+  .section {
+    background: #fff; border-radius: 16px; padding: 22px 18px;
+    margin-bottom: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #f0f0f0;
+  }
+  .section-icon {
+    background: #ddeaf4; color: #4a7fa5; width: 34px; height: 34px;
+    border-radius: 10px; display: flex; align-items: center;
+    justify-content: center; font-size: 1rem; flex-shrink: 0;
+  }
+  .section-header h2 { font-size: 1.1rem; font-weight: 700; }
+  p { margin: 8px 0; color: #3a3a3c; font-size: 0.93rem; }
+  p:first-child { margin-top: 0; }
+  strong { color: #1d1d1f; }
+  a { color: #4a7fa5; text-decoration: none; }
+  .tip {
+    background: #edf4f9; border-left: 3px solid #4a7fa5;
+    border-radius: 0 10px 10px 0; padding: 11px 14px; margin: 12px 0;
+    font-size: 0.88rem; color: #1d3557;
+  }
+  .tip strong { color: #4a7fa5; }
+  .note {
+    background: #f5f5f7; border-radius: 10px; padding: 12px 14px;
+    margin: 12px 0; font-size: 0.88rem; color: #3a3a3c; border: 1px solid #e5e5e7;
+  }
+  .note-label {
+    font-weight: 700; font-size: 0.7rem; letter-spacing: 0.07em;
+    text-transform: uppercase; color: #6e6e73; margin-bottom: 4px;
+  }
+  .subsection { margin-top: 20px; }
+  .subsection h3 { font-size: 0.9rem; font-weight: 600; color: #1d1d1f; margin-bottom: 8px; }
+  .feature-list { list-style: none; display: flex; flex-direction: column; gap: 9px; margin-top: 8px; }
+  .feature-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: #3a3a3c; }
+  .feature-list li .check { color: #4a7fa5; font-size: 0.95rem; flex-shrink: 0; margin-top: 1px; }
+  .steps { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .step {
+    display: flex; align-items: flex-start; gap: 12px;
+    background: #f9f9fb; border-radius: 10px; padding: 10px 14px;
+  }
+  .step-num {
+    background: #4a7fa5; color: white; width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+  }
+  .step-text { font-size: 0.88rem; color: #3a3a3c; line-height: 1.5; }
+  .step-text strong { color: #1d1d1f; }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+  .badge {
+    background: #edf4f9; color: #1d3557; border-radius: 20px;
+    padding: 4px 12px; font-size: 0.8rem; font-weight: 500; border: 1px solid #c8dcea;
+  }
+  .footer-meta {
+    text-align: center; color: #6e6e73; font-size: 0.82rem;
+    margin-top: 24px; padding-bottom: 16px; line-height: 1.8;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="intro-card">
+    <h2>Fahrtkosten ist für alle zugänglich</h2>
+    <p>Die App unterstützt die Bedienungshilfen von iOS vollständig –
+    damit jeder Nutzer die App sicher und bequem verwenden kann,
+    unabhängig von körperlichen Einschränkungen oder persönlichen Vorlieben.</p>
+  </div>
+
+  <!-- VoiceOver -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🔊</div>
+      <h2>VoiceOver</h2>
+    </div>
+    <p>Fahrtkosten unterstützt <strong>VoiceOver</strong> vollständig –
+    Apples eingebauten Screenreader für blinde und sehbehinderte Nutzer.</p>
+    <ul class="feature-list" style="margin-top:12px;">
+      <li><span class="check">✓</span> Alle Schaltflächen und Symbole haben aussagekräftige Beschriftungen</li>
+      <li><span class="check">✓</span> Datenkacheln werden vollständig vorgelesen</li>
+      <li><span class="check">✓</span> Listeneinträge enthalten Datum, Strecke, Kilometer und Erstattungsbetrag</li>
+      <li><span class="check">✓</span> Der aktive Fahrt-Banner nennt Ziel und vergangene Fahrzeit</li>
+      <li><span class="check">✓</span> Filter und Tabs zeigen den ausgewählten Zustand an</li>
+      <li><span class="check">✓</span> Dekorative Grafiken sind für Screenreader ausgeblendet</li>
+    </ul>
+    <div class="subsection">
+      <h3>VoiceOver aktivieren</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Einstellungen</strong> öffnen</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Bedienungshilfen</strong> antippen</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text"><strong>VoiceOver</strong> antippen und einschalten</div></div>
+      </div>
+    </div>
+    <div class="tip" style="margin-top:14px;">
+      <strong>Tipp:</strong> VoiceOver lässt sich auch per dreifachem Drücken der Seitentaste
+      ein- und ausschalten – sobald es unter <em>Einstellungen → Bedienungshilfen → Kurzbefehl</em>
+      eingerichtet wurde.
+    </div>
+  </div>
+
+  <!-- Reduzierte Bewegung -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">✋</div>
+      <h2>Reduzierte Bewegung</h2>
+    </div>
+    <p>Alle Animationen der App respektieren die iOS-Einstellung
+    <strong>„Bewegung reduzieren"</strong>. Wer auf Bewegungseffekte sensibel reagiert,
+    kann sie vollständig deaktivieren.</p>
+    <div class="steps" style="margin-top:12px;">
+      <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Einstellungen</strong> öffnen</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Bedienungshilfen → Bewegung</strong> antippen</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Bewegung reduzieren</strong> einschalten</div></div>
+    </div>
+  </div>
+
+  <!-- Dynamic Type -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🔤</div>
+      <h2>Dynamic Type – Schriftgröße</h2>
+    </div>
+    <p>Fahrtkosten passt sich automatisch der Schriftgröße an,
+    die du in den iOS-Einstellungen festgelegt hast – von sehr klein bis extra-groß.</p>
+    <div class="steps" style="margin-top:12px;">
+      <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Einstellungen</strong> öffnen</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Bedienungshilfen → Anzeige &amp; Textgröße</strong> antippen</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Größerer Text</strong> aktivieren und Schieberegler anpassen</div></div>
+    </div>
+  </div>
+
+  <!-- Weitere Bedienungshilfen -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">⚙️</div>
+      <h2>Weitere unterstützte Bedienungshilfen</h2>
+    </div>
+    <div class="subsection">
+      <h3>Kontrast &amp; Darstellung</h3>
+      <ul class="feature-list">
+        <li><span class="check">✓</span> <strong>Erhöhter Kontrast:</strong> Die App respektiert die iOS-Einstellung für mehr Kontrast</li>
+        <li><span class="check">✓</span> <strong>Dunkler Modus:</strong> Vollständige Unterstützung von Light Mode und Dark Mode</li>
+        <li><span class="check">✓</span> <strong>Transparenz reduzieren:</strong> Hintergründe werden bei Bedarf weniger transparent dargestellt</li>
+      </ul>
+    </div>
+    <div class="subsection">
+      <h3>Bedienung</h3>
+      <ul class="feature-list">
+        <li><span class="check">✓</span> <strong>Sprachsteuerung:</strong> Alle Elemente sind korrekt benannt und per Voice Control bedienbar</li>
+        <li><span class="check">✓</span> <strong>Wischgesten:</strong> Alle Listeneinträge unterstützen Wischgesten zum Bearbeiten und Löschen</li>
+        <li><span class="check">✓</span> <strong>Kontextmenü:</strong> Langes Drücken öffnet ein Kontextmenü mit allen Aktionen</li>
+      </ul>
+    </div>
+    <div class="subsection">
+      <h3>Apple Watch</h3>
+      <ul class="feature-list">
+        <li><span class="check">✓</span> Die Watch-App unterstützt die Schriftgröße aus den Watch-Einstellungen</li>
+        <li><span class="check">✓</span> Haptisches Feedback beim Starten und Stoppen einer Fahrt</li>
+      </ul>
+    </div>
+    <div class="badge-row">
+      <span class="badge">VoiceOver</span>
+      <span class="badge">Dynamic Type</span>
+      <span class="badge">Dark Mode</span>
+      <span class="badge">Erhöhter Kontrast</span>
+      <span class="badge">Reduzierte Bewegung</span>
+      <span class="badge">Sprachsteuerung</span>
+      <span class="badge">Haptik (Watch)</span>
+    </div>
+  </div>
+
+  <!-- Feedback -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">💬</div>
+      <h2>Feedback &amp; Verbesserungen</h2>
+    </div>
+    <p>Wenn eine Funktion mit VoiceOver oder einer anderen Bedienungshilfe
+    nicht korrekt funktioniert, freue ich mich über dein Feedback.</p>
+    <div class="tip" style="margin-top:12px;">
+      <strong>Kontakt:</strong> <a href="mailto:info@wagner-fahrtkosten.de">info@wagner-fahrtkosten.de</a> –
+      Rückmeldungen zu Bedienungshilfen werden bevorzugt bearbeitet.
+    </div>
+    <div class="note" style="margin-top:8px;">
+      <div class="note-label">Feedback direkt in der App</div>
+      Unter <strong>Einstellungen → Feedback &amp; Support</strong> kannst du
+      ein Protokoll der App-Aktivität mitschicken – das hilft bei der schnellen Fehlersuche.
+    </div>
+  </div>
+
+  <div class="footer-meta">
+    Fahrtkosten App &nbsp;·&nbsp; Version 1.15.3 &nbsp;·&nbsp; Thomas Wagner<br>
+    <a href="mailto:info@wagner-fahrtkosten.de">info@wagner-fahrtkosten.de</a>
+  </div>
+
+</div>
 </body>
 </html>
 """#
