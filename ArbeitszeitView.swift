@@ -393,6 +393,19 @@ struct ArbeitszeitRow: View {
     let isExpanded: Bool
     let onToggle:   () -> Void
 
+    /// Effektive Anzeigezeit: bei Fahrten mit Uhrzeiten wird die Gesamtspanne
+    /// (frühstes Start bis spätestes Ende) angezeigt – konsistent mit totalH.
+    private var displayRange: (start: Date, end: Date) {
+        let timed = trips.filter { $0.startTime != nil && $0.endTime != nil }
+        guard !timed.isEmpty else { return (meal.startTime, meal.endTime) }
+        // Nur Fahrten ohne eigene Arbeitszeit: Meal-Zeiten weglassen wenn hours ≈ 0
+        let includeMeal = meal.hours > 0.01
+        var starts = timed.compactMap { $0.startTime }
+        var ends   = timed.compactMap { $0.endTime }
+        if includeMeal { starts.append(meal.startTime); ends.append(meal.endTime) }
+        return (starts.min() ?? meal.startTime, ends.max() ?? meal.endTime)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
 
@@ -412,7 +425,7 @@ struct ArbeitszeitRow: View {
                         .font(.system(size: 15, weight: .semibold))
 
                     HStack(spacing: 4) {
-                        Text("\(meal.startTime.timeOnly)–\(meal.endTime.timeOnly)")
+                        Text("\(displayRange.start.timeOnly)–\(displayRange.end.timeOnly)")
                             .foregroundColor(.secondary)
                         Text("·")
                             .foregroundColor(.secondary)
