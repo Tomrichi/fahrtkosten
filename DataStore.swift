@@ -338,11 +338,34 @@ extension DataStore {
     func adjustedMealAllowance(for meal: MealEntry) -> Double {
         let totalH = totalWorkHours(for: meal)
         let rates = mealRates(for: meal.region)
+
+        // Wenn Zielort einer Fahrt des gleichen Tages = Heimatort:
+        // Kein Abendessen abzugsfähig → nur 50 % Pauschale (rate3to6), auch bei ≥ 6 h.
+        let homeAddress = local.string(forKey: "homeAddress")
+            ?? UserDefaults.standard.string(forKey: "homeAddress")
+            ?? ""
+        let cal = Calendar.current
+        let dayTrips = trips.filter { cal.isDate($0.date, inSameDayAs: meal.date) }
+
+        let returnsHome: Bool = !homeAddress.isEmpty &&
+            dayTrips.contains { $0.to.localizedCaseInsensitiveContains(homeAddress) }
+
+        // Volle Pauschale gilt wieder, wenn Reiseende ≥ 19:30 Uhr
+        let endsLate: Bool = {
+            var endCandidates: [Date] = dayTrips.compactMap { $0.endTime }
+            endCandidates.append(meal.endTime)
+            return endCandidates.contains { date in
+                let h = cal.component(.hour,   from: date)
+                let m = cal.component(.minute, from: date)
+                return h > 19 || (h == 19 && m >= 30)
+            }
+        }()
+
         let raw: Double
         switch totalH {
         case ..<3:  raw = rates.rate1to3
         case ..<6:  raw = rates.rate3to6
-        default:    raw = rates.rate6plus
+        default:    raw = (returnsHome && !endsLate) ? rates.rate3to6 : rates.rate6plus
         }
         return max(0, raw - meal.breakfastAmount) + meal.ownBreakfastAmount
     }
