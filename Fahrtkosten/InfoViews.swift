@@ -175,7 +175,7 @@ private let impressumHTML = #"""
 <p>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr">ec.europa.eu/consumers/odr</a></p>
 <p>Zur Teilnahme an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle bin ich nicht verpflichtet und nicht bereit.</p>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.3 · Thomas Wagner · 26. Mai 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.4 · Thomas Wagner · 26. Mai 2026</p>
 
 </body>
 </html>
@@ -244,7 +244,7 @@ private let datenschutzHTML_de = #"""
 <body>
 
 <h1>Datenschutzerklärung</h1>
-<p class="meta">Fahrtkosten App · Version 1.15.3 · Stand 26. Mai 2026 · Build 9<br>
+<p class="meta">Fahrtkosten App · Version 1.15.4 · Stand 26. Mai 2026 · Build 9<br>
 Entwickler: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>Auf einen Blick</h2>
@@ -393,7 +393,7 @@ Entwickler: Thomas Wagner · info@wagner-fahrtkosten.de</p>
   Anfragen werden innerhalb von 30 Tagen beantwortet.
 </div>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.3 · Thomas Wagner · 26. Mai 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.4 · Thomas Wagner · 26. Mai 2026</p>
 
 </body>
 </html>
@@ -451,7 +451,7 @@ private let datenschutzHTML_en = #"""
 <body>
 
 <h1>Privacy Policy</h1>
-<p class="meta">Fahrtkosten App · Version 1.15.3 · May 26, 2026<br>
+<p class="meta">Fahrtkosten App · Version 1.15.4 · May 26, 2026<br>
 Developer: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>At a Glance</h2>
@@ -600,7 +600,7 @@ Developer: Thomas Wagner · info@wagner-fahrtkosten.de</p>
   Enquiries will be answered within 30 days.
 </div>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.3 · Thomas Wagner · May 26, 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.4 · Thomas Wagner · May 26, 2026</p>
 
 </body>
 </html>
@@ -655,7 +655,7 @@ private let datenschutzHTML_pl = #"""
 <body>
 
 <h1>Polityka prywatności</h1>
-<p class="meta">Fahrtkosten App · Wersja 1.15.3 · 26 Maj 2026<br>
+<p class="meta">Fahrtkosten App · Wersja 1.15.4 · 26 Maj 2026<br>
 Deweloper: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>W skrócie</h2>
@@ -804,7 +804,7 @@ Deweloper: Thomas Wagner · info@wagner-fahrtkosten.de</p>
   Zapytania będą odpowiedzone w ciągu 30 dni.
 </div>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Wersja 1.15.3 · Thomas Wagner · 26 Maj 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Wersja 1.15.4 · Thomas Wagner · 26 Maj 2026</p>
 
 </body>
 </html>
@@ -859,7 +859,7 @@ private let datenschutzHTML_cs = #"""
 <body>
 
 <h1>Zásady ochrany osobních údajů</h1>
-<p class="meta">Fahrtkosten App · Verze 1.15.3 · 26. května 2026<br>
+<p class="meta">Fahrtkosten App · Verze 1.15.4 · 26. května 2026<br>
 Vývojář: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>Stručný přehled</h2>
@@ -1008,7 +1008,7 @@ Vývojář: Thomas Wagner · info@wagner-fahrtkosten.de</p>
   Dotazy budou zodpovězeny do 30 dnů.
 </div>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Verze 1.15.3 · Thomas Wagner · 26. května 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Verze 1.15.4 · Thomas Wagner · 26. května 2026</p>
 
 </body>
 </html>
@@ -1077,7 +1077,7 @@ private let hilfeHTML = #"""
 
 <h1>Fahrtkosten</h1>
 <p class="subtitle">Dienstreisen professionell, korrekt &amp; steuerkonform abrechnen.</p>
-<p><span class="version">Version 1.15.3</span></p>
+<p><span class="version">Version 1.15.4</span></p>
 
 <p>Fahrtkosten ist dein digitaler Reisekostenassistent für iPhone, iPad und Mac. Die App erfasst alle erstattungsfähigen Kosten einer Dienstreise – Fahrten, Verpflegung, Übernachtungen und Fahrzeugkosten – an einem Ort, berechnet alles automatisch nach den aktuellen gesetzlichen Pauschalsätzen und erstellt auf Knopfdruck eine fertige Abrechnung.</p>
 
@@ -1255,7 +1255,7 @@ private let hilfeHTML = #"""
   </div>
 </details>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.3 · Thomas Wagner · 26. Mai 2026<br>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.4 · Thomas Wagner · 26. Mai 2026<br>
 Kontakt: <a href="mailto:info@wagner-fahrtkosten.de">info@wagner-fahrtkosten.de</a></p>
 
 </body>
@@ -1334,12 +1334,12 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.15.3 – aktuell -->
+<!-- 1.15.4 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.15.3
+        Version 1.15.4
         <span class="current-badge">● Aktuell</span>
       </div>
       <div class="preview-text">Mac-Unterstützung · Bedienungshilfen-Seite in App · Plattform-Info</div>
@@ -1921,7 +1921,7 @@ private let bedienungshilfenHTML = #"""
   </div>
 
   <div class="footer-meta">
-    Fahrtkosten App &nbsp;·&nbsp; Version 1.15.3 &nbsp;·&nbsp; Thomas Wagner<br>
+    Fahrtkosten App &nbsp;·&nbsp; Version 1.15.4 &nbsp;·&nbsp; Thomas Wagner<br>
     <a href="mailto:info@wagner-fahrtkosten.de">info@wagner-fahrtkosten.de</a>
   </div>
 
