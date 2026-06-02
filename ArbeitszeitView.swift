@@ -393,16 +393,13 @@ struct ArbeitszeitRow: View {
     let isExpanded: Bool
     let onToggle:   () -> Void
 
-    /// Anzeigezeit: Wenn Fahrten mit Uhrzeiten vorhanden sind, wird nur deren
-    /// Zeitspanne gezeigt (frühste Abfahrt – späteste Ankunft).
-    /// Eigene Meal-Zeiten werden in der Anzeige ignoriert, damit keine
-    /// Default-Startzeit die Fahrzeit überlagert.
+    /// Gesamter Zeitbereich: frühstes Start und spätestes Ende aus Meal + allen Fahrten mit Uhrzeiten.
     private var displayRange: (start: Date, end: Date) {
         let timed = trips.filter { $0.startTime != nil && $0.endTime != nil }
         guard !timed.isEmpty else { return (meal.startTime, meal.endTime) }
-        let starts = timed.compactMap { $0.startTime }
-        let ends   = timed.compactMap { $0.endTime }
-        return (starts.min() ?? meal.startTime, ends.max() ?? meal.endTime)
+        let allStarts = timed.compactMap { $0.startTime } + [meal.startTime]
+        let allEnds   = timed.compactMap { $0.endTime }   + [meal.endTime]
+        return (allStarts.min() ?? meal.startTime, allEnds.max() ?? meal.endTime)
     }
 
     var body: some View {
