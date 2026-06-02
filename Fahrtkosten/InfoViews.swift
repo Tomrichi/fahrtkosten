@@ -175,7 +175,7 @@ private let impressumHTML = #"""
 <p>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr">ec.europa.eu/consumers/odr</a></p>
 <p>Zur Teilnahme an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle bin ich nicht verpflichtet und nicht bereit.</p>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.4 · Thomas Wagner · 26. Mai 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.10 · Thomas Wagner · 2. Juni 2026</p>
 
 </body>
 </html>
@@ -244,7 +244,7 @@ private let datenschutzHTML_de = #"""
 <body>
 
 <h1>Datenschutzerklärung</h1>
-<p class="meta">Fahrtkosten App · Version 1.15.4 · Stand 26. Mai 2026 · Build 9<br>
+<p class="meta">Fahrtkosten App · Version 1.15.10 · Stand 2. Juni 2026 · Build 17<br>
 Entwickler: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>Auf einen Blick</h2>
@@ -393,7 +393,7 @@ Entwickler: Thomas Wagner · info@wagner-fahrtkosten.de</p>
   Anfragen werden innerhalb von 30 Tagen beantwortet.
 </div>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.4 · Thomas Wagner · 26. Mai 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.10 · Thomas Wagner · 2. Juni 2026</p>
 
 </body>
 </html>
@@ -451,7 +451,7 @@ private let datenschutzHTML_en = #"""
 <body>
 
 <h1>Privacy Policy</h1>
-<p class="meta">Fahrtkosten App · Version 1.15.4 · May 26, 2026<br>
+<p class="meta">Fahrtkosten App · Version 1.15.10 · June 2, 2026<br>
 Developer: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>At a Glance</h2>
@@ -655,7 +655,7 @@ private let datenschutzHTML_pl = #"""
 <body>
 
 <h1>Polityka prywatności</h1>
-<p class="meta">Fahrtkosten App · Wersja 1.15.4 · 26 Maj 2026<br>
+<p class="meta">Fahrtkosten App · Wersja 1.15.10 · 2 Cze 2026<br>
 Deweloper: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>W skrócie</h2>
@@ -859,7 +859,7 @@ private let datenschutzHTML_cs = #"""
 <body>
 
 <h1>Zásady ochrany osobních údajů</h1>
-<p class="meta">Fahrtkosten App · Verze 1.15.4 · 26. května 2026<br>
+<p class="meta">Fahrtkosten App · Verze 1.15.10 · 2. června 2026<br>
 Vývojář: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>Stručný přehled</h2>
@@ -1077,7 +1077,7 @@ private let hilfeHTML = #"""
 
 <h1>Fahrtkosten</h1>
 <p class="subtitle">Dienstreisen professionell, korrekt &amp; steuerkonform abrechnen.</p>
-<p><span class="version">Version 1.15.4</span></p>
+<p><span class="version">Version 1.15.10</span></p>
 
 <p>Fahrtkosten ist dein digitaler Reisekostenassistent für iPhone, iPad und Mac. Die App erfasst alle erstattungsfähigen Kosten einer Dienstreise – Fahrten, Verpflegung, Übernachtungen und Fahrzeugkosten – an einem Ort, berechnet alles automatisch nach den aktuellen gesetzlichen Pauschalsätzen und erstellt auf Knopfdruck eine fertige Abrechnung.</p>
 
@@ -1255,7 +1255,7 @@ private let hilfeHTML = #"""
   </div>
 </details>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.4 · Thomas Wagner · 26. Mai 2026<br>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.10 · Thomas Wagner · 2. Juni 2026<br>
 Kontakt: <a href="mailto:info@wagner-fahrtkosten.de">info@wagner-fahrtkosten.de</a></p>
 
 </body>
@@ -1334,22 +1334,47 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.15.4 – aktuell -->
+<!-- 1.15.10 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.15.4
+        Version 1.15.10
         <span class="current-badge">● Aktuell</span>
       </div>
-      <div class="preview-text">Mac-Unterstützung · Bedienungshilfen-Seite in App · Plattform-Info</div>
+      <div class="preview-text">Geschäftlich/Privat · Arbeitszeit + Fahrten · Verpflegung automatisch</div>
     </div>
-    <span class="build-info">26. Mai 2026 · Build 13</span>
+    <span class="build-info">2. Juni 2026 · Build 17</span>
     <span class="chevron">›</span>
   </summary>
   <div class="detail-content">
     <ul>
-      <li><span class="badge-new">NEU</span> <strong>Mac-Verfügbarkeit:</strong> Fahrtkosten läuft als „Designed for iPad" nativ auf Macs mit Apple Silicon (M1+, macOS 14+). Die App-Beschreibung und die Hilfeseite informieren jetzt vollständig darüber – inkl. Hinweis welche Funktionen iPhone-spezifisch sind (GPS, Live Activity, CarPlay).</li>
+      <li><span class="badge-new">NEU</span> <strong>Geschäftlich / Privat:</strong> Beim Erfassen einer Fahrt kann nun zwischen Geschäftlich und Privat gewählt werden. Private Fahrten werden nicht in Erstattungen, Verpflegungspauschalen oder Arbeitszeit eingerechnet und sind in der Liste mit einem farbigen Icon gekennzeichnet.</li>
+      <li><span class="badge-new">NEU</span> <strong>Arbeitszeit zeigt Fahrten automatisch:</strong> Geschäftliche Fahrten erscheinen nun automatisch im Arbeitszeit-Tab – auch wenn kein separater Arbeitszeit-Eintrag vorhanden ist. Fahrten und Arbeitszeit desselben Tages werden zusammengeführt und aufklappbar angezeigt.</li>
+      <li><span class="badge-new">NEU</span> <strong>Verpflegungspauschale für Fahrt-only Tage:</strong> Ist nur eine Fahrt ohne Arbeitszeit-Eintrag vorhanden, berechnet die App die Verpflegungspauschale automatisch aus der Fahrtdauer – inkl. Heimfahrt-Regelung (halbe Pauschale vor 19:30 Uhr).</li>
+      <li><span class="badge-new">NEU</span> <strong>Fahrtzeiten in der Fahrtenliste:</strong> Start- und Endzeit einer Fahrt werden nun direkt in der Fahrtenliste angezeigt (z. B. 08:00–09:00).</li>
+      <li><span class="badge-new">NEU</span> <strong>Arbeitszeit gezielt löschen:</strong> Bei kombinierten Einträgen (Fahrt + Arbeitszeit) kann die Arbeitszeit über einen Mülleimer-Button einzeln gelöscht werden, ohne die Fahrt zu entfernen.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.15.4 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.15.10
+      </div>
+      <div class="preview-text">Mac-Unterstützung · Bedienungshilfen-Seite in App · Plattform-Info</div>
+    </div>
+    <span class="build-info">26. Mai 2026 · Build 13 (ersetzt durch 1.15.10)</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEU</span> <strong>Mac-Verfügbarkeit:</strong> Fahrtkosten läuft als „Designed for iPad" nativ auf Macs mit Apple Silicon (M1+, macOS 14+).</li>
       <li><span class="badge-new">NEU</span> <strong>Bedienungshilfen-Seite in der App:</strong> Unter Einstellungen → Info → Bedienungshilfen gibt es jetzt eine eigene Seite mit Erklärungen zu VoiceOver, Reduzierter Bewegung, Dynamic Type und weiteren iOS-Bedienungshilfen.</li>
       <li><span class="badge-change">INFO</span> <strong>Plattformen:</strong> iPhone &amp; iPad (iOS 17+) · Mac mit Apple Silicon (macOS 14+) · Apple Watch (watchOS 10+).</li>
     </ul>
@@ -1921,7 +1946,7 @@ private let bedienungshilfenHTML = #"""
   </div>
 
   <div class="footer-meta">
-    Fahrtkosten App &nbsp;·&nbsp; Version 1.15.4 &nbsp;·&nbsp; Thomas Wagner<br>
+    Fahrtkosten App &nbsp;·&nbsp; Version 1.15.10 &nbsp;·&nbsp; Thomas Wagner<br>
     <a href="mailto:info@wagner-fahrtkosten.de">info@wagner-fahrtkosten.de</a>
   </div>
 
