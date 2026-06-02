@@ -423,6 +423,7 @@ struct ArbeitszeitView: View {
 // MARK: - Kompakte aufklappbare Zeile
 struct ArbeitszeitRow: View {
     @EnvironmentObject var store: DataStore
+    @AppStorage("homeAddress") private var homeAddress: String = ""
     let meal:       MealEntry
     let trips:      [Trip]
     let adjusted:   Double
@@ -528,9 +529,19 @@ struct ArbeitszeitRow: View {
                                 .font(.system(size: 10))
                                 .foregroundColor(.blue)
                                 .frame(width: 14)
-                            Text("\(trip.from) → \(trip.to)")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                            HStack(spacing: 3) {
+                                if !homeAddress.isEmpty && trip.from.localizedCaseInsensitiveContains(homeAddress) {
+                                    Image(systemName: "house.fill").font(.system(size: 9)).foregroundColor(.orange)
+                                }
+                                Text(trip.from)
+                                Text("→").foregroundColor(.secondary)
+                                if !homeAddress.isEmpty && trip.to.localizedCaseInsensitiveContains(homeAddress) {
+                                    Image(systemName: "house.fill").font(.system(size: 9)).foregroundColor(.orange)
+                                }
+                                Text(trip.to)
+                            }
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                             Spacer()
                             if let st = trip.startTime, let et = trip.endTime {
                                 Text("\(st.timeOnly)–\(et.timeOnly)")
@@ -568,6 +579,7 @@ struct ArbeitszeitRow: View {
 // MARK: - Trip-only Arbeitszeit Row
 struct TripOnlyArbeitszeitRow: View {
     @EnvironmentObject var store: DataStore
+    @AppStorage("homeAddress") private var homeAddress: String = ""
     let trips:      [Trip]
     let isExpanded: Bool
     let onToggle:   () -> Void
@@ -631,9 +643,19 @@ struct TripOnlyArbeitszeitRow: View {
                                 .font(.system(size: 10))
                                 .foregroundColor(.blue)
                                 .frame(width: 14)
-                            Text("\(trip.from) → \(trip.to)")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                            HStack(spacing: 3) {
+                                if !homeAddress.isEmpty && trip.from.localizedCaseInsensitiveContains(homeAddress) {
+                                    Image(systemName: "house.fill").font(.system(size: 9)).foregroundColor(.orange)
+                                }
+                                Text(trip.from)
+                                Text("→").foregroundColor(.secondary)
+                                if !homeAddress.isEmpty && trip.to.localizedCaseInsensitiveContains(homeAddress) {
+                                    Image(systemName: "house.fill").font(.system(size: 9)).foregroundColor(.orange)
+                                }
+                                Text(trip.to)
+                            }
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                             Spacer()
                             if let st = trip.startTime, let et = trip.endTime {
                                 Text("\(st.timeOnly)–\(et.timeOnly)")

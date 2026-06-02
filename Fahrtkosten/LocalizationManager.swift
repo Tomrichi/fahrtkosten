@@ -113,7 +113,7 @@ let translations: [AppLanguage: [String: String]] = [
         "overview.accommodation.short": "Übernacht.",
 
         // Trips
-        "trips.gps.tile": "Aufzeichnung\nstarten",
+        "trips.gps.tile": "GPS starten",
         "trips.new.tile": "Neue\nFahrt",
         "trips.empty.title": "Keine Fahrten",
         "trips.empty.subtitle": "Starte eine GPS-Aufzeichnung oder füge eine Fahrt manuell hinzu",

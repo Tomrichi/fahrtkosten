@@ -216,19 +216,19 @@ struct FahrtenView: View {
                             AppLogger.shared.logTap("GPS-Aufzeichnung starten")
                             showGPSSheet = true
                         } label: {
-                            VStack(spacing: 6) {
+                            HStack(spacing: 6) {
                                 Image(systemName: "location.circle.fill")
-                                    .font(.system(size: 26))
+                                    .font(.system(size: 28))
                                     .foregroundColor(.iosGreen)
                                     .accessibilityHidden(true)
-                                Text(lm.t("trips.gps.tile"))
-                                    .font(.caption)
-                                    .multilineTextAlignment(.center)
+                                Text(lm.t("trips.gps.tile").replacingOccurrences(of: "\n", with: " "))
+                                    .font(.subheadline)
                                     .foregroundColor(.primary)
-                                    .lineLimit(2)
+                                    .lineLimit(1)
                             }
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
+                            .padding(.vertical, 16)
+                            .padding(.horizontal, 8)
                             .background(Color(.secondarySystemGroupedBackground))
                             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                             .overlay(
@@ -245,19 +245,19 @@ struct FahrtenView: View {
                             AppLogger.shared.logTap("Neue Fahrt (Kachel)")
                             showAdd = true
                         } label: {
-                            VStack(spacing: 6) {
+                            HStack(spacing: 6) {
                                 Image(systemName: "plus.circle.fill")
-                                    .font(.system(size: 26))
+                                    .font(.system(size: 28))
                                     .foregroundColor(.blue)
                                     .accessibilityHidden(true)
-                                Text(lm.t("trips.new.tile"))
-                                    .font(.caption)
-                                    .multilineTextAlignment(.center)
+                                Text(lm.t("trips.new.tile").replacingOccurrences(of: "\n", with: " "))
+                                    .font(.subheadline)
                                     .foregroundColor(.primary)
-                                    .lineLimit(2)
+                                    .lineLimit(1)
                             }
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
+                            .padding(.vertical, 16)
+                            .padding(.horizontal, 8)
                             .background(Color(.secondarySystemGroupedBackground))
                             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                             .overlay(
