@@ -45,6 +45,11 @@ struct MealRates {
 }
 
 // MARK: - Trip Model
+enum TripArt: String, Codable, CaseIterable {
+    case geschaeftlich = "Geschäftlich"
+    case privat        = "Privat"
+}
+
 struct Trip: Identifiable, Codable {
     var id = UUID()
     var from: String
@@ -52,6 +57,7 @@ struct Trip: Identifiable, Codable {
     var date: Date
     var km: Double
     var note: String
+    var art: TripArt = .geschaeftlich
     var distanceText: String?
     var durationText: String?
     var fahrzeitText: String?
@@ -82,17 +88,18 @@ struct Trip: Identifiable, Codable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, from, to, date, km, note, distanceText, durationText, fahrzeitText
+        case id, from, to, date, km, note, art, distanceText, durationText, fahrzeitText
         case fuelPricePerLiter, fuelConsumption, fuelTypeRaw, startTime, endTime
     }
 
     init(id: UUID = UUID(), from: String, to: String, date: Date = Date(),
-         km: Double, note: String = "", distanceText: String? = nil,
+         km: Double, note: String = "", art: TripArt = .geschaeftlich,
+         distanceText: String? = nil,
          durationText: String? = nil, fahrzeitText: String? = nil,
          fuelPricePerLiter: Double? = nil, fuelConsumption: Double? = nil,
          fuelTypeRaw: String? = nil, startTime: Date? = nil, endTime: Date? = nil) {
         self.id = id; self.from = from; self.to = to; self.date = date
-        self.km = km; self.note = note; self.distanceText = distanceText
+        self.km = km; self.note = note; self.art = art; self.distanceText = distanceText
         self.durationText = durationText; self.fahrzeitText = fahrzeitText
         self.fuelPricePerLiter = fuelPricePerLiter; self.fuelConsumption = fuelConsumption
         self.fuelTypeRaw = fuelTypeRaw; self.startTime = startTime; self.endTime = endTime
@@ -106,6 +113,7 @@ struct Trip: Identifiable, Codable {
         date = try c.decode(Date.self, forKey: .date)
         km = try c.decode(Double.self, forKey: .km)
         note = try c.decode(String.self, forKey: .note)
+        art  = try c.decodeIfPresent(TripArt.self, forKey: .art) ?? .geschaeftlich
         distanceText = try c.decodeIfPresent(String.self, forKey: .distanceText)
         durationText = try c.decodeIfPresent(String.self, forKey: .durationText)
         fahrzeitText = try c.decodeIfPresent(String.self, forKey: .fahrzeitText)

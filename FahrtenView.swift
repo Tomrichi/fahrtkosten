@@ -848,8 +848,12 @@ struct TripRow: View {
 
             // Hauptinhalt
             VStack(alignment: .leading, spacing: 4) {
-                // Zeile 1: Von → Nach
+                // Zeile 1: Von → Nach  (+  Art-Badge)
                 HStack(spacing: 5) {
+                    Image(systemName: trip.art == .privat ? "person.fill" : "briefcase.fill")
+                        .font(.system(size: 10))
+                        .foregroundStyle(trip.art == .privat ? Color.orange : Color.blue)
+                        .accessibilityHidden(true)
                     if !homeAddress.isEmpty && trip.from.localizedCaseInsensitiveContains(homeAddress) {
                         Image(systemName: "house.fill")
                             .font(.system(size: 9))
@@ -876,21 +880,29 @@ struct TripRow: View {
                     }
                 }
 
-                // Zeile 2: km · Zeit · Sprit — alles in einer Zeile
+                // Zeile 2: km · Dauer · Uhrzeiten
                 HStack(spacing: 0) {
                     Text(trip.km.kmFormatted)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.primary)
                     if let dur = trip.fahrzeitText ?? trip.durationText {
                         Text("  ·  " + dur)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.primary)
                     }
-                    if let fuel = fuelInfo {
-                        Text("  ·  " + fuel)
-                            .foregroundStyle(Color(.tertiaryLabel))
+                    if let st = trip.startTime, let et = trip.endTime {
+                        Text("  ·  \(st.timeOnly)–\(et.timeOnly)")
+                            .foregroundStyle(.primary)
                     }
                 }
                 .font(.system(size: 11))
                 .lineLimit(1)
+
+                // Zeile 3: Spritinfo (nur wenn vorhanden)
+                if let fuel = fuelInfo {
+                    Text(fuel)
+                        .font(.system(size: 11))
+                        .foregroundColor(Color(red: 0.3, green: 0.3, blue: 0.3))
+                        .lineLimit(1)
+                }
             }
 
             Spacer(minLength: 4)
@@ -951,6 +963,7 @@ struct TripFormView: View {
     @State private var date              = Date()
     @State private var kmString          = ""
     @State private var note              = ""
+    @State private var tripArt: TripArt  = .geschaeftlich
     @State private var fahrzeitText      = ""
     @State private var fahrzeitStart     : Date = Calendar.current.date(bySettingHour: 8, minute: 0, second: 0, of: Date()) ?? Date()
     @State private var fahrzeitEnd       : Date = Calendar.current.date(bySettingHour: 17, minute: 0, second: 0, of: Date()) ?? Date()
@@ -1190,6 +1203,39 @@ struct TripFormView: View {
                         TextField(lm.t("common.optional"), text: $note)
                             .multilineTextAlignment(.trailing)
                     }
+                    HStack(spacing: 0) {
+                        Button {
+                            tripArt = .geschaeftlich
+                        } label: {
+                            HStack(spacing: 6) {
+                                Image(systemName: "briefcase.fill")
+                                Text("Geschäftlich")
+                                    .fontWeight(.semibold)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(tripArt == .geschaeftlich ? Color.blue : Color(.systemGray5))
+                            .foregroundColor(tripArt == .geschaeftlich ? .white : Color(.label))
+                        }
+                        .buttonStyle(.plain)
+
+                        Button {
+                            tripArt = .privat
+                        } label: {
+                            HStack(spacing: 6) {
+                                Image(systemName: "house.fill")
+                                Text("Privat")
+                                    .fontWeight(.semibold)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(tripArt == .privat ? Color.orange : Color(.systemGray5))
+                            .foregroundColor(tripArt == .privat ? .white : Color(.label))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .listRowInsets(EdgeInsets())
                     // Abfahrtszeit
                     DatePicker("Abfahrt", selection: $fahrzeitStart, displayedComponents: .hourAndMinute)
                         .foregroundColor(.purple)
@@ -1682,6 +1728,7 @@ struct TripFormView: View {
             date        = t.date
             kmString    = String(Int(t.km.rounded()))
             note        = t.note
+            tripArt     = t.art
             fahrzeitText = t.fahrzeitText ?? t.durationText ?? ""
             // Picker-Modus aktivieren wenn Fahrzeit vorhanden
             // Start/Endzeit wiederherstellen
@@ -1781,7 +1828,7 @@ struct TripFormView: View {
 
         var trip = Trip(
             from: from, to: to, date: date,
-            km: kmValue, note: note,
+            km: kmValue, note: note, art: tripArt,
             distanceText: mapsService.routeResult?.distanceText,
             durationText: mapsService.routeResult?.durationText,
             fuelPricePerLiter: parseFuelInput(fuelPriceStr),
@@ -1798,33 +1845,10 @@ struct TripFormView: View {
         } else {
             store.addTrip(trip)
             AppLogger.shared.log("Fahrt gespeichert: \(from) → \(to), \(String(format: "%.1f", kmValue)) km", level: .store)
-            autoCreateMeal(for: trip)
         }
         dismiss()
     }
 
-    private func autoCreateMeal(for trip: Trip) {
-        let durationHours: Double
-        if let result = mapsService.routeResult {
-            durationHours = result.durationSeconds / 3600.0
-        } else {
-            durationHours = trip.km / 80.0
-        }
-        guard durationHours >= 3.0 else { return }
-        let alreadyExists = store.meals.contains {
-            Calendar.current.isDate($0.date, inSameDayAs: trip.date)
-        }
-        guard !alreadyExists else { return }
-        let cal       = Calendar.current
-        let startTime = cal.date(bySettingHour: 7, minute: 0, second: 0, of: trip.date) ?? trip.date
-        let endTime   = startTime.addingTimeInterval(max(durationHours, 3.0) * 3600.0)
-        let meal = MealEntry(
-            id: UUID(), date: trip.date,
-            startTime: startTime, endTime: endTime,
-            note: "Auto: \(trip.from) → \(trip.to)"
-        )
-        store.addMeal(meal)
-    }
 }
 
 // MARK: - Maps Route Section

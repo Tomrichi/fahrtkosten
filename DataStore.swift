@@ -226,8 +226,8 @@ class DataStore: ObservableObject {
     }
 
     // MARK: - Totals
-    var totalKmAmount:    Double { trips.reduce(0)           { $0 + $1.km * kmRate } }
-    var totalKm:          Double { trips.reduce(0)           { $0 + $1.km } }
+    var totalKmAmount:    Double { trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km * kmRate } }
+    var totalKm:          Double { trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km } }
     var totalMeal:        Double { meals.reduce(0)           { $0 + $1.allowance(rates: mealRates(for: $1.region)) } }
     var totalHotel:       Double { hotels.reduce(0)          { $0 + $1.amount(flat: hotelFlat) } }
     var totalVehicle:     Double { vehicleCosts.reduce(0)    { $0 + $1.amount } }
@@ -335,6 +335,48 @@ private extension Double {
 // MARK: - Verpflegungsberechnung mit Fahrzeit
 extension DataStore {
 
+    /// Verpflegungspauschale für Tage mit nur Fahrten (kein MealEntry).
+    func mealAllowanceForTripsOnly(_ dayTrips: [Trip]) -> Double {
+        guard let refDate = dayTrips.first?.date else { return 0 }
+        let cal = Calendar.current
+        // Alle Trips des Tages frisch aus dem Store – identisch zu adjustedMealAllowance
+        let allDayTrips = trips.filter { cal.isDate($0.date, inSameDayAs: refDate) && $0.art == .geschaeftlich }
+        let totalH = totalWorkHoursForTripsOnly(allDayTrips)
+        guard totalH > 0 else { return 0 }
+        let rates = mealRates(for: .inland)
+        let homeAddress = local.string(forKey: "homeAddress")
+            ?? UserDefaults.standard.string(forKey: "homeAddress") ?? ""
+        let returnsHome = !homeAddress.isEmpty &&
+            allDayTrips.contains { $0.to.localizedCaseInsensitiveContains(homeAddress) }
+        let endsLate = allDayTrips.compactMap { $0.endTime }.contains { d in
+            let h = cal.component(.hour, from: d); let m = cal.component(.minute, from: d)
+            return h > 19 || (h == 19 && m >= 30)
+        }
+        switch totalH {
+        case ..<3:  return rates.rate1to3
+        case ..<6:  return rates.rate3to6
+        default:    return (returnsHome && !endsLate) ? rates.rate3to6 : rates.rate6plus
+        }
+    }
+
+    func totalWorkHoursForTripsOnly(_ dayTrips: [Trip]) -> Double {
+        let timed = dayTrips.filter { $0.startTime != nil && $0.endTime != nil }
+        if !timed.isEmpty {
+            let cal = Calendar.current
+            func toSec(_ d: Date) -> Double {
+                Double(cal.component(.hour, from: d) * 3600 + cal.component(.minute, from: d) * 60)
+            }
+            let earliest = timed.compactMap { $0.startTime }.map(toSec).min() ?? 0
+            let latest   = timed.compactMap { $0.endTime   }.map(toSec).max() ?? 0
+            return max(0, (latest - earliest) / 3600.0)
+        }
+        // Fallback: nur fahrzeitText summieren
+        return dayTrips.reduce(0.0) { acc, trip in
+            guard let text = trip.fahrzeitText ?? trip.durationText, !text.isEmpty else { return acc }
+            return acc + parseFahrzeitText(text)
+        }
+    }
+
     func adjustedMealAllowance(for meal: MealEntry) -> Double {
         let totalH = totalWorkHours(for: meal)
         let rates = mealRates(for: meal.region)
@@ -345,7 +387,7 @@ extension DataStore {
             ?? UserDefaults.standard.string(forKey: "homeAddress")
             ?? ""
         let cal = Calendar.current
-        let dayTrips = trips.filter { cal.isDate($0.date, inSameDayAs: meal.date) }
+        let dayTrips = trips.filter { cal.isDate($0.date, inSameDayAs: meal.date) && $0.art == .geschaeftlich }
 
         let returnsHome: Bool = !homeAddress.isEmpty &&
             dayTrips.contains { $0.to.localizedCaseInsensitiveContains(homeAddress) }
@@ -375,7 +417,7 @@ extension DataStore {
         if meal.excludeTrips { return meal.hours }
 
         let cal = Calendar.current
-        let dayTrips = trips.filter { cal.isDate($0.date, inSameDayAs: meal.date) }
+        let dayTrips = trips.filter { cal.isDate($0.date, inSameDayAs: meal.date) && $0.art == .geschaeftlich }
         // Alle MealEntries des gleichen Tages einbeziehen – nicht nur den aktuellen
         let dayMeals = meals.filter { cal.isDate($0.date, inSameDayAs: meal.date) && !$0.excludeTrips }
 
