@@ -2,18 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleShortVersionString</key>
-	<string>1.15.4</string>
-	<key>CFBundleVersion</key>
-	<string>16</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.widgetkit-extension</string>
 	</dict>
-	<key>CFBundleIdentifier</key>
-	<string></string>
-	<key>NSSupportsLiveActivities</key>
-	<true/>
 </dict>
 </plist>

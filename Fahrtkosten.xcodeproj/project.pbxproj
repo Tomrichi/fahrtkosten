@@ -33,13 +33,13 @@
 		4AAB58402FBE602F00B12F04 /* .storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4AAB583A2FBE602F00B12F04 /* .storyboard */; };
 		4AAB58412FBE602F00B12F04 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AAB583D2FBE602F00B12F04 /* ShareViewController.swift */; };
 		4AAB58422FBE608200B12F04 /* ReisespesenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A5874452F8DFD3700B46E99 /* ReisespesenView.swift */; };
-		BE0F0001CAFECAFE /* RecurringTripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0F0002CAFECAFE /* RecurringTripView.swift */; };
 		4AE9A9472FB367AF003B89DF /* ActiveTripBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE9A9452FB367AF003B89DF /* ActiveTripBanner.swift */; };
 		4AE9A9482FB367AF003B89DF /* FahrtkostenIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE9A9462FB367AF003B89DF /* FahrtkostenIntents.swift */; };
 		4AE9A94A2FB36C80003B89DF /* StatistikView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE9A9492FB36C80003B89DF /* StatistikView.swift */; };
 		4AE9A9522FB37022003B89DF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AE9A9512FB37022003B89DF /* WidgetKit.framework */; };
 		4AE9A9542FB37022003B89DF /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AE9A9532FB37022003B89DF /* SwiftUI.framework */; };
 		4AE9A9632FB37024003B89DF /* FahrtkostenWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4AE9A94F2FB37022003B89DF /* FahrtkostenWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BE0F0001CAFECAFE /* RecurringTripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0F0002CAFECAFE /* RecurringTripView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -101,7 +101,6 @@
 		4A5874432F8DFD3700B46E99 /* ReceiptParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptParser.swift; sourceTree = "<group>"; };
 		4A5874442F8DFD3700B46E99 /* ReceiptScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptScannerView.swift; sourceTree = "<group>"; };
 		4A5874452F8DFD3700B46E99 /* ReisespesenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReisespesenView.swift; sourceTree = "<group>"; };
-		BE0F0002CAFECAFE /* RecurringTripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringTripView.swift; sourceTree = "<group>"; };
 		4A8674972F82E1CD00885EED /* Fahrtkosten.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Fahrtkosten.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A8674C22F82E6AC00885EED /* DataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
 		4A8674C42F82E6AC00885EED /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
@@ -129,6 +128,7 @@
 		4AE9A94F2FB37022003B89DF /* FahrtkostenWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FahrtkostenWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		4AE9A9512FB37022003B89DF /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		4AE9A9532FB37022003B89DF /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		BE0F0002CAFECAFE /* RecurringTripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringTripView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -564,7 +564,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = 2HE885H8JT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -577,7 +577,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.15.4;
+				MARKETING_VERSION = 1.15.10;
 				PRODUCT_BUNDLE_IDENTIFIER = Thomas.Fahrtkosten.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -599,7 +599,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = 2HE885H8JT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -612,7 +612,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.15.4;
+				MARKETING_VERSION = 1.15.10;
 				PRODUCT_BUNDLE_IDENTIFIER = Thomas.Fahrtkosten.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -633,11 +633,11 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = FahrtkostenShareExtension/FahrtkostenShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = 2HE885H8JT;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FahrtkostenShareExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = FahrtkostenShareExtension;
+				INFOPLIST_KEY_CFBundleDisplayName = Fahrtkosten;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -645,7 +645,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.15.4;
+				MARKETING_VERSION = 1.15.10;
 				PRODUCT_BUNDLE_IDENTIFIER = Thomas.Fahrtkosten.FahrtkostenShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -663,11 +663,11 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = FahrtkostenShareExtension/FahrtkostenShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = 2HE885H8JT;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FahrtkostenShareExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = FahrtkostenShareExtension;
+				INFOPLIST_KEY_CFBundleDisplayName = Fahrtkosten;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -675,7 +675,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.15.4;
+				MARKETING_VERSION = 1.15.10;
 				PRODUCT_BUNDLE_IDENTIFIER = Thomas.Fahrtkosten.FahrtkostenShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -722,7 +722,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 2HE885H8JT;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -744,7 +744,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.15.4;
+				MARKETING_VERSION = 1.15.10;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -789,7 +789,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 2HE885H8JT;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -805,7 +805,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.15.4;
+				MARKETING_VERSION = 1.15.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -823,7 +823,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Fahrtkosten/Fahrtkosten.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = 2HE885H8JT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -840,7 +840,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.15.4;
+				MARKETING_VERSION = 1.15.10;
 				PRODUCT_BUNDLE_IDENTIFIER = Thomas.Fahrtkosten;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -862,7 +862,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Fahrtkosten/Fahrtkosten.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = 2HE885H8JT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -879,7 +879,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.15.4;
+				MARKETING_VERSION = 1.15.10;
 				PRODUCT_BUNDLE_IDENTIFIER = Thomas.Fahrtkosten;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -899,19 +899,20 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = FahrtkostenWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = 2HE885H8JT;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FahrtkostenWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = FahrtkostenWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.15.4;
+				MARKETING_VERSION = 1.15.10;
 				PRODUCT_BUNDLE_IDENTIFIER = Thomas.Fahrtkosten.FahrtkostenWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -931,19 +932,20 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = FahrtkostenWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = 2HE885H8JT;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FahrtkostenWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = FahrtkostenWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.15.4;
+				MARKETING_VERSION = 1.15.10;
 				PRODUCT_BUNDLE_IDENTIFIER = Thomas.Fahrtkosten.FahrtkostenWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
