@@ -452,7 +452,7 @@
 		4A420D842F859AF30090B362 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
+			buildActionMask = 8;
 			files = (
 			);
 			inputFileListPaths = (
@@ -464,9 +464,9 @@
 			);
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nif [ \"$CONFIGURATION\" = \"Release\" ]; then\n  buildNumber=$((CURRENT_PROJECT_VERSION + 1))\n  cd \"$PROJECT_DIR\"\n  agvtool new-version -all $buildNumber\nfi\n";
+			shellScript = "export PATH=\"/usr/bin:/usr/local/bin:$PATH\"\n\nif [ \"${CONFIGURATION}\" == \"Release\" ] && [ \"${ACTION}\" == \"install\" ]; then\n    buildNumber=$((CURRENT_PROJECT_VERSION + 1))\n    cd \"$PROJECT_DIR\"\n    agvtool new-version -all $buildNumber\n    \n    git add -A\n    git commit -m \"Build $buildNumber\"\n    git tag \"build-$buildNumber\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
