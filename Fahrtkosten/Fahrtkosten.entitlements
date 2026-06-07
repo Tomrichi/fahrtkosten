@@ -20,11 +20,9 @@
     <key>com.apple.developer.ubiquity-kvstore-identifier</key>
     <string>$(TeamIdentifierPrefix)de.tommwagner.fahrtkosten</string>
 
-    <!-- CarPlay Parking Entitlement -->
-    <!-- NOCH NICHT AKTIV – wartet auf Apple-Genehmigung -->
-    <!-- Nach Genehmigung diese beiden Zeilen einkommentieren: -->
-    <!-- <key>com.apple.developer.carplay-parking</key> -->
-    <!-- <true/> -->
+    <!-- CarPlay Driving Task Entitlement -->
+    <key>com.apple.developer.carplay-driving-task</key>
+    <true/>
 
 </dict>
 </plist>

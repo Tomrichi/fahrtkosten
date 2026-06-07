@@ -175,7 +175,7 @@ private let impressumHTML = #"""
 <p>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr">ec.europa.eu/consumers/odr</a></p>
 <p>Zur Teilnahme an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle bin ich nicht verpflichtet und nicht bereit.</p>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.10 · Thomas Wagner · 2. Juni 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.16.10 · Thomas Wagner · 2. Juni 2026</p>
 
 </body>
 </html>
@@ -244,7 +244,7 @@ private let datenschutzHTML_de = #"""
 <body>
 
 <h1>Datenschutzerklärung</h1>
-<p class="meta">Fahrtkosten App · Version 1.15.10 · Stand 2. Juni 2026 · Build 17<br>
+<p class="meta">Fahrtkosten App · Version 1.16.10 · Stand 2. Juni 2026 · Build 17<br>
 Entwickler: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>Auf einen Blick</h2>
@@ -393,7 +393,7 @@ Entwickler: Thomas Wagner · info@wagner-fahrtkosten.de</p>
   Anfragen werden innerhalb von 30 Tagen beantwortet.
 </div>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.10 · Thomas Wagner · 2. Juni 2026</p>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.16.10 · Thomas Wagner · 2. Juni 2026</p>
 
 </body>
 </html>
@@ -451,7 +451,7 @@ private let datenschutzHTML_en = #"""
 <body>
 
 <h1>Privacy Policy</h1>
-<p class="meta">Fahrtkosten App · Version 1.15.10 · June 2, 2026<br>
+<p class="meta">Fahrtkosten App · Version 1.16.10 · June 2, 2026<br>
 Developer: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>At a Glance</h2>
@@ -655,7 +655,7 @@ private let datenschutzHTML_pl = #"""
 <body>
 
 <h1>Polityka prywatności</h1>
-<p class="meta">Fahrtkosten App · Wersja 1.15.10 · 2 Cze 2026<br>
+<p class="meta">Fahrtkosten App · Wersja 1.16.10 · 2 Cze 2026<br>
 Deweloper: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>W skrócie</h2>
@@ -859,7 +859,7 @@ private let datenschutzHTML_cs = #"""
 <body>
 
 <h1>Zásady ochrany osobních údajů</h1>
-<p class="meta">Fahrtkosten App · Verze 1.15.10 · 2. června 2026<br>
+<p class="meta">Fahrtkosten App · Verze 1.16.10 · 2. června 2026<br>
 Vývojář: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 
 <h2>Stručný přehled</h2>
@@ -1077,7 +1077,7 @@ private let hilfeHTML = #"""
 
 <h1>Fahrtkosten</h1>
 <p class="subtitle">Dienstreisen professionell, korrekt &amp; steuerkonform abrechnen.</p>
-<p><span class="version">Version 1.15.10</span></p>
+<p><span class="version">Version 1.16.10</span></p>
 
 <p>Fahrtkosten ist dein digitaler Reisekostenassistent für iPhone, iPad und Mac. Die App erfasst alle erstattungsfähigen Kosten einer Dienstreise – Fahrten, Verpflegung, Übernachtungen und Fahrzeugkosten – an einem Ort, berechnet alles automatisch nach den aktuellen gesetzlichen Pauschalsätzen und erstellt auf Knopfdruck eine fertige Abrechnung.</p>
 
@@ -1093,7 +1093,7 @@ private let hilfeHTML = #"""
 <div class="feature">🕐 <strong>Abfahrts- &amp; Ankunftszeit</strong> – pro Fahrt erfassbar, fließt in Verpflegungspauschale ein</div>
 <div class="feature">📍 <strong>GPS-Streckenaufzeichnung</strong> – Hintergrundtracking mit intelligenter Pause- und Stopp-Automatik</div>
 <div class="feature">🗺️ <strong>Apple Maps Integration</strong> – Kilometerzahl per Adresseingabe automatisch berechnen</div>
-<div class="feature">🚘 <strong>CarPlay-Integration</strong> – Aufzeichnungsstatus direkt im Fahrzeugdisplay sichtbar</div>
+<div class="feature">🚘 <strong>CarPlay-Integration</strong> – GPS starten/stoppen, laufende Fahrt und Monatsübersicht direkt am Fahrzeugdisplay</div>
 <div class="feature">⛽ <strong>5 Antriebsarten</strong> – Super E5, E10, Diesel, Elektro, Hybrid; Preis &amp; Verbrauch je Antriebsart getrennt gespeichert</div>
 <div class="feature">⚡ <strong>Elektro &amp; Hybrid</strong> – Verbrauch in kWh/100 km; Hybrid berechnet Strom- und Benzinkosten getrennt</div>
 <div class="feature">🔋 <strong>Live-Spritpreise</strong> – günstigster Preis in der Nähe via Tankerkönig API (Benzin/Diesel)</div>
@@ -1255,7 +1255,7 @@ private let hilfeHTML = #"""
   </div>
 </details>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.15.10 · Thomas Wagner · 2. Juni 2026<br>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.16.10 · Thomas Wagner · 2. Juni 2026<br>
 Kontakt: <a href="mailto:info@wagner-fahrtkosten.de">info@wagner-fahrtkosten.de</a></p>
 
 </body>
@@ -1334,21 +1334,22 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.15.10 – aktuell -->
+<!-- 1.16.10 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.15.10
+        Version 1.16.10
         <span class="current-badge">● Aktuell</span>
       </div>
-      <div class="preview-text">Geschäftlich/Privat · Arbeitszeit + Fahrten · Verpflegung automatisch</div>
+      <div class="preview-text">CarPlay · GPS via Display · Geschäftlich/Privat · Arbeitszeit + Fahrten</div>
     </div>
-    <span class="build-info">2. Juni 2026 · Build 17</span>
+    <span class="build-info">6. Juni 2026 · Build 20</span>
     <span class="chevron">›</span>
   </summary>
   <div class="detail-content">
     <ul>
+      <li><span class="badge-new">NEU</span> <strong>CarPlay-Integration:</strong> GPS-Aufzeichnung starten und stoppen direkt am Fahrzeugdisplay – ohne das iPhone anfassen zu müssen. Das Dashboard zeigt laufende Fahrt, Fahrzeit, geschätzte Erstattung und Monatsübersicht.</li>
       <li><span class="badge-new">NEU</span> <strong>Geschäftlich / Privat:</strong> Beim Erfassen einer Fahrt kann nun zwischen Geschäftlich und Privat gewählt werden. Private Fahrten werden nicht in Erstattungen, Verpflegungspauschalen oder Arbeitszeit eingerechnet und sind in der Liste mit einem farbigen Icon gekennzeichnet.</li>
       <li><span class="badge-new">NEU</span> <strong>Arbeitszeit zeigt Fahrten automatisch:</strong> Geschäftliche Fahrten erscheinen nun automatisch im Arbeitszeit-Tab – auch wenn kein separater Arbeitszeit-Eintrag vorhanden ist. Fahrten und Arbeitszeit desselben Tages werden zusammengeführt und aufklappbar angezeigt.</li>
       <li><span class="badge-new">NEU</span> <strong>Verpflegungspauschale für Fahrt-only Tage:</strong> Ist nur eine Fahrt ohne Arbeitszeit-Eintrag vorhanden, berechnet die App die Verpflegungspauschale automatisch aus der Fahrtdauer – inkl. Heimfahrt-Regelung (halbe Pauschale vor 19:30 Uhr).</li>
@@ -1365,11 +1366,11 @@ private let versionHistoryHTML = #"""
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.15.10
+        Version 1.16.10
       </div>
       <div class="preview-text">Mac-Unterstützung · Bedienungshilfen-Seite in App · Plattform-Info</div>
     </div>
-    <span class="build-info">26. Mai 2026 · Build 13 (ersetzt durch 1.15.10)</span>
+    <span class="build-info">26. Mai 2026 · Build 13 (ersetzt durch 1.16.10)</span>
     <span class="chevron">›</span>
   </summary>
   <div class="detail-content">
@@ -1946,7 +1947,7 @@ private let bedienungshilfenHTML = #"""
   </div>
 
   <div class="footer-meta">
-    Fahrtkosten App &nbsp;·&nbsp; Version 1.15.10 &nbsp;·&nbsp; Thomas Wagner<br>
+    Fahrtkosten App &nbsp;·&nbsp; Version 1.16.10 &nbsp;·&nbsp; Thomas Wagner<br>
     <a href="mailto:info@wagner-fahrtkosten.de">info@wagner-fahrtkosten.de</a>
   </div>
 

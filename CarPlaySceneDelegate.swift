@@ -80,28 +80,35 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
                 ? String(format: "%d:%02d:%02d", h, m, s)
                 : String(format: "%02d:%02d", m, s)
 
-            items.append(CPInformationItem(title: "🔴 GPS-Aufzeichnung", detail: "Aktiv"))
-            items.append(CPInformationItem(title: "Strecke", detail: "\(Int(gps.km.rounded())) km"))
+            items.append(CPInformationItem(title: "🔴 GPS läuft", detail: "\(String(format: "%.1f", gps.km)) km"))
             items.append(CPInformationItem(title: "Fahrzeit", detail: timeStr))
+            items.append(CPInformationItem(title: "Erstattung ca.", detail: carPlayEuro(gps.km * CarPlayDataAccess.kmRate())))
 
-        // ── Bereit ────────────────────────────────────────────────
+            let stopGPSBtn = CPTextButton(title: "GPS stoppen",
+                                          textStyle: .cancel) { [weak self] _ in
+                self?.stopGPSFromCarPlay()
+            }
+            actions.append(stopGPSBtn)
+
+        // ── Bereit → GPS starten anbieten ─────────────────────────
         } else {
-            items.append(CPInformationItem(title: "Status", detail: "Bereit"))
+            items.append(CPInformationItem(title: "Heute", detail: "\(Int(monthly.monthKm)) km · \(monthly.tripCount) Fahrten"))
+            items.append(CPInformationItem(title: "Erstattung", detail: carPlayEuro(monthly.monthEuro)))
+
+            let startGPSBtn = CPTextButton(title: "🛰 GPS starten",
+                                           textStyle: .confirm) { [weak self] _ in
+                self?.startGPSFromCarPlay()
+            }
+            actions.append(startGPSBtn)
         }
 
-        // ── Monatsdaten immer anzeigen ─────────────────────────────
-        items.append(CPInformationItem(
-            title: "Monat",
-            detail: "\(monthly.monthLabel)"
-        ))
-        items.append(CPInformationItem(
-            title: "Erstattung",
-            detail: carPlayEuro(monthly.monthEuro)
-        ))
-        items.append(CPInformationItem(
-            title: "Kilometer",
-            detail: "\(Int(monthly.monthKm)) km · \(monthly.tripCount) Fahrten"
-        ))
+        // ── Monatsdaten nur anzeigen wenn GPS läuft oder Fahrt aktiv ─
+        if active != nil || gps.recording {
+            items.append(CPInformationItem(
+                title: monthly.monthLabel,
+                detail: "\(Int(monthly.monthKm)) km · \(carPlayEuro(monthly.monthEuro))"
+            ))
+        }
 
         // ── Template ───────────────────────────────────────────────
         let title = active != nil
@@ -118,6 +125,38 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
         )
 
         interfaceController?.setRootTemplate(tpl, animated: false, completion: nil)
+    }
+
+    // MARK: - GPS über CarPlay starten
+    // Sendet ein Signal via App Group → die Haupt-App startet den LocationTracker
+    private func startGPSFromCarPlay() {
+        guard let ud = UserDefaults(suiteName: Self.appGroup) else { return }
+        ud.set(true, forKey: "carPlayStartGPS")
+        ud.synchronize()
+        // Notification an die laufende App
+        NotificationCenter.default.post(name: NSNotification.Name("carPlayStartGPS"), object: nil)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            self?.renderDashboard()
+        }
+    }
+
+    // MARK: - GPS über CarPlay stoppen
+    private func stopGPSFromCarPlay() {
+        guard let ud = UserDefaults(suiteName: Self.appGroup) else { return }
+        ud.set(true, forKey: "carPlayStopGPS")
+        ud.synchronize()
+        NotificationCenter.default.post(name: NSNotification.Name("carPlayStopGPS"), object: nil)
+
+        let items = [
+            CPInformationItem(title: "✓ GPS wird gestoppt", detail: "Fahrt wird gespeichert…"),
+            CPInformationItem(title: "Hinweis", detail: "Details in der App prüfen")
+        ]
+        let tpl = CPInformationTemplate(title: "Fahrt beendet", layout: .leading, items: items, actions: [])
+        interfaceController?.setRootTemplate(tpl, animated: true, completion: nil)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+            self?.renderDashboard()
+        }
     }
 
     // MARK: - Siri-Fahrt über CarPlay stoppen

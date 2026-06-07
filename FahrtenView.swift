@@ -489,6 +489,24 @@ struct FahrtenView: View {
                 let km         = note.userInfo?["km"] as? Double ?? 0
                 importMode = .importFromMaps(from: from, to: to, travelTime: travelTime, km: km)
             }
+            // ── CarPlay GPS-Signale ────────────────────────────────
+            .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("carPlayStartGPS"))) { _ in
+                locationTracker.requestAndStart()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("carPlayStopGPS"))) { _ in
+                locationTracker.stopAndGeocode { from, to, km in
+                    let trip = Trip(
+                        from: from.isEmpty ? "Startort" : from,
+                        to:   to.isEmpty   ? "Zielort"  : to,
+                        date: Date(),
+                        km:   km,
+                        note: "GPS via CarPlay",
+                        startTime: nil,
+                        endTime: Date()
+                    )
+                    store.addTrip(trip)
+                }
+            }
         }
     }
 }
