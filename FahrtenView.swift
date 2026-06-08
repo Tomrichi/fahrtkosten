@@ -205,6 +205,28 @@ struct FahrtenView: View {
 
     @StateObject private var locationTracker = LocationTracker()
 
+    private func handleCarPlayStopGPS() {
+        let ud = UserDefaults(suiteName: "group.de.tommwagner.fahrtkosten")
+        let autoStopped = ud?.bool(forKey: "carPlayAutoStopped") ?? false
+        ud?.removeObject(forKey: "carPlayAutoStopped")
+        if autoStopped {
+            // CarPlay getrennt → Sheet öffnen, User prüft Daten selbst
+            showGPSSheet = true
+        } else {
+            // Manuell per CarPlay-Button gestoppt → direkt speichern
+            locationTracker.stopAndGeocode { from, to, km in
+                let trip = Trip(
+                    from: from.isEmpty ? "Startort" : from,
+                    to:   to.isEmpty   ? "Zielort"  : to,
+                    date: Date(), km: km,
+                    note: "GPS via CarPlay",
+                    startTime: nil, endTime: Date()
+                )
+                store.addTrip(trip)
+            }
+        }
+    }
+
     var body: some View {
         NavigationStack {
             List {
@@ -494,18 +516,7 @@ struct FahrtenView: View {
                 locationTracker.requestAndStart()
             }
             .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("carPlayStopGPS"))) { _ in
-                locationTracker.stopAndGeocode { from, to, km in
-                    let trip = Trip(
-                        from: from.isEmpty ? "Startort" : from,
-                        to:   to.isEmpty   ? "Zielort"  : to,
-                        date: Date(),
-                        km:   km,
-                        note: "GPS via CarPlay",
-                        startTime: nil,
-                        endTime: Date()
-                    )
-                    store.addTrip(trip)
-                }
+                handleCarPlayStopGPS()
             }
         }
     }

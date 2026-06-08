@@ -26,7 +26,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>22</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>CPSupportedTemplates</key>
 	<array>
 		<string>CPInformationTemplate</string>

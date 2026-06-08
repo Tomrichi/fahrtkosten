@@ -29,6 +29,18 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
         interfaceController = nil
         refreshTimer?.invalidate()
         refreshTimer = nil
+
+        // GPS läuft noch → automatisch stoppen und an die App übergeben
+        let gps = readGPSState()
+        if gps.recording {
+            guard let ud = UserDefaults(suiteName: Self.appGroup) else { return }
+            ud.set(true, forKey: "carPlayStopGPS")
+            ud.set(true, forKey: "carPlayAutoStopped") // Marker: App soll GPS-Sheet öffnen
+            ud.synchronize()
+            NotificationCenter.default.post(
+                name: NSNotification.Name("carPlayStopGPS"), object: nil
+            )
+        }
     }
 
     // GPS-Status direkt aus App Group UserDefaults lesen (prozessübergreifend zuverlässig)
@@ -114,7 +126,7 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
         let title = active != nil
             ? "Fahrt läuft"
             : gps.recording
-                ? "GPS · Fahrtkosten"
+                ? "GPS · Fahrt"
                 : "Fahrtkosten"
 
         let tpl = CPInformationTemplate(
