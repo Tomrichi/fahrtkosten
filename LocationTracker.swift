@@ -7,8 +7,8 @@ import ActivityKit
 
 // MARK: - Live Activity Attributes
 // activityType-String muss mit FahrtkostenWidgetLiveActivity.swift übereinstimmen
-struct FahrtkostenGPSAttributes: ActivityAttributes {
-    struct ContentState: Codable, Hashable {
+nonisolated struct FahrtkostenGPSAttributes: ActivityAttributes {
+    nonisolated struct ContentState: Codable, Hashable {
         var km: Double
         var elapsedSeconds: Int
         var speedKmh: Double
