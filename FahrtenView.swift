@@ -214,13 +214,15 @@ struct FahrtenView: View {
             showGPSSheet = true
         } else {
             // Manuell per CarPlay-Button gestoppt → direkt speichern
+            let startDate = locationTracker.tripStartDate
             locationTracker.stopAndGeocode { from, to, km in
+                let start = startDate ?? Date()
                 let trip = Trip(
                     from: from.isEmpty ? "Startort" : from,
                     to:   to.isEmpty   ? "Zielort"  : to,
-                    date: Date(), km: km,
+                    date: start, km: km,
                     note: "GPS via CarPlay",
-                    startTime: nil, endTime: Date()
+                    startTime: start, endTime: Date()
                 )
                 store.addTrip(trip)
             }
@@ -477,7 +479,7 @@ struct FahrtenView: View {
             // GPS-Aufzeichnungs-Sheet
             // Nach Stop: Fahrt wird DIREKT gespeichert – kein extra Formular nötig
             .sheet(isPresented: $showGPSSheet) {
-                GPSTripSheet(tracker: locationTracker) { from, to, km, duration in
+                GPSTripSheet(tracker: locationTracker) { from, to, km, duration, startDate, endDate in
                     // Fahrzeit formatieren
                     let h = duration / 3600
                     let m = (duration % 3600) / 60
@@ -486,12 +488,16 @@ struct FahrtenView: View {
                     else if m > 0 { fahrzeitText = String(format: "%dmin", m) }
                     else { fahrzeitText = "" }
 
+                    // Tatsächliche Start-/Endzeit übernehmen (statt 08:00-Fallback)
+                    let start = startDate ?? endDate
                     var trip = Trip(
                         from: from,
                         to: to.isEmpty ? from : to,
-                        date: Date(),
+                        date: start,
                         km: km,
-                        note: "GPS-Fahrt"
+                        note: "GPS-Fahrt",
+                        startTime: start,
+                        endTime: endDate
                     )
                     trip.fahrzeitText = fahrzeitText.isEmpty ? nil : fahrzeitText
                     store.addTrip(trip)
@@ -527,7 +533,7 @@ struct GPSTripSheet: View {
     @ObservedObject var tracker: LocationTracker
     @EnvironmentObject var lm: LocalizationManager
 
-    let onResult: (String, String, Double, Int) -> Void
+    let onResult: (String, String, Double, Int, Date?, Date) -> Void
 
     @Environment(\.dismiss) private var dismiss
 
@@ -668,8 +674,10 @@ struct GPSTripSheet: View {
                 // ── Stop-Button ──
                 Button {
                     let elapsed = tracker.elapsedSeconds
+                    let startDate = tracker.tripStartDate
+                    let endDate = Date()
                     tracker.stopAndGeocode { from, to, km in
-                        onResult(from, to, km, elapsed)
+                        onResult(from, to, km, elapsed, startDate, endDate)
                     }
                 } label: {
                     HStack(spacing: 12) {
@@ -755,8 +763,10 @@ struct GPSTripSheet: View {
                 // Fahrt beenden
                 Button {
                     let elapsed = tracker.elapsedSeconds
+                    let startDate = tracker.tripStartDate
+                    let endDate = Date()
                     tracker.stopAndGeocode { from, to, km in
-                        onResult(from, to, km, elapsed)
+                        onResult(from, to, km, elapsed, startDate, endDate)
                     }
                 } label: {
                     HStack(spacing: 10) {

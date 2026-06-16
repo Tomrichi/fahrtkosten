@@ -68,6 +68,9 @@ final class LocationTracker: NSObject, ObservableObject {
     private let manager        = CLLocationManager()
     private var locations      : [CLLocation] = []
     private var startedAt      : Date?
+    /// Tatsächlicher Startzeitpunkt der laufenden/letzten Aufzeichnung
+    /// (für die gespeicherte Fahrt – damit die echte Uhrzeit übernommen wird)
+    var tripStartDate: Date? { startedAt }
     private var timer          : Timer?
     private var carPlayTimer   : Timer?          // eigene Referenz, damit der Timer nicht freigegeben wird
     private var geocodeTask    : Task<Void, Never>?
