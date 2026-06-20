@@ -1,28 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!--
-   Fahrtkosten.entitlements
-   Fahrtkosten
-
-   Created by Thomas Wagner on 29.04.26.
-   Copyright (c) 2026 Thomas Wagner. All rights reserved.
--->
 <plist version="1.0">
 <dict>
-
-    <!-- App Group – geteilt mit Widget Extension und CarPlay -->
-    <key>com.apple.security.application-groups</key>
-    <array>
-        <string>group.de.tommwagner.fahrtkosten</string>
-    </array>
-
-    <!-- iCloud Key-Value Store -->
-    <key>com.apple.developer.ubiquity-kvstore-identifier</key>
-    <string>$(TeamIdentifierPrefix)de.tommwagner.fahrtkosten</string>
-
-    <!-- CarPlay Driving Task Entitlement -->
-    <key>com.apple.developer.carplay-driving-task</key>
-    <true/>
-
+	<key>com.apple.developer.carplay-driving-task</key>
+	<true/>
+	<key>com.apple.developer.ubiquity-kvstore-identifier</key>
+	<string>$(TeamIdentifierPrefix)de.tommwagner.fahrtkosten</string>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.de.wagner.Tankbuch</string>
+	</array>
 </dict>
 </plist>
