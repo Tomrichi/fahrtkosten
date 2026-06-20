@@ -1,5 +1,5 @@
 # Fahrtkosten – Hilfe & Bedienungsanleitung
-Version 1.15.1 · 23. Mai 2026
+Version 1.16.11 · 18. Juni 2026
 
 ---
 
@@ -7,14 +7,17 @@ Version 1.15.1 · 23. Mai 2026
 
 1. [Erste Schritte](#1-erste-schritte)
 2. [Fahrten erfassen](#2-fahrten-erfassen)
-3. [Wiederkehrende Fahrten](#3-wiederkehrende-fahrten)
-4. [Arbeitszeit & Spesen](#4-arbeitszeit--spesen)
-5. [Google Maps Import](#5-google-maps-import)
-6. [Apple Watch](#6-apple-watch)
-7. [GPS-Aufzeichnung & Live Activity](#7-gps-aufzeichnung--live-activity)
-8. [Export & Backup](#8-export--backup)
-9. [Einstellungen](#9-einstellungen)
-10. [Häufige Fragen](#10-häufige-fragen)
+3. [Privat & Geschäftlich](#3-privat--geschäftlich)
+4. [Wiederkehrende Fahrten](#4-wiederkehrende-fahrten)
+5. [Arbeitszeit & Spesen](#5-arbeitszeit--spesen)
+6. [Google Maps Import](#6-google-maps-import)
+7. [Apple Watch](#7-apple-watch)
+8. [GPS-Aufzeichnung & Live Activity](#8-gps-aufzeichnung--live-activity)
+9. [Export & Backup](#9-export--backup)
+10. [Einstellungen](#10-einstellungen)
+11. [Bedienungshilfen](#11-bedienungshilfen)
+12. [Fahrtkosten auf dem Mac](#12-fahrtkosten-auf-dem-mac)
+13. [Häufige Fragen](#13-häufige-fragen)
 
 ---
 
@@ -55,6 +58,7 @@ Tippe auf **+** im Fahrten-Tab. Folgende Felder stehen zur Verfügung:
 | Kilometer | Strecke in km (kann automatisch berechnet werden) |
 | Abfahrtszeit | Uhrzeit der Abfahrt (für Abwesenheitszeitberechnung) |
 | Ankunftszeit | Uhrzeit der Ankunft (für Abwesenheitszeitberechnung) |
+| Art | Privat oder Geschäftlich (siehe Abschnitt 3) |
 | Fahrzeug | Fahrzeugtyp und Kraftstoff |
 | Notiz | Freitext, z. B. Kundennummer oder Projektnummer |
 
@@ -62,15 +66,15 @@ Tippe auf **+** im Fahrten-Tab. Folgende Felder stehen zur Verfügung:
 
 ### Via GPS aufzeichnen
 
-Siehe Abschnitt [7. GPS-Aufzeichnung & Live Activity](#7-gps-aufzeichnung--live-activity).
+Siehe Abschnitt [8. GPS-Aufzeichnung & Live Activity](#8-gps-aufzeichnung--live-activity).
 
 ### Via Apple Watch
 
-Siehe Abschnitt [6. Apple Watch](#6-apple-watch).
+Siehe Abschnitt [7. Apple Watch](#7-apple-watch).
 
 ### Via Google Maps / Apple Maps teilen
 
-Siehe Abschnitt [5. Google Maps Import](#5-google-maps-import).
+Siehe Abschnitt [6. Google Maps Import](#6-google-maps-import).
 
 ### Einträge bearbeiten und duplizieren
 
@@ -82,7 +86,32 @@ Die Wischgesten-Aktionen können in den Einstellungen frei konfiguriert werden.
 
 ---
 
-## 3. Wiederkehrende Fahrten
+## 3. Privat & Geschäftlich
+
+*(neu in 1.16.11)*
+
+### Wozu dient die Unterscheidung?
+
+Jede Fahrt lässt sich als **privat** oder **geschäftlich** markieren. So bleiben deine steuerlich relevanten Geschäftsfahrten klar von Privatfahrten getrennt – die Übersicht weist Zeiten für Arbeit und Privatfahrten getrennt aus.
+
+### Fahrt als privat oder geschäftlich markieren
+
+1. Öffne eine Fahrt (neu anlegen oder bestehenden Eintrag bearbeiten).
+2. Wähle unter **Art** zwischen **Geschäftlich** und **Privat**.
+3. Tippe auf **Speichern**.
+
+Standardmäßig werden Fahrten als geschäftlich erfasst. Privatfahrten fließen nicht in die geschäftliche Zeit- und Spesenberechnung ein.
+
+### Auswirkung auf Berechnungen
+
+- **Geschäftliche Fahrten** zählen wie gewohnt für Erstattung, Abwesenheitszeit und Verpflegungspauschale.
+- **Private Fahrten** werden separat ausgewiesen und nicht in die geschäftliche Abwesenheitszeit eingerechnet.
+
+In der Übersicht erkennst du auf einen Blick, wie sich Arbeits- und Privatzeiten verteilen.
+
+---
+
+## 4. Wiederkehrende Fahrten
 
 ### Was sind wiederkehrende Fahrten?
 
@@ -109,16 +138,16 @@ Wenn heute ein passender Wochentag ist, erscheint über dem Formular der Abschni
 
 ---
 
-## 4. Arbeitszeit & Spesen
+## 5. Arbeitszeit & Spesen
 
 ### Wie die Abwesenheitszeitberechnung funktioniert
 
 Die App berechnet die tägliche Gesamtabwesenheitszeit aus zwei Quellen:
 
-1. **Fahrzeiten** der an diesem Tag erfassten Fahrten (nur manuell eingetragene Fahrzeiten)
+1. **Fahrzeiten** der an diesem Tag erfassten **geschäftlichen** Fahrten (nur manuell eingetragene Fahrzeiten)
 2. **Manuell erfasste Arbeitszeit** im Tab Arbeitszeit
 
-Die Summe ergibt die Gesamtabwesenheitszeit, die für die Verpflegungspauschale maßgeblich ist.
+Die Summe ergibt die Gesamtabwesenheitszeit, die für die Verpflegungspauschale maßgeblich ist. Privatfahrten fließen nicht ein.
 
 ### Verpflegungspauschalen (§ 9 Abs. 4a EStG)
 
@@ -127,9 +156,11 @@ Die Summe ergibt die Gesamtabwesenheitszeit, die für die Verpflegungspauschale 
 | Inland | 0,00 € | 14,00 € | 28,00 € |
 | Schweiz / Ausland | 0,00 € | 20,00 € | 35,00 € |
 
-### Verpflegung Bilanz (neu in 1.15.1)
+**Hinweis zu Heimfahrten (ab 1.16.11):** Bei Heimfahrten gilt die halbe Verpflegungspauschale – außer die Reise endet um 19:30 Uhr oder später, dann wird die volle Pauschale angesetzt.
 
-In der Übersicht → Reisespesen → Verpflegung siehst du jetzt auf einen Blick:
+### Verpflegung Bilanz
+
+In der Übersicht → Reisespesen → Verpflegung siehst du auf einen Blick:
 
 - **Eigene Ausgaben** (rot) – tatsächlich gezahlte Verpflegungskosten
 - **Verpflegungspauschale** (grün) – steuerlich anerkannte Pauschale
@@ -142,13 +173,13 @@ In der Übersicht → Reisespesen → Verpflegung siehst du jetzt auf einen Blic
 3. Trage **Beginn** und **Ende** der Arbeitszeit ein.
 4. Optional: Region wählen (Inland / Schweiz / Ausland).
 
-### Wichtiger Hinweis (ab Version 1.14.5)
+### Wichtiger Hinweis
 
-Bei mehreren Fahrten am gleichen Tag fließen **nur manuell eingetragene Fahrzeiten** (Abfahrts- und Ankunftszeit) in die Berechnung ein.
+Bei mehreren Fahrten am gleichen Tag fließen **nur manuell eingetragene Fahrzeiten** (Abfahrts- und Ankunftszeit) geschäftlicher Fahrten in die Berechnung ein.
 
 ---
 
-## 5. Google Maps Import
+## 6. Google Maps Import
 
 ### Route aus Google Maps in Fahrtkosten importieren
 
@@ -165,14 +196,14 @@ Derselbe Vorgang funktioniert auch mit Apple Maps.
 
 ---
 
-## 6. Apple Watch
+## 7. Apple Watch
 
 ### Voraussetzungen
 
 - Apple Watch mit watchOS 10 oder neuer
 - Fahrtkosten ab Version 1.14.4
 
-### Neue Funktionen ab Version 1.15.1
+### Funktionen
 
 - **Hintergrund-GPS:** Die Watch zeichnet GPS-Strecken auch bei gesperrtem Display auf – ein iPhone in der Nähe ist nicht mehr nötig.
 - **Live-Geschwindigkeit & Durchschnittsgeschwindigkeit:** Aktuelle Geschwindigkeit und ⌀-Geschwindigkeit (km/h) werden während der Aufzeichnung in Echtzeit angezeigt.
@@ -194,7 +225,7 @@ Derselbe Vorgang funktioniert auch mit Apple Maps.
 
 ---
 
-## 7. GPS-Aufzeichnung & Live Activity
+## 8. GPS-Aufzeichnung & Live Activity
 
 ### Live-Tracking starten
 
@@ -204,7 +235,7 @@ Derselbe Vorgang funktioniert auch mit Apple Maps.
 
 Die Aufzeichnung läuft im Hintergrund weiter, auch wenn das Display gesperrt ist.
 
-### Live Activity & Dynamic Island (neu in 1.15.1)
+### Live Activity & Dynamic Island
 
 Während der GPS-Aufzeichnung wird automatisch eine **Live Activity** gestartet:
 
@@ -225,11 +256,11 @@ Tippe auf den **roten Banner** am oberen Bildschirmrand oder öffne den GPS-Tab 
 
 ### CarPlay
 
-Fahrtkosten zeigt den GPS-Aufzeichnungsstatus direkt im CarPlay-Display.
+Fahrtkosten zeigt den GPS-Aufzeichnungsstatus direkt im CarPlay-Display. Die Statusanzeige wurde in 1.16.11 stabilisiert.
 
 ---
 
-## 8. Export & Backup
+## 9. Export & Backup
 
 ### PDF-Export
 
@@ -259,7 +290,7 @@ CSV-Spalten: `Datum;Kategorie;Von;Nach;Kilometer;Spritpreis €/L;Verbrauch L/10
 
 ---
 
-## 9. Einstellungen
+## 10. Einstellungen
 
 ### Heimatadresse
 
@@ -293,7 +324,47 @@ Unter **Einstellungen** > **Info & Datenschutz** > **Diagnoseprotokoll** kannst 
 
 ---
 
-## 10. Häufige Fragen
+## 11. Bedienungshilfen
+
+*(neu in 1.16.11)*
+
+Fahrtkosten ist vollständig auf die Bedienungshilfen von iOS abgestimmt. Eine eigene Infoseite findest du in der App unter **Einstellungen → Info → Bedienungshilfen**.
+
+### VoiceOver
+
+Alle Karten, Fahrten, Buttons und Filter werden von VoiceOver korrekt vorgelesen und sind in sinnvoller Reihenfolge erreichbar. Aktivieren unter **Einstellungen** (iOS) > **Bedienungshilfen** > **VoiceOver**.
+
+### Bewegung reduzieren
+
+Aktivierst du **Einstellungen** (iOS) > **Bedienungshilfen** > **Bewegung** > **Bewegung reduzieren**, verzichtet die App auf Animationen und nutzt dezente Überblendungen.
+
+### Voice Control (Sprachsteuerung)
+
+Alle Bedienelemente sind über Voice Control ansprechbar und benannt, sodass sich die App vollständig per Sprache steuern lässt.
+
+### Dynamic Type
+
+Die App unterstützt größere Schriftgrößen. Stelle die gewünschte Textgröße unter **Einstellungen** (iOS) > **Bedienungshilfen** > **Anzeige & Textgröße** ein.
+
+---
+
+## 12. Fahrtkosten auf dem Mac
+
+*(neu in 1.16.11)*
+
+Fahrtkosten läuft als **„Designed for iPad"** auf Macs mit **Apple Silicon (M1 oder neuer, macOS 14+)**. Du findest die App im Mac App Store unter „iPhone- & iPad-Apps".
+
+**Hinweis:** Einige Funktionen sind gerätespezifisch und stehen auf dem Mac nicht oder nur eingeschränkt zur Verfügung:
+
+- **GPS-Streckenaufzeichnung** und **Live Activity / Dynamic Island** – nur auf dem iPhone
+- **CarPlay** – nur im Fahrzeug mit iPhone
+- **Apple Watch** – Begleit-App nur in Verbindung mit dem iPhone
+
+Manuelle Eingabe, Berechnungen, Export und Backup funktionieren auf dem Mac uneingeschränkt.
+
+---
+
+## 13. Häufige Fragen
 
 ### Die GPS-Aufzeichnung stoppt unerwartet
 
@@ -313,6 +384,12 @@ Unter **Einstellungen** > **Info & Datenschutz** > **Diagnoseprotokoll** kannst 
 
 ---
 
+### Was ist der Unterschied zwischen privaten und geschäftlichen Fahrten?
+
+**Antwort:** Geschäftliche Fahrten zählen für Erstattung, Abwesenheitszeit und Verpflegungspauschale. Private Fahrten werden separat ausgewiesen und fließen nicht in die geschäftliche Berechnung ein. Die Art legst du beim Anlegen oder Bearbeiten einer Fahrt unter **Art** fest.
+
+---
+
 ### Wiederkehrende Fahrten erscheinen nicht als Vorschlag
 
 **Antwort:** Die Vorschläge erscheinen nur, wenn der heutige Wochentag mit den gespeicherten Wochentagen der Route übereinstimmt und die Route nicht pausiert ist.
@@ -328,9 +405,9 @@ Unter **Einstellungen** > **Info & Datenschutz** > **Diagnoseprotokoll** kannst 
 
 ---
 
-### Die Fahrt aus Google Maps wurde nicht gespeichert
+### Läuft die App auf dem Mac?
 
-**Antwort:** Dieser Fehler trat in Versionen vor 1.14.5 auf. Aktualisiere die App auf Version 1.15.1.
+**Antwort:** Ja – auf Macs mit Apple Silicon (M1+, macOS 14+) als „Designed for iPad"-App. Gerätespezifische Funktionen wie GPS, Live Activity und CarPlay stehen dort nicht zur Verfügung. Siehe Abschnitt 12.
 
 ---
 
@@ -342,7 +419,7 @@ Nutze den PDF-Export aus der Übersicht. Das Dokument enthält alle notwendigen 
 
 ### Wo werden meine Daten gespeichert?
 
-Alle Daten werden **ausschließlich lokal auf deinem iPhone** gespeichert. Es gibt keine Cloud-Synchronisierung, keine Registrierung und keine Übertragung von Daten an Dritte.
+Alle Daten werden **ausschließlich lokal auf deinem iPhone** gespeichert. Wiederkehrende Fahrten und Favoriten werden optional via iCloud zwischen deinen Geräten synchronisiert. Es gibt keine Registrierung und keine Übertragung von Daten an Dritte.
 
 ---
 

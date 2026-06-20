@@ -1,11 +1,11 @@
 # Fahrtkosten App
 
-**Digitaler Reisekostenassistent für iPhone, Apple Watch und iPad**
+**Digitaler Reisekostenassistent für iPhone, Apple Watch, iPad und Mac**
 
 [![Platform](https://img.shields.io/badge/Platform-iOS%2016%2B-blue?logo=apple)](https://apps.apple.com)
 [![watchOS](https://img.shields.io/badge/watchOS-10%2B-blue?logo=apple)](https://apps.apple.com)
 [![Swift](https://img.shields.io/badge/Swift-5.9-orange?logo=swift)](https://swift.org)
-[![Version](https://img.shields.io/badge/Version-1.15.1-green)](CHANGES.md)
+[![Version](https://img.shields.io/badge/Version-1.16.11-green)](CHANGES.md)
 [![License](https://img.shields.io/badge/License-Proprietary-lightgrey)](LICENSE)
 
 ---
@@ -26,7 +26,20 @@ Fahrtkosten entstand aus dem eigenen Alltag als Außendienstmitarbeiter – frü
 - Import direkt aus **Google Maps** oder **Apple Maps** (Teilen-Funktion)
 - Erstattungsberechnung nach § 9 EStG (0,30 €/km, anpassbar)
 
-### 🔁 Wiederkehrende Fahrten *(neu in 1.15.1)*
+### 🏷 Privat & Geschäftlich *(neu in 1.16.11)*
+- Jede Fahrt als privat oder geschäftlich markieren
+- Übersicht trennt Zeiten für Arbeit und Privatfahrten sauber
+- Überarbeitete, korrigierte Zeitberechnung
+
+### ♿ Bedienungshilfen *(neu in 1.16.11)*
+- Volle VoiceOver-Unterstützung für Karten, Fahrten, Buttons und Filter
+- „Bewegung reduzieren", Voice Control und Dynamic Type
+- Eigene Infoseite unter Einstellungen → Info → Bedienungshilfen
+
+### 🖥 Mac-Unterstützung *(neu in 1.16.11)*
+- Läuft als „Designed for iPad" auf Macs mit Apple Silicon (M1+, macOS 14+)
+
+### 🔁 Wiederkehrende Fahrten
 - Häufige Routen mit Wochentagen hinterlegen
 - Passende Routen erscheinen beim Anlegen einer neuen Fahrt automatisch als Vorschlag
 - Direkter Zugriff über das Menü (⋯) in der Fahrtenliste
@@ -142,6 +155,7 @@ Vollständiges Protokoll: **[CHANGES.md](CHANGES.md)**
 
 | Version | Highlights |
 |---|---|
+| **1.16.11** *(Juni 2026)* | Privat & Geschäftlich · Bedienungshilfen (VoiceOver, Voice Control, Reduzierte Bewegung, Dynamic Type) · Mac-Unterstützung (Designed for iPad) · CarPlay stabilisiert · GPS-Startzeit-Fix · Verpflegungspauschale Heimfahrt-Fix |
 | **1.15.1** *(Mai 2026)* | Live Activity & Dynamic Island · Wiederkehrende Fahrten · Watch-GPS · Watch-Durchschnittsgeschwindigkeit · iCloud-Sync Favoriten & Wiederkehrende · Haptisches Feedback · Verpflegung-Bilanz |
 | **1.14.5** *(Mai 2026)* | Google Maps Import-Fix · präzisere Abwesenheitszeitberechnung · iOS 26 Kompatibilität |
 | **1.14.4** *(Mai 2026)* | Apple Watch App · Home Screen Widget · CarPlay-Integration · GPS Stadterkennung |

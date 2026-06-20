@@ -2,6 +2,18 @@
 
 ---
 
+## Version 1.16.11 (18. Juni 2026)
+
+- **Neu: Privat & Geschäftlich** – Jede Fahrt lässt sich jetzt als privat oder geschäftlich markieren. Die Übersicht trennt Zeiten für Arbeit und Privatfahrten sauber voneinander – die zugehörigen Berechnungen wurden überarbeitet und korrigiert.
+- **Neu: Bedienungshilfen** – VoiceOver liest alle Karten, Fahrten, Buttons und Filter korrekt vor. Animationen respektieren die iOS-Einstellung „Bewegung reduzieren", Voice Control funktioniert für alle Elemente und Dynamic Type wird unterstützt. Neue Infoseite unter Einstellungen → Info → Bedienungshilfen.
+- **Neu: Mac-Unterstützung** – Die App läuft als „Designed for iPad" auf Macs mit Apple Silicon (M1+, macOS 14+). Hinweise zu iPhone-spezifischen Funktionen (GPS, Live Activity, CarPlay) wurden in App und Hilfeseite ergänzt.
+- **Verbesserung: CarPlay** – Stabilere Anzeige des Aufzeichnungsstatus im Fahrzeugdisplay.
+- **Fehlerbehebung: GPS-Startzeit** – GPS-Fahrten starten jetzt mit der korrekten Uhrzeit.
+- **Fehlerbehebung: Verpflegungspauschale** – Bei Heimfahrten gilt jetzt korrekt die halbe Pauschale statt der vollen – außer die Reise endet um 19:30 Uhr oder später, dann bleibt es bei der vollen Pauschale.
+- **Fehlerbehebung: Arbeits- und Fahrzeit** – Berechnung der kombinierten Zeiten korrigiert.
+
+---
+
 ## Version 1.15.1 (22. Mai 2026)
 
 - **Neu: Watch – Durchschnittsgeschwindigkeit** – Die Watch zeigt während der GPS-Aufzeichnung jetzt zusätzlich zur aktuellen Geschwindigkeit auch die Durchschnittsgeschwindigkeit (⌀ km/h) in Echtzeit an.

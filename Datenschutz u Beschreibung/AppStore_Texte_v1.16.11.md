@@ -1,14 +1,17 @@
 # Fahrtkosten – App Store Texte
-Version 1.15.1 · Build 7 · Thomas Wagner · 23. Mai 2026
+Version 1.16.11 · Build 23 · Thomas Wagner · 18. Juni 2026
 
 ---
 
 ## App Store Beschreibung (Deutsch)
 *Limit: 4.000 Zeichen*
 
-Fahrtkosten – Dein digitaler Reisekostenassistent für iPhone, Apple Watch und iPad.
+Fahrtkosten – Dein digitaler Reisekostenassistent für iPhone, Apple Watch, iPad und Mac.
 
 Erfasse alle erstattungsfähigen Kosten einer Dienstreise an einem Ort: Fahrten mit Kilometerpauschale, Arbeitszeiten & Spesen nach gesetzlichen Pauschalsätzen, Übernachtungen und Fahrzeugkosten – alles wird automatisch berechnet, steuerkonform und auf Knopfdruck als PDF oder CSV exportiert.
+
+**Privat & Geschäftlich**
+Markiere jede Fahrt als privat oder geschäftlich. Die Übersicht trennt Zeiten für Arbeit und Privatfahrten sauber voneinander – so bleibt deine steuerlich relevante Abrechnung übersichtlich und korrekt.
 
 **Live Activity & Dynamic Island**
 Während der GPS-Aufzeichnung erscheinen gefahrene Kilometer, vergangene Zeit und aktuelle Geschwindigkeit als Live Activity im Dynamic Island und auf dem Sperrbildschirm – immer im Blick, ohne die App zu öffnen.
@@ -40,6 +43,12 @@ Fotografiere Hotelrechnungen oder KFZ-Belege direkt mit der Kamera, importiere s
 **Aktuelle Spritpreise**
 Rufe mit einem Tippen den günstigsten Kraftstoffpreis in deiner Nähe ab (Tankerkönig API).
 
+**Bedienungshilfen**
+Volle VoiceOver-Unterstützung für alle Karten, Fahrten, Buttons und Filter. Animationen respektieren „Bewegung reduzieren", Voice Control funktioniert für alle Elemente, Dynamic Type wird unterstützt. Eine eigene Infoseite findest du unter Einstellungen → Info → Bedienungshilfen.
+
+**Auch auf dem Mac**
+Die App läuft als „Designed for iPad" auf Macs mit Apple Silicon (M1+, macOS 14+).
+
 **Mehrsprachige Oberfläche**
 Deutsch 🇩🇪 · Englisch 🇬🇧 · Polnisch 🇵🇱 · Tschechisch 🇨🇿
 
@@ -51,9 +60,12 @@ Alle Daten bleiben ausschließlich lokal auf deinem iPhone. Keine Registrierung,
 
 ## App Store Beschreibung (English)
 
-Fahrtkosten – Your digital business travel expense assistant for iPhone, Apple Watch and iPad.
+Fahrtkosten – Your digital business travel expense assistant for iPhone, Apple Watch, iPad and Mac.
 
 Track all reimbursable costs of a business trip in one place: trips with mileage allowance, working hours & meal allowances based on statutory flat rates, overnight stays and vehicle costs – everything is calculated automatically, tax-compliant and exportable as PDF or CSV at the push of a button.
+
+**Private & Business**
+Mark each trip as private or business. The overview keeps working time and private trips cleanly separated – so your tax-relevant accounting stays clear and correct.
 
 **Live Activity & Dynamic Island**
 During GPS recording, driven kilometres, elapsed time and current speed appear as a Live Activity in the Dynamic Island and on the Lock Screen – always visible without opening the app.
@@ -79,6 +91,12 @@ In the overview, the meal allowance category shows at a glance: your own expense
 **Receipt Scanning – Fast & Local**
 Photograph hotel invoices or vehicle receipts, import from your photo library, or upload a PDF. Built-in text recognition (Apple Vision Framework) reads amount, date and hotel name automatically – entirely on-device.
 
+**Accessibility**
+Full VoiceOver support for all cards, trips, buttons and filters. Animations respect "Reduce Motion", Voice Control works for all elements, and Dynamic Type is supported. A dedicated info page is available under Settings → Info → Accessibility.
+
+**Also on Mac**
+The app runs as "Designed for iPad" on Macs with Apple Silicon (M1+, macOS 14+).
+
 **Multilingual**
 German 🇩🇪 · English 🇬🇧 · Polish 🇵🇱 · Czech 🇨🇿
 
@@ -91,6 +109,9 @@ All data stays exclusively on your iPhone. No registration, no account, no track
 ## App Store Beschreibung (Polnisch)
 
 Fahrtkosten – Twój cyfrowy asystent rozliczeń podróży służbowych na iPhone, Apple Watch i iPad.
+
+**Prywatne i służbowe**
+Oznacz każdy przejazd jako prywatny lub służbowy. Przegląd wyraźnie oddziela czas pracy od przejazdów prywatnych.
 
 **Live Activity i Dynamic Island**
 Podczas nagrywania GPS przebyte kilometry, czas i aktualna prędkość wyświetlają się jako Live Activity w Dynamic Island i na ekranie blokady.
@@ -107,6 +128,9 @@ Trasa jest nagrywana precyzyjnie w tle – nawet gdy ekran jest zablokowany. Int
 **Czas pracy i diety – automatycznie połączone**
 Rejestruj czas pracy każdego dnia. Aplikacja automatycznie wykrywa przejazdy tego samego dnia i oblicza całkowity czas pracy.
 
+**Dostępność**
+Pełna obsługa VoiceOver, „Ogranicz ruch", Voice Control i Dynamic Type.
+
 **Prywatność przede wszystkim**
 Wszystkie dane pozostają wyłącznie lokalnie na Twoim iPhonie. Bez rejestracji, bez konta, bez śledzenia, bez reklam.
 
@@ -116,6 +140,9 @@ Wszystkie dane pozostają wyłącznie lokalnie na Twoim iPhonie. Bez rejestracji
 ## App Store Beschreibung (Tschechisch)
 
 Fahrtkosten – Váš digitální asistent pro vyúčtování pracovních cest na iPhone, Apple Watch a iPad.
+
+**Soukromé a služební**
+Označte každou jízdu jako soukromou nebo služební. Přehled jasně odděluje pracovní dobu od soukromých jízd.
 
 **Live Activity a Dynamic Island**
 Během záznamu GPS se ujetné kilometry, čas a aktuální rychlost zobrazují jako Live Activity v Dynamic Island a na uzamčené obrazovce.
@@ -129,6 +156,9 @@ Spouštějte a ukončujte jízdy přímo z zápěstí – včetně záznamu GPS 
 **Záznam trasy GPS**
 Trasa se přesně zaznamenává na pozadí – i když je displej zamknutý.
 
+**Přístupnost**
+Plná podpora VoiceOver, „Omezit pohyb", Voice Control a Dynamic Type.
+
 **Soukromí na prvním místě**
 Všechna data zůstávají výhradně lokálně na vašem iPhonu. Bez registrace, bez účtu, bez sledování, bez reklam.
 
@@ -138,7 +168,7 @@ Všechna data zůstávají výhradně lokálně na vašem iPhonu. Bez registrace
 ## Keywords (100 Zeichen)
 
 ```
-Reisekosten,Fahrtenbuch,Kilometerpauschale,Dienstreise,Spesen,GPS,Watch,Widget,Steuer,Abrechnung
+Reisekosten,Fahrtenbuch,Kilometerpauschale,Dienstreise,Spesen,GPS,Watch,Privat,Geschäftlich,Steuer
 ```
 
 ---
@@ -154,10 +184,21 @@ Dienstreisen smart abrechnen
 ## Promotional Text (170 Zeichen)
 
 ```
-Neu 1.15.1: Watch-Durchschnittsgeschwindigkeit, iCloud-Sync für Favoriten & wiederkehrende Fahrten. Live Activity, Watch-GPS ohne iPhone.
+Neu: Fahrten als privat oder geschäftlich trennen – plus volle VoiceOver-Bedienung und Mac-Support. Dienstreisen per GPS erfassen und steuerkonform als PDF exportieren.
 ```
 
 ---
+
+## Was ist neu – Version 1.16.11 (Build 23)
+
+• Neu: Privat & Geschäftlich – Markiere jede Fahrt als privat oder geschäftlich; die Übersicht trennt Zeiten für Arbeit und Privatfahrten sauber, mit überarbeiteter, korrigierter Berechnung
+• Neu: Bedienungshilfen – volle VoiceOver-Unterstützung, „Bewegung reduzieren", Voice Control und Dynamic Type; eigene Infoseite unter Einstellungen → Info → Bedienungshilfen
+• Neu: Mac-Unterstützung – App läuft als „Designed for iPad" auf Macs mit Apple Silicon (M1+, macOS 14+)
+• Verbesserung: CarPlay – stabilere Anzeige des Aufzeichnungsstatus im Fahrzeugdisplay
+• Fix: GPS-Fahrten starten jetzt mit korrekter Uhrzeit
+• Fix: Bei Heimfahrten gilt korrekt die halbe Verpflegungspauschale (außer die Reise endet um 19:30 Uhr oder später → volle Pauschale)
+• Fix: Arbeits- und Fahrzeitberechnung korrigiert
+• Kontakt: info@wagner-fahrtkosten.de
 
 ## Was ist neu – Version 1.15.1 (Build 7)
 
@@ -170,23 +211,6 @@ Neu 1.15.1: Watch-Durchschnittsgeschwindigkeit, iCloud-Sync für Favoriten & wie
 • Neu: Watch – Live-Geschwindigkeit, haptisches Feedback, Heimatadresse & Favoriten als Schnellziele
 • Neu: Verpflegung Bilanz – Ausgaben vs. Pauschale (rot/grün) in der Übersicht
 • Fix: Verpflegungsberechnung – Stufe und Betrag basieren jetzt einheitlich auf denselben Zeiten
-• Kontakt: info@wagner-fahrtkosten.de
-
-## Was ist neu – Version 1.14.5 (Build 5)
-
-• Fix: Google Maps Import – Geteilte Routen aus Google Maps werden jetzt zuverlässig als Fahrt gespeichert
-• Verbesserung: Abwesenheitszeitberechnung – nur tatsächlich eingetragene Fahrzeiten werden berücksichtigt
-• Kompatibilität: iOS 26 MapKit-API aktualisiert
-• Intern: Versionsnummern der App-Erweiterungen synchronisiert
-• Kontakt: info@wagner-fahrtkosten.de
-
-## Was ist neu – Version 1.14.4 (Build 1)
-
-• Neu: Apple Watch App – Fahrten direkt vom Handgelenk starten und beenden, automatischer Import in die iPhone-App
-• Neu: Home Screen Widget – aktive Fahrt auf dem Home Screen im Blick
-• Neu: CarPlay-Integration – Fahrt-Status direkt im Fahrzeugdisplay
-• Neu: GPS Stadt-Erkennung – Ortsnamen statt vollständiger Adressen bei GPS-Fahrten
-• Verbesserung: Tankerkönig API-Anbindung aktualisiert und stabilisiert
 • Kontakt: info@wagner-fahrtkosten.de
 
 ---
