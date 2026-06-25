@@ -269,7 +269,7 @@ struct SplashScreenView: View {
         }
 
         // Phase 7: Ausblenden & App öffnen
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
             withOptionalAnimation(.easeInOut(duration: 0.40)) {
                 bgOpacity = 0
             }

@@ -33,8 +33,8 @@ struct UebersichtView: View {
     @EnvironmentObject var store: DataStore
     @EnvironmentObject var lm: LocalizationManager
     @State private var showSettings    = false
-    @State private var uebersichtTab: UebersichtTab = .dashboard
-    @State private var zeitFilter: ZeitFilter = .monat
+    @AppStorage("uebersicht.tab") private var uebersichtTab: UebersichtTab = .dashboard
+    @AppStorage("uebersicht.zeitFilter") private var zeitFilter: ZeitFilter = .monat
     @State private var showExport         = false
     @State private var pdfPreviewItem    : PDFPreviewItem? = nil
     @State private var showPDFDatePicker = false
@@ -49,6 +49,10 @@ struct UebersichtView: View {
     @State private var expandReisespesen        = false
     @State private var expandVerpflegungAusgaben = false
     @State private var expandPrivate             = false
+    @State private var showAddVerpflegungSpese  = false
+    @State private var editVerpflegungSpese: ReiseSpese?
+    @State private var showAddPrivateExpense    = false
+    @State private var editPrivateExpense: PrivateExpense?
 
     var body: some View {
         NavigationStack {
@@ -108,6 +112,22 @@ struct UebersichtView: View {
             }
             .sheet(isPresented: $showSettings) {
                 EinstellungenView()
+            }
+            .sheet(isPresented: $showAddVerpflegungSpese) {
+                KFZKostenFormView(mode: .add, defaultKategorie: .verpflegung)
+                    .environmentObject(store)
+            }
+            .sheet(item: $editVerpflegungSpese) { spese in
+                KFZKostenFormView(mode: .edit(spese))
+                    .environmentObject(store)
+            }
+            .sheet(isPresented: $showAddPrivateExpense) {
+                PrivateExpenseFormView(mode: .add)
+                    .environmentObject(store)
+            }
+            .sheet(item: $editPrivateExpense) { item in
+                PrivateExpenseFormView(mode: .edit(item))
+                    .environmentObject(store)
             }
             .sheet(item: $pdfPreviewItem) { item in
                 PDFPreviewView(pdfData: item.data, filename: item.filename)
@@ -418,24 +438,29 @@ struct UebersichtView: View {
 
 
                 // Verpflegungsausgaben (tatsächliche Essenausgaben)
-                if !filteredVerpflegungAusgaben.isEmpty {
-                    let verpflegungAusgabenTotal = filteredVerpflegungAusgaben.reduce(0.0) { $0 + $1.amount }
-                    expandableCard(
-                        icon: "fork.knife.circle.fill", color: .brown,
-                        label: "Verpflegungsausgaben",
-                        amount: verpflegungAusgabenTotal,
-                        detail: filteredVerpflegungAusgaben.count == 1 ? "1 Eintrag" : "\(filteredVerpflegungAusgaben.count) Einträge",
-                        isExpanded: $expandVerpflegungAusgaben
-                    ) {
-                        ForEach(filteredVerpflegungAusgaben.sorted(by: { $0.date > $1.date })) { spese in
-                            expandRow(
-                                icon: "fork.knife.circle.fill", color: .brown,
-                                title: spese.title.isEmpty ? "Verpflegung" : spese.title,
-                                subtitle: spese.date.shortDateShort,
-                                amount: spese.amount.euroFormatted,
-                                amountColor: .brown
-                            )
-                        }
+                let verpflegungAusgabenTotal = filteredVerpflegungAusgaben.reduce(0.0) { $0 + $1.amount }
+                expandableCard(
+                    icon: "fork.knife.circle.fill", color: .brown,
+                    label: "Verpflegungsausgaben",
+                    amount: verpflegungAusgabenTotal,
+                    detail: filteredVerpflegungAusgaben.isEmpty ? "Keine Einträge" : (filteredVerpflegungAusgaben.count == 1 ? "1 Eintrag" : "\(filteredVerpflegungAusgaben.count) Einträge"),
+                    isExpanded: $expandVerpflegungAusgaben,
+                    onAdd: { showAddVerpflegungSpese = true }
+                ) {
+                    ForEach(filteredVerpflegungAusgaben.sorted(by: { $0.date > $1.date })) { spese in
+                        expandRow(
+                            icon: "fork.knife.circle.fill", color: .brown,
+                            title: spese.title.isEmpty ? "Verpflegung" : spese.title,
+                            subtitle: spese.date.shortDateShort,
+                            amount: spese.amount.euroFormatted,
+                            amountColor: .brown
+                        )
+                        .contentShape(Rectangle())
+                        .onTapGesture { editVerpflegungSpese = spese }
+                        .dynamicSwipeActions(
+                            onDelete: { store.deleteReiseSpese(spese.id) },
+                            onEdit: { editVerpflegungSpese = spese }
+                        )
                     }
                 }
 
@@ -488,23 +513,28 @@ struct UebersichtView: View {
                 }
 
                 // Private Ausgaben
-                if !filteredPrivateExpenses.isEmpty {
-                    expandableCard(
-                        icon: "person.fill", color: Color.pink,
-                        label: "Private Ausgaben",
-                        amount: privateAmount,
-                        detail: "\(filteredPrivateExpenses.count) Einträge",
-                        isExpanded: $expandPrivate
-                    ) {
-                        ForEach(filteredPrivateExpenses.sorted(by: { $0.date > $1.date })) { p in
-                            expandRow(
-                                icon: "person.fill", color: .pink,
-                                title: p.title.isEmpty ? "Ausgabe" : p.title,
-                                subtitle: p.date.shortDateShort,
-                                amount: p.amount.euroFormatted,
-                                amountColor: .pink
-                            )
-                        }
+                expandableCard(
+                    icon: "person.fill", color: Color.pink,
+                    label: "Private Ausgaben",
+                    amount: privateAmount,
+                    detail: filteredPrivateExpenses.isEmpty ? "Keine Einträge" : "\(filteredPrivateExpenses.count) Einträge",
+                    isExpanded: $expandPrivate,
+                    onAdd: { showAddPrivateExpense = true }
+                ) {
+                    ForEach(filteredPrivateExpenses.sorted(by: { $0.date > $1.date })) { p in
+                        expandRow(
+                            icon: "person.fill", color: .pink,
+                            title: p.title.isEmpty ? "Ausgabe" : p.title,
+                            subtitle: p.date.shortDateShort,
+                            amount: p.amount.euroFormatted,
+                            amountColor: .pink
+                        )
+                        .contentShape(Rectangle())
+                        .onTapGesture { editPrivateExpense = p }
+                        .dynamicSwipeActions(
+                            onDelete: { store.deletePrivateExpense(p.id) },
+                            onEdit: { editPrivateExpense = p }
+                        )
                     }
                 }
 
@@ -607,60 +637,72 @@ struct UebersichtView: View {
         label: String, amount: Double, detail: String,
         isExpanded: Binding<Bool>,
         badge: String? = nil,
+        onAdd: (() -> Void)? = nil,
         @ViewBuilder content: @escaping () -> Content
     ) -> some View {
         VStack(spacing: 0) {
-            Button {
-                withOptionalAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                    isExpanded.wrappedValue.toggle()
+            HStack(spacing: 12) {
+                Button {
+                    withOptionalAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        isExpanded.wrappedValue.toggle()
+                    }
+                } label: {
+                    HStack(spacing: 12) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                .fill(color.opacity(0.12))
+                                .frame(width: 42, height: 42)
+                            Image(systemName: icon)
+                                .font(.system(size: 17, weight: .medium))
+                                .foregroundColor(color)
+                        }
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack(spacing: 5) {
+                                Text(label)
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                                if let badge {
+                                    Text(badge)
+                                        .font(.system(size: 8, weight: .semibold))
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 5)
+                                        .padding(.vertical, 2)
+                                        .background(badge == "Ausgabe" ? Color.orange.opacity(0.75) : Color.secondary.opacity(0.6))
+                                        .clipShape(Capsule())
+                                        .lineLimit(1)
+                                        .fixedSize()
+                                }
+                            }
+                            .lineLimit(1)
+                            Text(amount.euroFormatted)
+                                .font(.system(size: 18, weight: .bold, design: .monospaced))
+                                .foregroundColor(.primary)
+                        }
+                        Spacer()
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text(detail)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Image(systemName: isExpanded.wrappedValue ? "chevron.up" : "chevron.down")
+                                .font(.caption.bold())
+                                .foregroundColor(.secondary)
+                        }
+                    }
                 }
-            } label: {
-                HStack(spacing: 12) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .fill(color.opacity(0.12))
-                            .frame(width: 42, height: 42)
-                        Image(systemName: icon)
-                            .font(.system(size: 17, weight: .medium))
+                .buttonStyle(.plain)
+
+                if let onAdd {
+                    Button(action: onAdd) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 20))
                             .foregroundColor(color)
                     }
-                    VStack(alignment: .leading, spacing: 2) {
-                        HStack(spacing: 5) {
-                            Text(label)
-                                .font(.system(size: 13, weight: .medium))
-                                .foregroundColor(.secondary)
-                                .lineLimit(1)
-                            if let badge {
-                                Text(badge)
-                                    .font(.system(size: 8, weight: .semibold))
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, 5)
-                                    .padding(.vertical, 2)
-                                    .background(badge == "Ausgabe" ? Color.orange.opacity(0.75) : Color.secondary.opacity(0.6))
-                                    .clipShape(Capsule())
-                                    .lineLimit(1)
-                                    .fixedSize()
-                            }
-                        }
-                        .lineLimit(1)
-                        Text(amount.euroFormatted)
-                            .font(.system(size: 18, weight: .bold, design: .monospaced))
-                            .foregroundColor(.primary)
-                    }
-                    Spacer()
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text(detail)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Image(systemName: isExpanded.wrappedValue ? "chevron.up" : "chevron.down")
-                            .font(.caption.bold())
-                            .foregroundColor(.secondary)
-                    }
+                    .buttonStyle(.plain)
                 }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 12)
             }
-            .buttonStyle(.plain)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
 
             if isExpanded.wrappedValue {
                 Divider().padding(.horizontal, 14)

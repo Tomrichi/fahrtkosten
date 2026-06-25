@@ -239,46 +239,49 @@ class DataStore: ObservableObject {
     var grandTotal: Double { totalKmAmount + totalMeal + totalHotel }
 
     // MARK: - CRUD
-    func addTrip(_ t: Trip)    { trips.append(t); AppLogger.shared.logData("Fahrt hinzugefügt: \(t.from) → \(t.to), \(String(format: "%.1f", t.km)) km") }
-    func updateTrip(_ t: Trip) { if let i = trips.firstIndex(where: { $0.id == t.id }) { trips[i] = t; AppLogger.shared.logData("Fahrt aktualisiert: \(t.from) → \(t.to)") } }
+    func addTrip(_ t: Trip)    { trips.append(t); trips.sort { $0.date < $1.date }; AppLogger.shared.logData("Fahrt hinzugefügt: \(t.from) → \(t.to), \(String(format: "%.1f", t.km)) km") }
+    func updateTrip(_ t: Trip) { if let i = trips.firstIndex(where: { $0.id == t.id }) { trips[i] = t; trips.sort { $0.date < $1.date }; AppLogger.shared.logData("Fahrt aktualisiert: \(t.from) → \(t.to)") } }
     func deleteTrip(_ id: UUID){ trips.removeAll { $0.id == id }; AppLogger.shared.logData("Fahrt gelöscht") }
     func duplicateTrip(_ trip: Trip) {
         var copy = trip
         copy.id = UUID()
         trips.append(copy)
+        trips.sort { $0.date < $1.date }
         AppLogger.shared.logData("Fahrt dupliziert: \(trip.from) → \(trip.to)")
     }
 
-    func addMeal(_ m: MealEntry)    { meals.append(m); AppLogger.shared.logData("Speseneintrag hinzugefügt: \(m.region.rawValue), \(String(format: "%.1f", m.hours))h") }
-    func updateMeal(_ m: MealEntry) { if let i = meals.firstIndex(where: { $0.id == m.id }) { meals[i] = m; AppLogger.shared.logData("Speseneintrag aktualisiert") } }
+    func addMeal(_ m: MealEntry)    { meals.append(m); meals.sort { $0.date < $1.date }; AppLogger.shared.logData("Speseneintrag hinzugefügt: \(m.region.rawValue), \(String(format: "%.1f", m.hours))h") }
+    func updateMeal(_ m: MealEntry) { if let i = meals.firstIndex(where: { $0.id == m.id }) { meals[i] = m; meals.sort { $0.date < $1.date }; AppLogger.shared.logData("Speseneintrag aktualisiert") } }
     func deleteMeal(_ id: UUID)     { meals.removeAll { $0.id == id }; AppLogger.shared.logData("Speseneintrag gelöscht") }
     func duplicateMeal(_ meal: MealEntry) {
         var copy = meal
         copy.id = UUID()
         meals.append(copy)
+        meals.sort { $0.date < $1.date }
         AppLogger.shared.logData("Arbeitszeit dupliziert: \(meal.date.shortDate)")
     }
 
-    func addHotel(_ h: HotelEntry)    { hotels.append(h); AppLogger.shared.logData("Übernachtung hinzugefügt: \(h.city), \(h.numberOfNights) Nacht/Nächte") }
-    func updateHotel(_ h: HotelEntry) { if let i = hotels.firstIndex(where: { $0.id == h.id }) { hotels[i] = h; AppLogger.shared.logData("Übernachtung aktualisiert") } }
+    func addHotel(_ h: HotelEntry)    { hotels.append(h); hotels.sort { $0.date < $1.date }; AppLogger.shared.logData("Übernachtung hinzugefügt: \(h.city), \(h.numberOfNights) Nacht/Nächte") }
+    func updateHotel(_ h: HotelEntry) { if let i = hotels.firstIndex(where: { $0.id == h.id }) { hotels[i] = h; hotels.sort { $0.date < $1.date }; AppLogger.shared.logData("Übernachtung aktualisiert") } }
     func deleteHotel(_ id: UUID)      { hotels.removeAll { $0.id == id }; AppLogger.shared.logData("Übernachtung gelöscht") }
     func duplicateHotel(_ hotel: HotelEntry) {
         var copy = hotel
         copy.id = UUID()
         hotels.append(copy)
+        hotels.sort { $0.date < $1.date }
         AppLogger.shared.logData("Übernachtung dupliziert: \(hotel.city)")
     }
 
-    func addVehicleCost(_ v: VehicleCost)    { vehicleCosts.append(v); AppLogger.shared.logData("KFZ-Kosten hinzugefügt: \(v.category.rawValue), \(String(format: "%.2f", v.amount)) €") }
-    func updateVehicleCost(_ v: VehicleCost) { if let i = vehicleCosts.firstIndex(where: { $0.id == v.id }) { vehicleCosts[i] = v; AppLogger.shared.logData("KFZ-Kosten aktualisiert") } }
+    func addVehicleCost(_ v: VehicleCost)    { vehicleCosts.append(v); vehicleCosts.sort { $0.date < $1.date }; AppLogger.shared.logData("KFZ-Kosten hinzugefügt: \(v.category.rawValue), \(String(format: "%.2f", v.amount)) €") }
+    func updateVehicleCost(_ v: VehicleCost) { if let i = vehicleCosts.firstIndex(where: { $0.id == v.id }) { vehicleCosts[i] = v; vehicleCosts.sort { $0.date < $1.date }; AppLogger.shared.logData("KFZ-Kosten aktualisiert") } }
     func deleteVehicleCost(_ id: UUID)       { vehicleCosts.removeAll { $0.id == id }; AppLogger.shared.logData("KFZ-Kosten gelöscht") }
 
-    func addReiseSpese(_ r: ReiseSpese)    { reiseSpesen.append(r); AppLogger.shared.logData("Reisespese hinzugefügt: \(r.kategorie.rawValue), \(String(format: "%.2f", r.amount)) €") }
-    func updateReiseSpese(_ r: ReiseSpese) { if let i = reiseSpesen.firstIndex(where: { $0.id == r.id }) { reiseSpesen[i] = r; AppLogger.shared.logData("Reisespese aktualisiert") } }
+    func addReiseSpese(_ r: ReiseSpese)    { reiseSpesen.append(r); reiseSpesen.sort { $0.date < $1.date }; AppLogger.shared.logData("Reisespese hinzugefügt: \(r.kategorie.rawValue), \(String(format: "%.2f", r.amount)) €") }
+    func updateReiseSpese(_ r: ReiseSpese) { if let i = reiseSpesen.firstIndex(where: { $0.id == r.id }) { reiseSpesen[i] = r; reiseSpesen.sort { $0.date < $1.date }; AppLogger.shared.logData("Reisespese aktualisiert") } }
     func deleteReiseSpese(_ id: UUID)      { reiseSpesen.removeAll { $0.id == id }; AppLogger.shared.logData("Reisespese gelöscht") }
 
-    func addPrivateExpense(_ p: PrivateExpense)    { privateExpenses.append(p); AppLogger.shared.logData("Private Ausgabe hinzugefügt: \(String(format: "%.2f", p.amount)) €") }
-    func updatePrivateExpense(_ p: PrivateExpense) { if let i = privateExpenses.firstIndex(where: { $0.id == p.id }) { privateExpenses[i] = p; AppLogger.shared.logData("Private Ausgabe aktualisiert") } }
+    func addPrivateExpense(_ p: PrivateExpense)    { privateExpenses.append(p); privateExpenses.sort { $0.date < $1.date }; AppLogger.shared.logData("Private Ausgabe hinzugefügt: \(String(format: "%.2f", p.amount)) €") }
+    func updatePrivateExpense(_ p: PrivateExpense) { if let i = privateExpenses.firstIndex(where: { $0.id == p.id }) { privateExpenses[i] = p; privateExpenses.sort { $0.date < $1.date }; AppLogger.shared.logData("Private Ausgabe aktualisiert") } }
     func deletePrivateExpense(_ id: UUID)          { privateExpenses.removeAll { $0.id == id }; AppLogger.shared.logData("Private Ausgabe gelöscht") }
 
     func addFavorite(from trip: Trip) {

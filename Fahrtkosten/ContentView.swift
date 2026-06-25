@@ -43,7 +43,7 @@ struct ContentView: View {
     @StateObject private var settingsController = SettingsController()
     @EnvironmentObject var lm: LocalizationManager
 
-    @State private var selectedTab: AppTab = .fahrten
+    @AppStorage("contentView.selectedTab") private var selectedTab: AppTab = .fahrten
 
     var body: some View {
         VStack(spacing: 0) {

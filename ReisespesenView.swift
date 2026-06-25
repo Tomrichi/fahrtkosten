@@ -59,7 +59,7 @@ struct KFZKostenView: View {
 
                         // ── Kategorie-Kacheln ──
                         LazyVGrid(columns: columns, spacing: 8) {
-                            ForEach(ReisespesenKategorie.allCases, id: \.self) { kat in
+                            ForEach(ReisespesenKategorie.allCases.filter { $0 != .verpflegung }, id: \.self) { kat in
                                 let items  = grouped[kat] ?? []
                                 let color  = kfzColor(kat)
                                 Button {
@@ -84,34 +84,7 @@ struct KFZKostenView: View {
                                                 .foregroundColor(.secondary)
                                         }
                                         Spacer()
-                                        if kat == .verpflegung {
-                                            let ausgaben = items.reduce(0) { $0 + $1.amount }
-                                            let pauschale = mealAllowanceInPeriod
-                                            let netto = pauschale - ausgaben
-                                            VStack(alignment: .trailing, spacing: 1) {
-                                                if ausgaben > 0 {
-                                                    Text("−\(ausgaben.euroFormatted)")
-                                                        .font(.system(size: 11, weight: .regular, design: .monospaced))
-                                                        .foregroundColor(.red)
-                                                }
-                                                if pauschale > 0 {
-                                                    Text("+\(pauschale.euroFormatted)")
-                                                        .font(.system(size: 11, weight: .regular, design: .monospaced))
-                                                        .foregroundColor(.iosGreen)
-                                                }
-                                                if ausgaben > 0 || pauschale > 0 {
-                                                    Text(netto >= 0
-                                                         ? "+\(netto.euroFormatted)"
-                                                         : "−\(abs(netto).euroFormatted)")
-                                                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                                                        .foregroundColor(netto >= 0 ? .iosGreen : .red)
-                                                } else {
-                                                    Text("–")
-                                                        .font(.system(size: 13, weight: .regular, design: .monospaced))
-                                                        .foregroundColor(.secondary)
-                                                }
-                                            }
-                                        } else if items.isEmpty {
+                                        if items.isEmpty {
                                             Text("–")
                                                 .font(.system(size: 13, weight: .regular, design: .monospaced))
                                                 .foregroundColor(.secondary)
@@ -181,7 +154,7 @@ struct KFZKostenView: View {
                 KFZKategorieDetailView(
                     kategorie: kat,
                     items: (grouped[kat] ?? []).sorted(by: { $0.date > $1.date }),
-                    mealAllowance: kat == .verpflegung ? mealAllowanceInPeriod : nil,
+                    mealAllowance: nil,
                     onEdit: { _ in },
                     onDelete: { id in store.deleteReiseSpese(id) }
                 )
@@ -203,13 +176,6 @@ struct KFZKostenView: View {
                 }
             }
         }
-    }
-
-    // Verpflegungspauschale im gefilterten Zeitraum
-    private var mealAllowanceInPeriod: Double {
-        store.meals
-            .filter { inPeriod($0.date) }
-            .reduce(0) { $0 + store.adjustedMealAllowance(for: $1) }
     }
 
     private func kfzColor(_ kat: ReisespesenKategorie) -> Color {
@@ -507,7 +473,7 @@ struct KFZKostenFormView: View {
                             .foregroundColor(.primary)
                         Spacer()
                         Menu {
-                            ForEach(ReisespesenKategorie.allCases, id: \.self) { k in
+                            ForEach(ReisespesenKategorie.allCases.filter { $0 != .verpflegung }, id: \.self) { k in
                                 Button {
                                     kategorie = k
                                 } label: {
@@ -568,7 +534,7 @@ struct KFZKostenFormView: View {
                     }
                 }
             }
-            .navigationTitle(isEdit ? "Bearbeiten" : "Neue KFZ Kosten")
+            .navigationTitle(isEdit ? "Bearbeiten" : (kategorie == .verpflegung ? "Neue Verpflegungsausgabe" : "Neue KFZ Kosten"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Abbrechen") { dismiss() } }
@@ -622,12 +588,11 @@ struct KFZKostenFormView: View {
     }
 }
 
-// MARK: - Fahrzeugwäsche + Private Ausgaben Kacheln
+// MARK: - Fahrzeugwäsche Kachel
 struct VehicleCostTilesSection: View {
     @EnvironmentObject var store: DataStore
     @EnvironmentObject var lm: LocalizationManager
     @State private var showWaescheForm = false
-    @State private var showPrivateForm = false
 
     let zeitFilter: ZeitFilter
 
@@ -645,10 +610,6 @@ struct VehicleCostTilesSection: View {
 
     private var waescheItems: [VehicleCost] {
         store.vehicleCosts.filter { $0.category == .fahrzeugwaesche && inPeriod($0.date) }
-    }
-
-    private var filteredPrivateExpenses: [PrivateExpense] {
-        store.privateExpenses.filter { inPeriod($0.date) }
     }
 
     var body: some View {
@@ -701,64 +662,10 @@ struct VehicleCostTilesSection: View {
                 .opacity(waescheItems.isEmpty ? 0.5 : 1.0)
             }
             .buttonStyle(.plain)
-
-            // Private Ausgaben
-            Button { showPrivateForm = true } label: {
-                HStack(spacing: 10) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
-                            .fill(Color.pink.opacity(0.15))
-                            .frame(width: 34, height: 34)
-                        Image(systemName: "person.fill")
-                            .font(.system(size: 14, weight: .regular))
-                            .foregroundColor(.pink)
-                    }
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text("Private Ausgaben")
-                            .font(.system(size: 14, weight: .regular))
-                            .foregroundColor(.primary)
-                            .lineLimit(1)
-                        Text(filteredPrivateExpenses.isEmpty ? "Keine Einträge" : "\(filteredPrivateExpenses.count) Einträge")
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondary)
-                    }
-                    Spacer()
-                    if filteredPrivateExpenses.isEmpty {
-                        Text("–")
-                            .font(.system(size: 13, weight: .regular, design: .monospaced))
-                            .foregroundColor(.secondary)
-                    } else {
-                        Text(filteredPrivateExpenses.reduce(0) { $0 + $1.amount }.euroFormatted)
-                            .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                            .foregroundColor(.pink)
-                    }
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(.secondary.opacity(0.4))
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 9)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(Color(.secondarySystemGroupedBackground))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(filteredPrivateExpenses.isEmpty ? Color.clear : Color.pink.opacity(0.2), lineWidth: 1)
-                )
-                .opacity(filteredPrivateExpenses.isEmpty ? 0.5 : 1.0)
-            }
-            .buttonStyle(.plain)
         }
         .padding(.horizontal, 16)
         .sheet(isPresented: $showWaescheForm) {
             FahrzeugwaescheFormView()
-                .environmentObject(store)
-                .environmentObject(lm)
-        }
-        .sheet(isPresented: $showPrivateForm) {
-            PrivateAusgabenView(zeitFilter: zeitFilter)
                 .environmentObject(store)
                 .environmentObject(lm)
         }
@@ -909,101 +816,6 @@ struct WaescheEntryFormView: View {
     }
 }
 
-// MARK: - Private Ausgaben View
-struct PrivateAusgabenView: View {
-    @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var store: DataStore
-    @State private var showAdd         = false
-    @State private var editItem: PrivateExpense?
-
-    let zeitFilter: ZeitFilter
-
-    private func inPeriod(_ date: Date) -> Bool {
-        let cal = Calendar.current
-        let now = Date()
-        switch zeitFilter {
-        case .woche: return cal.isDate(date, equalTo: now, toGranularity: .weekOfYear)
-        case .monat: return cal.isDate(date, equalTo: now, toGranularity: .month)
-        case .jahr:  return cal.isDate(date, equalTo: now, toGranularity: .year)
-        }
-    }
-
-    private var filteredExpenses: [PrivateExpense] {
-        store.privateExpenses.filter { inPeriod($0.date) }
-    }
-
-    var body: some View {
-        NavigationStack {
-            List {
-                if filteredExpenses.isEmpty {
-                    Section {
-                        VStack(spacing: 12) {
-                            Image(systemName: "person.fill")
-                                .font(.system(size: 36)).foregroundColor(.pink.opacity(0.5))
-                            Text("Keine privaten Ausgaben")
-                                .font(.subheadline)
-                            Text("Private Ausgaben werden separat erfasst und nicht in die Erstattung einberechnet.")
-                                .font(.subheadline).foregroundColor(.secondary).multilineTextAlignment(.center)
-                        }
-                        .frame(maxWidth: .infinity).padding(.vertical, 32)
-                        .listRowBackground(Color.clear)
-                    }
-                } else {
-                    Section {
-                        HStack {
-                            Label("Gesamt (privat)", systemImage: "person.fill").foregroundColor(.pink)
-                            Spacer()
-                            Text(filteredExpenses.reduce(0) { $0 + $1.amount }.euroFormatted)
-                                .font(.system(size: 17, weight: .regular, design: .monospaced)).foregroundColor(.pink)
-                        }
-                        .padding(.vertical, 4)
-                        .listRowBackground(Color.pink.opacity(0.07))
-                    }
-                    Section("\(filteredExpenses.count) Einträge") {
-                        ForEach(filteredExpenses.sorted(by: { $0.date > $1.date })) { item in
-                            HStack {
-                                VStack(alignment: .leading, spacing: 3) {
-                                    Text(item.title.isEmpty ? "Ausgabe" : item.title)
-                                        .font(.system(size: 15, weight: .regular))
-                                    Text(item.date.shortDateShort)
-                                        .font(.caption).foregroundColor(.secondary)
-                                    if !item.note.isEmpty {
-                                        Text(item.note).font(.caption).foregroundColor(.secondary).lineLimit(1)
-                                    }
-                                }
-                                Spacer()
-                                Text(item.amount.euroFormatted)
-                                    .font(.system(size: 15, weight: .regular, design: .monospaced)).foregroundColor(.pink)
-                            }
-                            .padding(.vertical, 4)
-                            .contentShape(Rectangle())
-                            .onTapGesture { editItem = item }
-                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                Button(role: .destructive) { store.deletePrivateExpense(item.id) } label: {
-                                    Label("Löschen", systemImage: "trash")
-                                }.tint(.red)
-                            }
-                        }
-                    }
-                }
-            }
-            .listStyle(.insetGrouped)
-            .navigationTitle("Private Ausgaben")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button { showAdd = true } label: { Image(systemName: "plus") }
-                        .accessibilityLabel("Neue private Ausgabe hinzufügen")
-                }
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Fertig") { dismiss() }
-                }
-            }
-            .sheet(isPresented: $showAdd) { PrivateExpenseFormView(mode: .add) }
-            .sheet(item: $editItem) { item in PrivateExpenseFormView(mode: .edit(item)) }
-        }
-    }
-}
 
 // MARK: - Private Expense Form
 enum PrivateExpenseFormMode { case add; case edit(PrivateExpense) }

@@ -40,7 +40,7 @@ struct ArbeitszeitView: View {
     }
     @State private var expandedMeals: Set<UUID> = []
     @State private var expandedTripDays: Set<String> = []
-    @State private var selectedFilter: ArbeitszeitFilter = .alle
+    @AppStorage("arbeitszeit.selectedFilter") private var selectedFilter: ArbeitszeitFilter = .alle
     @State private var selectedDate: Date = Date()
 
     private var filteredMeals: [MealEntry] {

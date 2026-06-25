@@ -73,13 +73,25 @@ struct PDFExportService {
             ctx.beginPage()
             var y: CGFloat = margin
             var rowIdx = 0
+            var pageNum = 1
+
+            func drawPageFooter() {
+                let text = "Seite \(pageNum)"
+                let sz = (text as NSString).size(withAttributes: a(.systemFont(ofSize: 8), textSec))
+                text.draw(at: CGPoint(x: pageWidth - margin - sz.width, y: pageHeight - margin + 6),
+                          withAttributes: a(.systemFont(ofSize: 8), textSec))
+            }
 
             func newPage() {
+                drawPageFooter()
                 ctx.beginPage()
+                pageNum += 1
                 y = margin
                 // Kopfzeile auf neuer Seite
                 drawPageHeader()
                 y += 36
+                // Tabellenkopf wiederholen, damit Spalten auf jeder Seite erkennbar bleiben
+                drawTableHeader()
             }
 
             func newPageIfNeeded(needed: CGFloat) {
@@ -339,6 +351,8 @@ struct PDFExportService {
             let hinweis = "* KFZ-Kosten und private Ausgaben sind in der Gesamterstattung nicht enthalten."
             hinweis.draw(at: CGPoint(x: margin, y: y),
                          withAttributes: a(.systemFont(ofSize: 7.5), textSec))
+
+            drawPageFooter()
         }
 
         return data

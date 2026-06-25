@@ -18,7 +18,7 @@ struct VerpflegungView: View {
         case monat = "Monat"
         case alle  = "Alle"
     }
-    @State private var selectedFilter: MealFilter = .alle
+    @AppStorage("verpflegung.selectedFilter") private var selectedFilter: MealFilter = .alle
     @State private var selectedDate: Date = Date()
 
     private var filteredMeals: [MealEntry] {

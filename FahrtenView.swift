@@ -154,7 +154,7 @@ struct FahrtenView: View {
         case monat  = "Monat"
         case alle   = "Alle"
     }
-    @State private var selectedFilter: TripFilter = .alle
+    @AppStorage("fahrten.selectedFilter") private var selectedFilter: TripFilter = .alle
     @State private var selectedDate: Date = Date()
 
     private var filteredTrips: [Trip] {

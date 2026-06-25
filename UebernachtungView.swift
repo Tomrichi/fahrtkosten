@@ -14,7 +14,7 @@ struct UebernachtungView: View {
         case monat = "Monat"
         case alle  = "Alle"
     }
-    @State private var selectedFilter: HotelFilter = .alle
+    @AppStorage("uebernachtung.selectedFilter") private var selectedFilter: HotelFilter = .alle
     @State private var selectedDate: Date = Date()
 
     private var filteredHotels: [HotelEntry] {
