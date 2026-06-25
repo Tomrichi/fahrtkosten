@@ -1,6 +1,26 @@
 import Vision
 import UIKit
 
+// MARK: - Orientierung
+// UIImagePickerController liefert das cgImage oft ohne die Orientierungs-Metadaten von UIImage.
+// Ohne diese Angabe läuft Vision ggf. auf einem seitlich verdrehten Bild und die Texterkennung
+// liest Zeilen in falscher Reihenfolge/Richtung – ein Hauptgrund für fehlerhafte Erkennung.
+extension CGImagePropertyOrientation {
+    init(_ uiOrientation: UIImage.Orientation) {
+        switch uiOrientation {
+        case .up:            self = .up
+        case .upMirrored:    self = .upMirrored
+        case .down:          self = .down
+        case .downMirrored:  self = .downMirrored
+        case .left:          self = .left
+        case .leftMirrored:  self = .leftMirrored
+        case .right:         self = .right
+        case .rightMirrored: self = .rightMirrored
+        @unknown default:    self = .up
+        }
+    }
+}
+
 // MARK: - Einzelne Beleg-Position (für KFZ-Kosten Multi-Erkennung)
 struct ReceiptLineItem {
     var description      : String
@@ -51,7 +71,8 @@ struct ReceiptParser {
         request.recognitionLanguages  = ["de-DE", "de-AT", "de-CH", "en-US"]
         request.usesLanguageCorrection = true
 
-        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+        let orientation = CGImagePropertyOrientation(image.imageOrientation)
+        let handler = VNImageRequestHandler(cgImage: cgImage, orientation: orientation, options: [:])
         DispatchQueue.global(qos: .userInitiated).async {
             try? handler.perform([request])
         }
@@ -79,7 +100,8 @@ struct ReceiptParser {
             request.recognitionLevel      = .accurate
             request.recognitionLanguages  = ["de-DE", "de-AT", "de-CH", "en-US"]
             request.usesLanguageCorrection = true
-            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+            let orientation = CGImagePropertyOrientation(image.imageOrientation)
+            let handler = VNImageRequestHandler(cgImage: cgImage, orientation: orientation, options: [:])
             DispatchQueue.global(qos: .userInitiated).async {
                 try? handler.perform([request])
             }
@@ -205,7 +227,8 @@ struct ReceiptParser {
             #"(\d{1,2})[.\-/](\d{1,2})[.\-/](20\d{2})"#,
             #"(20\d{2})[.\-/](\d{1,2})[.\-/](\d{1,2})"#,
         ]
-        for line in lines {
+
+        func date(in line: String) -> Date? {
             for pattern in patterns {
                 guard let regex = try? NSRegularExpression(pattern: pattern),
                       let m = regex.firstMatch(in: line, range: NSRange(line.startIndex..., in: line)),
@@ -221,6 +244,29 @@ struct ReceiptParser {
                    d > Date(timeIntervalSinceNow: -5 * 365 * 24 * 3600),
                    d <= Date() { return d }
             }
+            return nil
+        }
+
+        // ── Priorität 1: Datum in einer Zeile mit eindeutigem Beleg-Datum-Label ──
+        // Vermeidet, dass ein Fälligkeits-/Liefer-/Kartendatum fälschlich als Belegdatum gilt,
+        // nur weil es zufällig zuerst im OCR-Text auftaucht.
+        let dateLabelRx = try? NSRegularExpression(
+            pattern: #"(?i)(rechnungsdatum|belegdatum|kassenbon|bondatum|datum)"#
+        )
+        for (i, line) in lines.enumerated() {
+            guard let rx = dateLabelRx,
+                  rx.firstMatch(in: line, range: NSRange(line.startIndex..., in: line)) != nil else { continue }
+            // Fälligkeitsdatum/Lieferdatum explizit ausschließen
+            let lower = line.lowercased()
+            if lower.contains("fällig") || lower.contains("liefertermin") || lower.contains("lieferdatum") { continue }
+            // Datum steht entweder in derselben Zeile oder der nächsten (Label/Wert getrennt)
+            if let d = date(in: line) { return d }
+            if i + 1 < lines.count, let d = date(in: lines[i + 1]) { return d }
+        }
+
+        // ── Priorität 2: Fallback – erstes plausible Datum im gesamten Text ──────
+        for line in lines {
+            if let d = date(in: line) { return d }
         }
         return nil
     }

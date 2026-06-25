@@ -1,9 +1,49 @@
 import SwiftUI
 import UIKit
 import PDFKit
+import VisionKit
 import UniformTypeIdentifiers
 
-// MARK: - Kamera-Picker
+// MARK: - Dokumentenscanner (VisionKit)
+// Liefert im Gegensatz zum einfachen Kamerafoto automatisch perspektivisch entzerrte,
+// zugeschnittene und kontrastoptimierte Seiten – das verbessert die OCR-Qualität erheblich
+// gegenüber einem schräg/unscharf fotografierten Beleg.
+struct DocumentCameraView: UIViewControllerRepresentable {
+    var onScan: ([UIImage]) -> Void
+    var onDismiss: () -> Void
+
+    func makeUIViewController(context: Context) -> VNDocumentCameraViewController {
+        let vc = VNDocumentCameraViewController()
+        vc.delegate = context.coordinator
+        return vc
+    }
+    func updateUIViewController(_ uiViewController: VNDocumentCameraViewController, context: Context) {}
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+
+    class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
+        let parent: DocumentCameraView
+        init(_ p: DocumentCameraView) { parent = p }
+
+        func documentCameraViewController(_ controller: VNDocumentCameraViewController,
+                                           didFinishWith scan: VNDocumentCameraScan) {
+            var images: [UIImage] = []
+            for i in 0..<scan.pageCount {
+                images.append(scan.imageOfPage(at: i))
+            }
+            parent.onDismiss()
+            parent.onScan(images)
+        }
+        func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
+            parent.onDismiss()
+        }
+        func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
+            AppLogger.shared.logScan("Dokumentenscanner-Fehler: \(error.localizedDescription)")
+            parent.onDismiss()
+        }
+    }
+}
+
+// MARK: - Kamera-Picker (Fallback, falls VisionKit-Scanner nicht verfügbar ist)
 struct CameraPickerView: UIViewControllerRepresentable {
     @Binding var image: UIImage?
     var onDismiss: () -> Void
@@ -142,17 +182,20 @@ struct ReceiptScannerView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var capturedImage: UIImage?
+    @State private var scannedPages: [UIImage] = []   // VisionKit-Dokumentenscan (entzerrt/zugeschnitten)
     @State private var pdfPages: [UIImage] = []
     @State private var showCamera        = false
+    @State private var showFallbackCamera = false
     @State private var showPhotoLibrary  = false
     @State private var showPDFPicker     = false
     @State private var isProcessing      = false
     @State private var showError         = false
     @State private var errorMessage      = "Der Beleg konnte nicht ausgelesen werden."
 
-    private var hasInput: Bool { capturedImage != nil || !pdfPages.isEmpty }
+    private var hasInput: Bool { capturedImage != nil || !scannedPages.isEmpty || !pdfPages.isEmpty }
     private var previewImage: UIImage? {
         if let img = capturedImage { return img }
+        if !scannedPages.isEmpty { return PDFRenderer.combinedPreview(from: scannedPages) }
         return PDFRenderer.combinedPreview(from: pdfPages)
     }
 
@@ -177,7 +220,14 @@ struct ReceiptScannerView: View {
             }
         }
         .sheet(isPresented: $showCamera) {
-            CameraPickerView(image: $capturedImage, onDismiss: { showCamera = false })
+            DocumentCameraView(
+                onScan: { images in scannedPages = images },
+                onDismiss: { showCamera = false }
+            )
+            .ignoresSafeArea()
+        }
+        .sheet(isPresented: $showFallbackCamera) {
+            CameraPickerView(image: $capturedImage, onDismiss: { showFallbackCamera = false })
                 .ignoresSafeArea()
         }
         .sheet(isPresented: $showPhotoLibrary) {
@@ -218,6 +268,18 @@ struct ReceiptScannerView: View {
                     .padding(.horizontal, 12).padding(.vertical, 5)
                     .background(Color.red.opacity(0.1))
                     .clipShape(Capsule())
+                } else if scannedPages.count > 1 {
+                    HStack(spacing: 6) {
+                        Image(systemName: "doc.text.viewfinder")
+                            .foregroundColor(.blue)
+                            .font(.caption.bold())
+                        Text("Gescannt · \(scannedPages.count) Seiten")
+                            .font(.caption.bold())
+                            .foregroundColor(.blue)
+                    }
+                    .padding(.horizontal, 12).padding(.vertical, 5)
+                    .background(Color.blue.opacity(0.1))
+                    .clipShape(Capsule())
                 }
 
                 Image(uiImage: img)
@@ -250,6 +312,7 @@ struct ReceiptScannerView: View {
                         }
                         Button {
                             capturedImage = nil
+                            scannedPages = []
                             pdfPages = []
                         } label: {
                             Label("Anderen Beleg wählen", systemImage: "arrow.counterclockwise")
@@ -298,8 +361,10 @@ struct ReceiptScannerView: View {
                 // Kamera
                 Button {
                     AppLogger.shared.logTap("Beleg: Kamera öffnen")
-                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                    if VNDocumentCameraViewController.isSupported {
                         showCamera = true
+                    } else if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                        showFallbackCamera = true
                     } else {
                         showPhotoLibrary = true
                     }
@@ -375,6 +440,14 @@ struct ReceiptScannerView: View {
         if let img = capturedImage {
             // Foto-Pfad: direkt OCR
             ReceiptParser.parse(image: img) { result in
+                DispatchQueue.main.async {
+                    isProcessing = false
+                    handleResult(result)
+                }
+            }
+        } else if !scannedPages.isEmpty {
+            // Dokumentenscan-Pfad: bereits entzerrte/zugeschnittene Seite(n), OCR + Zusammenführen
+            ReceiptParser.parseMultiPage(images: scannedPages) { result in
                 DispatchQueue.main.async {
                     isProcessing = false
                     handleResult(result)
