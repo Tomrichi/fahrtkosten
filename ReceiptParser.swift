@@ -43,6 +43,22 @@ struct ReceiptScanResult {
 // MARK: - Receipt Parser (Vision OCR)
 struct ReceiptParser {
 
+    // Vision liefert Text-Observations nicht zuverlässig in Lesereihenfolge – bei mehrspaltigen
+    // Belegen (z.B. Hotelrechnungen mit Adress-/Datums-Spalten nebeneinander) kann das die
+    // Zeilenfolge durcheinanderbringen, worauf praktisch alle Heuristiken unten aufbauen
+    // ("erste Zeile mit Label X", "Wert in der nächsten Zeile" etc.). Daher explizit nach
+    // vertikaler Position (oben → unten) sortieren, bei ähnlicher Höhe nach horizontaler
+    // Position (links → rechts), damit zweispaltige Zeilen in der richtigen Reihenfolge stehen.
+    private static func sortedLines(from observations: [VNRecognizedTextObservation]) -> [String] {
+        let sorted = observations.sorted { a, b in
+            let ay = a.boundingBox.origin.y + a.boundingBox.height / 2
+            let by = b.boundingBox.origin.y + b.boundingBox.height / 2
+            if abs(ay - by) > 0.012 { return ay > by } // Vision: y=0 unten, y=1 oben
+            return a.boundingBox.origin.x < b.boundingBox.origin.x
+        }
+        return sorted.compactMap { $0.topCandidates(1).first?.string }
+    }
+
     static func parse(image: UIImage, completion: @escaping (ReceiptScanResult?) -> Void) {
         guard let cgImage = image.cgImage else { completion(nil); return }
 
@@ -51,7 +67,7 @@ struct ReceiptParser {
                   let observations = request.results as? [VNRecognizedTextObservation] else {
                 completion(nil); return
             }
-            let lines = observations.compactMap { $0.topCandidates(1).first?.string }
+            let lines = sortedLines(from: observations)
             let fullText = lines.joined(separator: "\n")
 
             let items = extractLineItems(from: lines)
@@ -84,18 +100,24 @@ struct ReceiptParser {
     static func parseMultiPage(images: [UIImage], completion: @escaping (ReceiptScanResult?) -> Void) {
         guard !images.isEmpty else { completion(nil); return }
 
-        var allLines: [String] = []
+        // Pro Seite eigener Slot statt gemeinsamem Array – die Seiten werden parallel
+        // verarbeitet, ein gemeinsames Array wäre sowohl ein Datenrennen als auch
+        // anfällig dafür, die Seiten in falscher Reihenfolge zusammenzuführen.
+        var linesByPage = Array<[String]>(repeating: [], count: images.count)
         let group = DispatchGroup()
+        // Serialisiert die Schreibzugriffe auf linesByPage, da die Seiten parallel
+        // auf verschiedenen Hintergrund-Queues verarbeitet werden.
+        let resultsQueue = DispatchQueue(label: "ReceiptParser.results")
 
-        for image in images {
+        for (pageIndex, image) in images.enumerated() {
             guard let cgImage = image.cgImage else { continue }
             group.enter()
             let request = VNRecognizeTextRequest { req, err in
                 defer { group.leave() }
                 guard err == nil,
                       let observations = req.results as? [VNRecognizedTextObservation] else { return }
-                let lines = observations.compactMap { $0.topCandidates(1).first?.string }
-                allLines.append(contentsOf: lines)
+                let pageLines = sortedLines(from: observations)
+                resultsQueue.sync { linesByPage[pageIndex] = pageLines }
             }
             request.recognitionLevel      = .accurate
             request.recognitionLanguages  = ["de-DE", "de-AT", "de-CH", "en-US"]
@@ -108,6 +130,7 @@ struct ReceiptParser {
         }
 
         group.notify(queue: .global(qos: .userInitiated)) {
+            let allLines = linesByPage.flatMap { $0 }
             guard !allLines.isEmpty else { completion(nil); return }
             // Nutze das erste Bild als Repräsentationsbild für das Ergebnis
             let representative = images[0]
