@@ -279,7 +279,7 @@ struct EinstellungenView: View {
                         .foregroundStyle(.secondary)
                 }
                 HStack {
-                    Label("Zulage Inland / am Werk", systemImage: "flag.fill")
+                    Label("Zulage Inland / Deutschland", systemImage: "flag.fill")
                     Spacer()
                     TextField("12,00", text: $monteurszulageInlandStr)
                         .keyboardType(.decimalPad)
@@ -288,7 +288,7 @@ struct EinstellungenView: View {
                     Text("€").foregroundStyle(.secondary).font(.subheadline)
                 }
                 HStack {
-                    Label("Zulage Ausland / Schweiz", systemImage: "globe.europe.africa.fill")
+                    Label("Zulage Ausland / Außerhalb des Werks und Deutschlands", systemImage: "globe.europe.africa.fill")
                     Spacer()
                     TextField("50,00", text: $monteurszulageAuslandStr)
                         .keyboardType(.decimalPad)
