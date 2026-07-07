@@ -46,7 +46,7 @@ struct VerpflegungView: View {
     }
 
     private var filteredTotal: Double {
-        filteredMeals.reduce(0) { $0 + $1.allowance(rates: store.mealRates(for: $1.region)) }
+        filteredMeals.reduce(0) { $0 + $1.allowance(rates: store.mealRates(for: $1.region)) + store.monteurszulage(for: $1) }
     }
 
     private var filterLabel: String {
@@ -278,11 +278,13 @@ struct VerpflegungView: View {
 // MARK: - Meal Row
 struct MealRow: View {
     @EnvironmentObject var lm: LocalizationManager
+    @EnvironmentObject var store: DataStore
 
     let meal: MealEntry
     let rates: MealRates
 
-    private var allowance: Double { meal.allowance(rates: rates) }
+    private var monteurszulage: Double { store.monteurszulage(for: meal) }
+    private var allowance: Double { meal.allowance(rates: rates) + monteurszulage }
 
     var body: some View {
         HStack(spacing: 14) {
@@ -336,6 +338,15 @@ struct MealRow: View {
                             .padding(.horizontal, 5)
                             .padding(.vertical, 2)
                             .background(Color.green.opacity(0.75))
+                            .clipShape(Capsule())
+                    }
+                    if monteurszulage > 0 {
+                        Text("🔧 +\(monteurszulage.euroFormatted)")
+                            .font(.system(size: 9, weight: .regular))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
+                            .background(Color.blue.opacity(0.75))
                             .clipShape(Capsule())
                     }
                     Text(stufeBadge)
@@ -397,6 +408,7 @@ struct MealFormView: View {
     @State private var ownBreakfastStr   = ""       // Eigenes Frühstück (selbst bezahlt)
     @State private var pauseMinutes: Int = 0
     @State private var includeTodaysTrips: Bool = true
+    @State private var workedAtPlant: Bool = false  // Am Werk (Heimatbetrieb) gearbeitet
 
     private var isEdit: Bool { if case .edit = mode { return true }; return false }
     private var editingMeal: MealEntry? { if case .edit(let m) = mode { return m }; return nil }
@@ -413,10 +425,12 @@ struct MealFormView: View {
                   startTime: startTime, endTime: endTime, note: note, region: region,
                   breakfastAmount: breakfastAmt, ownBreakfastAmount: ownBreakfastAmt,
                   pauseMinutes: pauseMinutes,
-                  excludeTrips: !includeTodaysTrips)
+                  excludeTrips: !includeTodaysTrips,
+                  workedAtPlant: workedAtPlant)
     }
     private var currentAllowance: Double { currentMeal.allowance(rates: rates) }
     private var currentLabel: String { currentMeal.allowanceLabel(rates: rates) }
+    private var currentMonteurszulage: Double { store.monteurszulage(for: currentMeal) }
 
     var body: some View {
         NavigationStack {
@@ -474,7 +488,7 @@ struct MealFormView: View {
                 }
 
                 // ── Region ──
-                Section(lm.t("meals.region")) {
+                Section {
                     Picker(lm.t("common.region"), selection: $region) {
                         ForEach(TravelRegion.allCases, id: \.self) { r in
                             Label(r.localizedName, systemImage: r.icon).tag(r)
@@ -482,6 +496,23 @@ struct MealFormView: View {
                     }
                     .pickerStyle(.segmented)
                     .padding(.vertical, 4)
+
+                    if region != .inland {
+                        Toggle(isOn: $workedAtPlant) {
+                            HStack(spacing: 8) {
+                                Label("Am Werk (\(store.werkOrt)) gearbeitet", systemImage: "building.2.fill")
+                            }
+                        }
+                        .tint(.blue)
+                    }
+                } header: {
+                    Text(lm.t("meals.region"))
+                } footer: {
+                    if region != .inland {
+                        Text(workedAtPlant
+                             ? "Am Werk gilt die Inlands-Zulage (\(store.monteurszulageInland.euroFormatted))."
+                             : "Außerhalb des Werks gilt die Auslands-Zulage (\(store.monteurszulageAusland.euroFormatted)).")
+                    }
                 }
 
                 // ── Arbeitszeit ──
@@ -604,9 +635,11 @@ struct MealFormView: View {
                         breakfastAmount: breakfastAmt,
                         ownBreakfastAmount: ownBreakfastAmt,
                         pauseMinutes: pauseMinutes,
-                        excludeTrips: !includeTodaysTrips
+                        excludeTrips: !includeTodaysTrips,
+                        workedAtPlant: workedAtPlant
                     )
-                    let effectiveAllowance = effectiveMeal.allowance(rates: rates)
+                    let effectiveMonteurszulage = store.monteurszulage(for: effectiveMeal)
+                    let effectiveAllowance = effectiveMeal.allowance(rates: rates) + effectiveMonteurszulage
                     LabeledRow(label: lm.t("meals.level"),
                                value: effectiveMeal.allowanceLabel(rates: rates),
                                valueColor: progressColor)
@@ -641,6 +674,18 @@ struct MealFormView: View {
                             Text("+\(ownBreakfastAmt.euroFormatted)")
                                 .font(.system(size: 15, weight: .regular, design: .monospaced))
                                 .foregroundColor(.orange)
+                        }
+                    }
+
+                    // Monteurszulage (nur anzeigen wenn Betrag > 0)
+                    if effectiveMonteurszulage > 0 {
+                        HStack {
+                            Label("Monteurszulage", systemImage: "wrench.and.screwdriver.fill")
+                                .foregroundColor(.blue)
+                            Spacer()
+                            Text("+\(effectiveMonteurszulage.euroFormatted)")
+                                .font(.system(size: 15, weight: .regular, design: .monospaced))
+                                .foregroundColor(.blue)
                         }
                     }
 
@@ -717,6 +762,7 @@ struct MealFormView: View {
             breakfastChecked    = m.breakfastAmount > 0
             pauseMinutes        = m.pauseMinutes
             includeTodaysTrips  = !m.excludeTrips
+            workedAtPlant       = m.workedAtPlant
             if m.ownBreakfastAmount > 0 {
                 ownBreakfastStr = String(format: "%.2f", m.ownBreakfastAmount).replacingOccurrences(of: ".", with: ",")
             }
@@ -740,7 +786,8 @@ struct MealFormView: View {
                              breakfastAmount: breakfastAmt,
                              ownBreakfastAmount: ownBreakfastAmt,
                              pauseMinutes: pauseMinutes,
-                             excludeTrips: !includeTodaysTrips)
+                             excludeTrips: !includeTodaysTrips,
+                             workedAtPlant: workedAtPlant)
         if isEdit {
             store.updateMeal(meal)
             AppLogger.shared.log("Verpflegung aktualisiert: \(meal.date.shortDate), \(meal.startTime.timeOnly)–\(meal.endTime.timeOnly)", level: .store)

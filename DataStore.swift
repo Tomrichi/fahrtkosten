@@ -35,6 +35,9 @@ class DataStore: ObservableObject {
     @Published var abroadMeal6plus: Double { didSet { local.set(abroadMeal6plus, forKey: "abroadMeal6plus") } }
     @Published var hotelFlat:       Double { didSet { local.set(hotelFlat,       forKey: "hotelFlat") } }
     @Published var breakfastFlat:   Double { didSet { local.set(breakfastFlat,   forKey: "breakfastFlat") } }
+    @Published var monteurszulageInland:  Double { didSet { local.set(monteurszulageInland,  forKey: "monteurszulageInland") } }
+    @Published var monteurszulageAusland: Double { didSet { local.set(monteurszulageAusland, forKey: "monteurszulageAusland") } }
+    @Published var werkOrt: String { didSet { local.set(werkOrt, forKey: "werkOrt") } }
 
     // MARK: - Init
     init() {
@@ -52,6 +55,9 @@ class DataStore: ObservableObject {
         abroadMeal6plus = local.double(forKey: "abroadMeal6plus").ifZero(Constants.abroadMeal6plus)
         hotelFlat       = local.double(forKey: "hotelFlat").ifZero(Constants.hotelFlat)
         breakfastFlat   = local.double(forKey: "breakfastFlat").ifZero(Constants.breakfastFlat)
+        monteurszulageInland  = local.double(forKey: "monteurszulageInland").ifZeroAllowed(Constants.monteurszulageInland)
+        monteurszulageAusland = local.double(forKey: "monteurszulageAusland").ifZeroAllowed(Constants.monteurszulageAusland)
+        werkOrt = local.string(forKey: "werkOrt") ?? Constants.werkOrt
 
         // SCHRITT 1: Migration einmalig ausführen (Standard → App Group)
         migrateFromStandardToAppGroup()
@@ -225,10 +231,20 @@ class DataStore: ObservableObject {
         }
     }
 
+    // MARK: - Monteurszulage
+    /// Pauschale Zulage zusätzlich zur Verpflegungspauschale: 12 € Inland, 50 € Ausland/Schweiz.
+    /// Am Werk (Steffisburg) gearbeitet zählt auch bei Region Schweiz/Ausland als Inland.
+    func monteurszulage(for meal: MealEntry) -> Double {
+        switch meal.region {
+        case .inland:            return monteurszulageInland
+        case .schweiz, .ausland: return meal.workedAtPlant ? monteurszulageInland : monteurszulageAusland
+        }
+    }
+
     // MARK: - Totals
     var totalKmAmount:    Double { trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km * kmRate } }
     var totalKm:          Double { trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km } }
-    var totalMeal:        Double { meals.reduce(0)           { $0 + $1.allowance(rates: mealRates(for: $1.region)) } }
+    var totalMeal:        Double { meals.reduce(0)           { $0 + $1.allowance(rates: mealRates(for: $1.region)) + monteurszulage(for: $1) } }
     var totalHotel:       Double { hotels.reduce(0)          { $0 + $1.amount(flat: hotelFlat) } }
     var totalVehicle:     Double { vehicleCosts.reduce(0)    { $0 + $1.amount } }
     var totalReiseSpesen: Double { reiseSpesen.reduce(0)     { $0 + $1.amount } }
@@ -412,7 +428,7 @@ extension DataStore {
         case ..<6:  raw = rates.rate3to6
         default:    raw = (returnsHome && !endsLate) ? rates.rate3to6 : rates.rate6plus
         }
-        return max(0, raw - meal.breakfastAmount) + meal.ownBreakfastAmount
+        return max(0, raw - meal.breakfastAmount) + meal.ownBreakfastAmount + monteurszulage(for: meal)
     }
 
     func totalWorkHours(for meal: MealEntry) -> Double {

@@ -19,6 +19,9 @@ struct EinstellungenView: View {
     @State private var abroadMeal6plusStr = ""
     @State private var hotelFlatStr       = ""
     @State private var breakfastFlatStr   = ""
+    @State private var monteurszulageInlandStr  = ""
+    @State private var monteurszulageAuslandStr = ""
+    @State private var werkOrtStr = ""
 
     @State private var showResetAlert       = false
     @State private var showDeleteAllAlert   = false
@@ -85,6 +88,7 @@ struct EinstellungenView: View {
     // Aufklappbare Sections
     @State private var expandRates   = false
     @State private var expandMeals   = false
+    @State private var expandMonteurszulage = false
     @State private var expandHotel   = false
     @State private var expandFuel    = false
     @State private var expandLang    = false
@@ -107,6 +111,7 @@ struct EinstellungenView: View {
                 homeAddressSection
                 collapsibleFuel
                 collapsibleMeals
+                collapsibleMonteurszulage
                 collapsibleHotel
                 resetSection
                 backupSection
@@ -261,6 +266,44 @@ struct EinstellungenView: View {
                     .fontWeight(.regular)
             }
         } footer: { Text("Inland: 0 € · 14 € · 28 €  |  Schweiz/Ausland: 0 € · 10 € · 35 €") }
+    }
+
+    @ViewBuilder private var collapsibleMonteurszulage: some View {
+        Section {
+            DisclosureGroup(isExpanded: $expandMonteurszulage) {
+                HStack {
+                    Label("Werk-Standort", systemImage: "building.2.fill")
+                    Spacer()
+                    TextField("z.B. Steffisburg", text: $werkOrtStr)
+                        .multilineTextAlignment(.trailing)
+                        .foregroundStyle(.secondary)
+                }
+                HStack {
+                    Label("Zulage Inland / am Werk", systemImage: "flag.fill")
+                    Spacer()
+                    TextField("12,00", text: $monteurszulageInlandStr)
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 80)
+                    Text("€").foregroundStyle(.secondary).font(.subheadline)
+                }
+                HStack {
+                    Label("Zulage Ausland / Schweiz", systemImage: "globe.europe.africa.fill")
+                    Spacer()
+                    TextField("50,00", text: $monteurszulageAuslandStr)
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 80)
+                    Text("€").foregroundStyle(.secondary).font(.subheadline)
+                }
+            } label: {
+                Label("Monteurszulage", systemImage: "wrench.and.screwdriver.fill")
+                    .foregroundStyle(.primary)
+                    .fontWeight(.regular)
+            }
+        } footer: {
+            Text("Pauschale Zulage zusätzlich zur Verpflegungspauschale: 12 € bei Region Inland oder bei Arbeit am Werk (\(werkOrtStr.isEmpty ? "Steffisburg" : werkOrtStr)), 50 € außerhalb des Werks bei Region Schweiz/Ausland. Beim Erfassen eines Verpflegungseintrags mit Region Schweiz oder Ausland kann „Am Werk gearbeitet\" angehakt werden, um die Inlands-Zulage anzuwenden.")
+        }
     }
 
     @ViewBuilder private var collapsibleHotel: some View {
@@ -893,6 +936,9 @@ struct EinstellungenView: View {
         abroadMeal6plusStr = fmt(store.abroadMeal6plus)
         hotelFlatStr       = fmt(store.hotelFlat)
         breakfastFlatStr   = fmt(store.breakfastFlat)
+        monteurszulageInlandStr  = fmt(store.monteurszulageInland)
+        monteurszulageAuslandStr = fmt(store.monteurszulageAusland)
+        werkOrtStr = store.werkOrt
     }
 
     private func saveAndApply() {
@@ -908,6 +954,9 @@ struct EinstellungenView: View {
         store.abroadMeal6plus = parseCurrency(abroadMeal6plusStr)
         store.hotelFlat       = parseCurrency(hotelFlatStr)
         store.breakfastFlat   = parseCurrency(breakfastFlatStr)
+        store.monteurszulageInland  = parseCurrency(monteurszulageInlandStr)
+        store.monteurszulageAusland = parseCurrency(monteurszulageAuslandStr)
+        store.werkOrt = werkOrtStr.trimmingCharacters(in: .whitespaces).isEmpty ? Constants.werkOrt : werkOrtStr
     }
 
     private func saveAndDismiss() {
@@ -929,6 +978,9 @@ struct EinstellungenView: View {
         store.abroadMeal6plus = Constants.abroadMeal6plus
         store.hotelFlat       = Constants.hotelFlat
         store.breakfastFlat   = Constants.breakfastFlat
+        store.monteurszulageInland  = Constants.monteurszulageInland
+        store.monteurszulageAusland = Constants.monteurszulageAusland
+        store.werkOrt = Constants.werkOrt
         AppLogger.shared.logTap("Einstellungen: Auf Standardwerte zurückgesetzt")
         loadValues()
     }

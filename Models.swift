@@ -15,6 +15,10 @@ struct Constants {
     static let hotelFlat:       Double = 20.0
     static let breakfastFlat:   Double = 0.0
     static let defaultFuelConsumption: Double = 7.5
+    // Monteurszulage: pauschale Zulage zusätzlich zur Verpflegungspauschale
+    static let monteurszulageInland:  Double = 12.0
+    static let monteurszulageAusland: Double = 50.0
+    static let werkOrt: String = "Steffisburg"
 }
 
 // MARK: - Reiseregion
@@ -168,17 +172,20 @@ struct MealEntry: Identifiable, Codable {
     var ownBreakfastAmount: Double = 0.0
     var pauseMinutes: Int = 0
     var excludeTrips: Bool = false
+    /// Am Werk (Heimatbetrieb) gearbeitet – auch bei Region Schweiz/Ausland gilt dann die Inlands-Zulage
+    var workedAtPlant: Bool = false
 
     enum CodingKeys: String, CodingKey {
-        case id, date, startTime, endTime, note, region, breakfastAmount, ownBreakfastAmount, pauseMinutes, excludeTrips
+        case id, date, startTime, endTime, note, region, breakfastAmount, ownBreakfastAmount, pauseMinutes, excludeTrips, workedAtPlant
     }
     init(id: UUID = UUID(), date: Date, startTime: Date, endTime: Date, note: String,
          region: TravelRegion = .inland, breakfastAmount: Double = 0.0,
-         ownBreakfastAmount: Double = 0.0, pauseMinutes: Int = 0, excludeTrips: Bool = false) {
+         ownBreakfastAmount: Double = 0.0, pauseMinutes: Int = 0, excludeTrips: Bool = false,
+         workedAtPlant: Bool = false) {
         self.id = id; self.date = date; self.startTime = startTime; self.endTime = endTime
         self.note = note; self.region = region; self.breakfastAmount = breakfastAmount
         self.ownBreakfastAmount = ownBreakfastAmount; self.pauseMinutes = pauseMinutes
-        self.excludeTrips = excludeTrips
+        self.excludeTrips = excludeTrips; self.workedAtPlant = workedAtPlant
     }
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -192,6 +199,7 @@ struct MealEntry: Identifiable, Codable {
         ownBreakfastAmount = try c.decodeIfPresent(Double.self, forKey: .ownBreakfastAmount) ?? 0.0
         pauseMinutes = try c.decodeIfPresent(Int.self, forKey: .pauseMinutes) ?? 0
         excludeTrips = try c.decodeIfPresent(Bool.self, forKey: .excludeTrips) ?? false
+        workedAtPlant = try c.decodeIfPresent(Bool.self, forKey: .workedAtPlant) ?? false
     }
     var hours: Double { max(0, endTime.timeIntervalSince(startTime) / 3600 - Double(pauseMinutes) / 60) }
     func mealAllowance(rates: MealRates) -> Double {

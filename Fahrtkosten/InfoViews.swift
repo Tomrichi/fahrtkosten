@@ -286,7 +286,7 @@ Entwickler: Thomas Wagner · info@wagner-fahrtkosten.de</p>
 <p>Die App speichert folgende Daten ausschließlich lokal auf deinem Gerät (iOS Data Protection, vollverschlüsselt):</p>
 <ul>
   <li><strong>Fahrten:</strong> Datum, Start- und Zielort, Kilometer, Abfahrts- und Ankunftszeit, berechnete Fahrzeit, Kraftstoffart, Spritpreis, Kraftstoffverbrauch, berechnete Erstattung, Notiz</li>
-  <li><strong>Arbeitszeit &amp; Spesen:</strong> Datum, Region (Inland / Schweiz / Ausland), Arbeitszeit (Start/Ende), Pausenminuten, Verpflegungspauschalstufe, Abzüge für Drittmahlzeiten, eigenes Frühstück, Notiz</li>
+  <li><strong>Arbeitszeit &amp; Spesen:</strong> Datum, Region (Inland / Schweiz / Ausland), Arbeitszeit (Start/Ende), Pausenminuten, Verpflegungspauschalstufe, Abzüge für Drittmahlzeiten, eigenes Frühstück, „Am Werk gearbeitet"-Kennzeichen für die Monteurszulage, Notiz</li>
   <li><strong>Übernachtungen:</strong> Check-in- und Check-out-Datum, Anzahl Nächte, Stadt, Hotelname, Betrag (Pauschale oder tatsächlich)</li>
   <li><strong>KFZ-Kosten:</strong> Datum, Kategorie, Betrag, Notiz, optionaler Kilometerstand</li>
   <li><strong>Reisespesen:</strong> Datum, Kategorie, Betrag, Notiz</li>
@@ -1098,6 +1098,7 @@ private let hilfeHTML = #"""
 <div class="feature">⚡ <strong>Elektro &amp; Hybrid</strong> – Verbrauch in kWh/100 km; Hybrid berechnet Strom- und Benzinkosten getrennt</div>
 <div class="feature">🔋 <strong>Live-Spritpreise</strong> – günstigster Preis in der Nähe via Tankerkönig API (Benzin/Diesel)</div>
 <div class="feature">🍽️ <strong>Verpflegungspauschale</strong> – Fahrzeit + Arbeitszeit kombiniert, 3 Regionen (Inland, Schweiz, Ausland)</div>
+<div class="feature">🔧 <strong>Monteurszulage</strong> – pauschale Zulage zusätzlich zur Verpflegungspauschale: 12 € Inland/am Werk, 50 € Ausland/Schweiz außerhalb des Werks; Sätze und Werk-Standort frei einstellbar</div>
 <div class="feature">⏸️ <strong>Pausenzeit</strong> – abziehbare Pause pro Arbeitszeiterfassung einstellbar (0–120 min, 15-min-Schritte)</div>
 <div class="feature">☕ <strong>Frühstück-Abrechnung</strong> – Verpflegung von Dritten abziehbar; eigenes bezahltes Frühstück addierbar</div>
 <div class="feature">🏨 <strong>Übernachtungen</strong> – Pauschale oder tatsächliche Kosten; Check-in/Check-out mit automatischer Nächteberechnung</div>
@@ -1142,6 +1143,7 @@ private let hilfeHTML = #"""
   <tr><td>Schweiz</td><td>0 €</td><td>20 €</td><td>35 €</td></tr>
   <tr><td>Ausland</td><td>0 €</td><td>20 €</td><td>35 €</td></tr>
 </table>
+<p>Zusätzlich zur Verpflegungspauschale kann eine <strong>Monteurszulage</strong> erfasst werden: 12 € bei Region Inland, 50 € bei Region Schweiz oder Ausland. Wird bei Region Schweiz/Ausland am Werk (Standort in den Einstellungen hinterlegt, z. B. Steffisburg) gearbeitet, gilt statt der Auslands- die Inlands-Zulage. Die Zulage wird automatisch zur Verpflegungspauschale addiert und in Liste, PDF- und CSV-Export separat ausgewiesen.</p>
 
 <h2>Tab Übernachtung</h2>
 <p>Erfasse Hotelübernachtungen mit Check-in- und Check-out-Datum – die Anzahl der Nächte wird automatisch berechnet. Wähle zwischen <strong>Pauschale</strong> oder <strong>tatsächlichen Kosten</strong>. Belege per Kamera oder Foto-Import scannen – OCR erkennt Betrag, Datum und Hotelname automatisch.</p>
@@ -1174,7 +1176,7 @@ private let hilfeHTML = #"""
 <div class="tip">💡 Tipp: Suche nach einem Datum ohne Textbegriff – so findest du alle Einträge eines bestimmten Tages kategorienübergreifend.</div>
 
 <h2>Einstellungen</h2>
-<p>Alle Pauschalsätze individuell anpassbar: Kilometerpauschale (Standard: 0,30 €/km), Verpflegungssätze (3 Stufen für Inland, Schweiz, Ausland), Übernachtung/Frühstück, Antriebsart &amp; Kraftstoffpreise. Wischgesten, Backup und Protokoll sind als aufklappbare Menüs zusammengefasst.</p>
+<p>Alle Pauschalsätze individuell anpassbar: Kilometerpauschale (Standard: 0,30 €/km), Verpflegungssätze (3 Stufen für Inland, Schweiz, Ausland), Monteurszulage (12 € Inland / 50 € Ausland, Werk-Standort frei einstellbar), Übernachtung/Frühstück, Antriebsart &amp; Kraftstoffpreise. Wischgesten, Backup und Protokoll sind als aufklappbare Menüs zusammengefasst.</p>
 
 <h2>Backup &amp; Wiederherstellen</h2>
 <p>Alle Daten lassen sich als JSON-Backup sichern. Über <strong>Lokal speichern</strong> wird das Backup in der Dateien-App abgelegt. Über <strong>Teilen</strong> kannst du es per AirDrop, E-Mail oder in Cloud-Dienste exportieren. Es werden maximal 10 lokale Backups aufbewahrt.</p>
@@ -1334,13 +1336,62 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.16.11 – aktuell -->
+<!-- 1.17.0 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.16.11
+        Version 1.17.0
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">Neu: Monteurszulage (12 € Inland / 50 € Ausland)</div>
+    </div>
+    <span class="build-info">7. Juli 2026 · Build 29</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEU</span> <strong>Monteurszulage:</strong> Zusätzlich zur Verpflegungspauschale kann jetzt eine pauschale Monteurszulage erfasst werden – 12 € bei Region Inland (bzw. bei Arbeit am Werk), 50 € bei Region Schweiz/Ausland außerhalb des Werks. Werk-Standort, Inlands- und Auslandssatz sind unter Einstellungen → Monteurszulage frei einstellbar.</li>
+      <li><span class="badge-new">NEU</span> <strong>„Am Werk gearbeitet"-Schalter:</strong> Beim Erfassen eines Verpflegungs-/Spesen-Eintrags mit Region Schweiz oder Ausland lässt sich angeben, ob am Werk (z. B. Steffisburg) gearbeitet wurde – dann gilt automatisch die Inlands-Zulage statt der Auslands-Zulage.</li>
+      <li><span class="badge-change">INFO</span> Die Monteurszulage wird in Spesen-Liste, PDF- und CSV-Export als eigene Position ausgewiesen.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.16.12 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.16.12
+      </div>
+      <div class="preview-text">Beleg-Scanner runderneuert · Chronologische Sortierung</div>
+    </div>
+    <span class="build-info">1. Juli 2026 · Build 28</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEU</span> <strong>Beleg-Scanner runderneuert:</strong> Automatischer Zuschnitt &amp; Entzerrung beim Fotografieren (Dokumentenscanner statt einfachem Foto), deutlich zuverlässigere Erkennung von Datum, Betrag und Name, auch bei mehrspaltigen Rechnungen.</li>
+      <li><span class="badge-new">NEU</span> Fahrten und Arbeitszeiten werden beim Erfassen automatisch chronologisch sortiert.</li>
+      <li><span class="badge-new">NEU</span> App merkt sich beim Schließen den zuletzt gewählten Tab und Zeitraum-Filter und öffnet wieder genau dort.</li>
+      <li><span class="badge-change">VERBESSERUNG</span> PDF-Export sauberer strukturiert – Tabellenkopf wiederholt sich auf jeder Seite, mit Seitenzahlen.</li>
+      <li><span class="badge-change">VERBESSERUNG</span> Übersicht erweitert – Verpflegungsausgaben und private Ausgaben lassen sich jetzt direkt dort erfassen.</li>
+      <li><span class="badge-change">VERBESSERUNG</span> KFZ-Bereich aufgeräumt und übersichtlicher.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.16.11 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.16.11
       </div>
       <div class="preview-text">CarPlay Fixes · GPS-Übergabe bei Trennung · Titelkorrektur</div>
     </div>

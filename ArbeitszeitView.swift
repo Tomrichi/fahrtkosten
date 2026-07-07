@@ -431,6 +431,8 @@ struct ArbeitszeitRow: View {
     let isExpanded: Bool
     let onToggle:   () -> Void
 
+    private var monteurszulage: Double { store.monteurszulage(for: meal) }
+
     /// Zeigt immer die eingetragene Arbeitszeit (Meal-Zeiten). Die Gesamtstunden inkl. Fahrzeit stehen separat dahinter.
     private var displayRange: (start: Date, end: Date) {
         (meal.startTime, meal.endTime)
@@ -471,6 +473,10 @@ struct ArbeitszeitRow: View {
                         Text(String(format: "%.1fh", totalH) + (trips.isEmpty ? "" : " ges."))
                             .foregroundColor(totalH >= 6 ? .green : totalH >= 3 ? Color.orange : .secondary)
                             .fontWeight(totalH >= 6 ? .semibold : .regular)
+                        if monteurszulage > 0 {
+                            Text("· 🔧 +\(monteurszulage.euroFormatted)")
+                                .foregroundColor(.blue)
+                        }
                     }
                     .font(.caption)
                 }
