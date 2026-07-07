@@ -1336,17 +1336,17 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.0 – aktuell -->
+<!-- 1.17.2 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.0
+        Version 1.17.2
         <span class="current-badge">● Aktuell</span>
       </div>
       <div class="preview-text">Neu: Monteurszulage (12 € Inland / 50 € Ausland)</div>
     </div>
-    <span class="build-info">7. Juli 2026 · Build 29</span>
+    <span class="build-info">8. Juli 2026 · Build 30</span>
     <span class="chevron">›</span>
   </summary>
   <div class="detail-content">

@@ -1,14 +1,14 @@
 # Fahrtkosten – App Store Texte
-Version 1.17.0 · Build 29 · Thomas Wagner · 7. Juli 2026
+Version 1.17.2 · Build 30 · Thomas Wagner · 8. Juli 2026
 
 ---
 
-## Was ist neu – Version 1.17.0 (Build 29)
+## Was ist neu – Version 1.17.2 (Build 30)
 
 • Neu: Monteurszulage – 12 € bei Region Inland, 50 € bei Region Schweiz/Ausland, separat erfassbar
 • Neu: „Am Werk gearbeitet"-Schalter bei Verpflegungseinträgen mit Region Schweiz/Ausland – wer am Werk (z. B. Steffisburg) arbeitet, erhält automatisch die Inlands- statt der Auslands-Zulage
 • Neu: Werk-Standort, Inlands- und Auslandssatz der Monteurszulage frei einstellbar unter Einstellungen → Monteurszulage
-• Info: Die Monteurszulage wird über den Lohn ausbezahlt und ist deshalb nicht Teil der Verpflegungspauschale/Erstattung – sie erscheint in Spesen-Liste, PDF- und CSV-Export als eigene, klar getrennte Position
+• Info: Die Monteurszulage wird über den Lohn ausbezahlt und ist deshalb nicht Teil der Verpflegungspauschale/Erstattung – sie erscheint in Spesen-Liste, PDF- und CSV-Export als eigene, klar getrennte Position, nicht mit den Spesen verrechnet
 • Kontakt: info@wagner-fahrtkosten.de
 
 ---
@@ -25,7 +25,7 @@ Neu: Monteurszulage – 12 € Inland, 50 € Ausland separat erfassbar, getrenn
 ## Ergänzung für Beschreibungstext – Abschnitt „Verpflegung & Monteurszulage" (neu)
 
 **Verpflegungspauschale & Monteurszulage**
-Die App berechnet die gesetzliche Verpflegungspauschale automatisch aus Fahrzeit und Arbeitszeit – für Inland, Schweiz und Ausland. Zusätzlich lässt sich eine pauschale Monteurszulage erfassen: 12 € bei Arbeit im Inland oder am Werk, 50 € bei Arbeit im Ausland außerhalb des Werks. Da die Monteurszulage in der Regel über den Lohn ausbezahlt wird, führt die App sie getrennt von der steuerfreien Verpflegungspauschale – praktisch zum Abgleich mit der Lohnabrechnung. Werk-Standort und beide Sätze sind in den Einstellungen frei anpassbar.
+Die App berechnet die gesetzliche Verpflegungspauschale automatisch aus Fahrzeit und Arbeitszeit – für Inland, Schweiz und Ausland. Zusätzlich lässt sich eine pauschale Monteurszulage erfassen: 12 € bei Arbeit im Inland oder am Werk, 50 € bei Arbeit im Ausland außerhalb des Werks. Da die Monteurszulage in der Regel über den Lohn ausbezahlt wird, führt die App sie getrennt von der steuerfreien Verpflegungspauschale und verrechnet sie nicht mit den Spesen – praktisch zum Abgleich mit der Lohnabrechnung. Werk-Standort und beide Sätze sind in den Einstellungen frei anpassbar.
 
 ---
 
