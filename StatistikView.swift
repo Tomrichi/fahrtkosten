@@ -263,8 +263,9 @@ struct StatistikView: View {
         let euro    = km * store.kmRate
         let meals   = store.meals.filter { Calendar.current.component(.year, from: $0.date) == selectedYear }
         let hotels  = store.hotels.filter { Calendar.current.component(.year, from: $0.date) == selectedYear }
-        let mealSum = meals.reduce(0.0) { $0 + $1.allowance(rates: store.mealRates(for: $1.region)) + store.monteurszulage(for: $1) }
+        let mealSum = meals.reduce(0.0) { $0 + $1.allowance(rates: store.mealRates(for: $1.region)) }
         let hotelSum = hotels.reduce(0.0) { $0 + $1.amount(flat: store.hotelFlat) }
+        let monteurszulageSum = store.totalMonteurszulage(meals)
         let gesamt  = euro + mealSum + hotelSum
 
         return VStack(alignment: .leading, spacing: 16) {
@@ -298,6 +299,26 @@ struct StatistikView: View {
             .padding(14)
             .background(Color.orange.opacity(0.1))
             .clipShape(RoundedRectangle(cornerRadius: 12))
+
+            // Monteurszulage – separat, NICHT Teil der Reisekosten-Erstattung
+            if monteurszulageSum > 0 {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Monteurszulage \(selectedYear)")
+                            .font(.subheadline.bold())
+                        Text("Lohnbestandteil – nicht Teil der Reisekosten (Anlage N)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Text(monteurszulageSum.euroFormatted)
+                        .font(.title3.bold())
+                        .foregroundColor(.blue)
+                }
+                .padding(14)
+                .background(Color.blue.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
 
             // Hinweis
             HStack(alignment: .top, spacing: 8) {

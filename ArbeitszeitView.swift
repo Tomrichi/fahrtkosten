@@ -105,6 +105,11 @@ struct ArbeitszeitView: View {
         filteredMeals.reduce(0) { $0 + store.adjustedMealAllowance(for: $1) }
     }
 
+    /// Monteurszulage-Summe (Lohnbestandteil, separat von der Spesen-Erstattung)
+    private var filteredMonteurszulage: Double {
+        store.totalMonteurszulage(filteredMeals)
+    }
+
     private func tripsForMeal(_ meal: MealEntry) -> [Trip] {
         let cal = Calendar.current
         return store.trips.filter { cal.isDate($0.date, inSameDayAs: meal.date) }
@@ -323,6 +328,21 @@ struct ArbeitszeitView: View {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .fill(Color(.secondarySystemGroupedBackground))
             )
+            if filteredMonteurszulage > 0 {
+                HStack(spacing: 8) {
+                    Image(systemName: "wrench.and.screwdriver.fill")
+                        .font(.caption)
+                        .foregroundColor(.blue)
+                    Text("Monteurszulage (über Lohn, separat)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text(filteredMonteurszulage.euroFormatted)
+                        .font(.system(size: 13, weight: .medium, design: .monospaced))
+                        .foregroundColor(.blue)
+                }
+                .listRowBackground(Color.clear)
+            }
         }
     }
 
@@ -474,7 +494,7 @@ struct ArbeitszeitRow: View {
                             .foregroundColor(totalH >= 6 ? .green : totalH >= 3 ? Color.orange : .secondary)
                             .fontWeight(totalH >= 6 ? .semibold : .regular)
                         if monteurszulage > 0 {
-                            Text("· 🔧 +\(monteurszulage.euroFormatted)")
+                            Text("· 🔧 Lohn +\(monteurszulage.euroFormatted)")
                                 .foregroundColor(.blue)
                         }
                     }

@@ -1098,7 +1098,7 @@ private let hilfeHTML = #"""
 <div class="feature">⚡ <strong>Elektro &amp; Hybrid</strong> – Verbrauch in kWh/100 km; Hybrid berechnet Strom- und Benzinkosten getrennt</div>
 <div class="feature">🔋 <strong>Live-Spritpreise</strong> – günstigster Preis in der Nähe via Tankerkönig API (Benzin/Diesel)</div>
 <div class="feature">🍽️ <strong>Verpflegungspauschale</strong> – Fahrzeit + Arbeitszeit kombiniert, 3 Regionen (Inland, Schweiz, Ausland)</div>
-<div class="feature">🔧 <strong>Monteurszulage</strong> – pauschale Zulage zusätzlich zur Verpflegungspauschale: 12 € Inland/am Werk, 50 € Ausland/Schweiz außerhalb des Werks; Sätze und Werk-Standort frei einstellbar</div>
+<div class="feature">🔧 <strong>Monteurszulage</strong> – Lohnbestandteil, separat von der Verpflegungspauschale erfasst: 12 € Inland/am Werk, 50 € Ausland/Schweiz außerhalb des Werks; Sätze und Werk-Standort frei einstellbar</div>
 <div class="feature">⏸️ <strong>Pausenzeit</strong> – abziehbare Pause pro Arbeitszeiterfassung einstellbar (0–120 min, 15-min-Schritte)</div>
 <div class="feature">☕ <strong>Frühstück-Abrechnung</strong> – Verpflegung von Dritten abziehbar; eigenes bezahltes Frühstück addierbar</div>
 <div class="feature">🏨 <strong>Übernachtungen</strong> – Pauschale oder tatsächliche Kosten; Check-in/Check-out mit automatischer Nächteberechnung</div>
@@ -1143,7 +1143,7 @@ private let hilfeHTML = #"""
   <tr><td>Schweiz</td><td>0 €</td><td>20 €</td><td>35 €</td></tr>
   <tr><td>Ausland</td><td>0 €</td><td>20 €</td><td>35 €</td></tr>
 </table>
-<p>Zusätzlich zur Verpflegungspauschale kann eine <strong>Monteurszulage</strong> erfasst werden: 12 € bei Region Inland, 50 € bei Region Schweiz oder Ausland. Wird bei Region Schweiz/Ausland am Werk (Standort in den Einstellungen hinterlegt, z. B. Steffisburg) gearbeitet, gilt statt der Auslands- die Inlands-Zulage. Die Zulage wird automatisch zur Verpflegungspauschale addiert und in Liste, PDF- und CSV-Export separat ausgewiesen.</p>
+<p>Zusätzlich kann eine <strong>Monteurszulage</strong> erfasst werden: 12 € bei Region Inland, 50 € bei Region Schweiz oder Ausland. Wird bei Region Schweiz/Ausland am Werk (Standort in den Einstellungen hinterlegt, z. B. Steffisburg) gearbeitet, gilt statt der Auslands- die Inlands-Zulage. Die Monteurszulage wird üblicherweise über den Lohn ausbezahlt (steuer- und sozialversicherungspflichtiger Arbeitslohn) und ist deshalb <strong>nicht</strong> Teil der steuerfreien Verpflegungspauschale/Erstattung – sie wird in Liste, Formular, PDF- und CSV-Export klar getrennt als eigene Position ausgewiesen.</p>
 
 <h2>Tab Übernachtung</h2>
 <p>Erfasse Hotelübernachtungen mit Check-in- und Check-out-Datum – die Anzahl der Nächte wird automatisch berechnet. Wähle zwischen <strong>Pauschale</strong> oder <strong>tatsächlichen Kosten</strong>. Belege per Kamera oder Foto-Import scannen – OCR erkennt Betrag, Datum und Hotelname automatisch.</p>
@@ -1351,9 +1351,9 @@ private let versionHistoryHTML = #"""
   </summary>
   <div class="detail-content">
     <ul>
-      <li><span class="badge-new">NEU</span> <strong>Monteurszulage:</strong> Zusätzlich zur Verpflegungspauschale kann jetzt eine pauschale Monteurszulage erfasst werden – 12 € bei Region Inland (bzw. bei Arbeit am Werk), 50 € bei Region Schweiz/Ausland außerhalb des Werks. Werk-Standort, Inlands- und Auslandssatz sind unter Einstellungen → Monteurszulage frei einstellbar.</li>
+      <li><span class="badge-new">NEU</span> <strong>Monteurszulage:</strong> Pauschale Zulage – 12 € bei Region Inland (bzw. bei Arbeit am Werk), 50 € bei Region Schweiz/Ausland außerhalb des Werks. Werk-Standort, Inlands- und Auslandssatz sind unter Einstellungen → Monteurszulage frei einstellbar.</li>
       <li><span class="badge-new">NEU</span> <strong>„Am Werk gearbeitet"-Schalter:</strong> Beim Erfassen eines Verpflegungs-/Spesen-Eintrags mit Region Schweiz oder Ausland lässt sich angeben, ob am Werk (z. B. Steffisburg) gearbeitet wurde – dann gilt automatisch die Inlands-Zulage statt der Auslands-Zulage.</li>
-      <li><span class="badge-change">INFO</span> Die Monteurszulage wird in Spesen-Liste, PDF- und CSV-Export als eigene Position ausgewiesen.</li>
+      <li><span class="badge-change">INFO</span> Die Monteurszulage wird über den Lohn ausbezahlt und ist daher nicht Teil der Verpflegungspauschale/Erstattung – sie erscheint in Spesen-Liste, Formular, PDF- und CSV-Export als klar getrennte, eigene Position.</li>
     </ul>
   </div>
 </details>

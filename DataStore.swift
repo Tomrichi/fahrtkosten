@@ -232,8 +232,12 @@ class DataStore: ObservableObject {
     }
 
     // MARK: - Monteurszulage
-    /// Pauschale Zulage zusätzlich zur Verpflegungspauschale: 12 € Inland, 50 € Ausland/Schweiz.
-    /// Am Werk (Steffisburg) gearbeitet zählt auch bei Region Schweiz/Ausland als Inland.
+    /// Pauschale Zulage: 12 € Inland, 50 € Ausland/Schweiz. Am Werk (Steffisburg) gearbeitet
+    /// zählt auch bei Region Schweiz/Ausland als Inland.
+    /// WICHTIG: Die Monteurszulage wird üblicherweise über den Lohn ausbezahlt (steuer- und
+    /// sozialversicherungspflichtiger Arbeitslohn) – NICHT über die steuerfreie Reisekosten-
+    /// erstattung nach § 9 EStG. Sie darf deshalb nicht in die Verpflegungspauschale/
+    /// Gesamterstattung eingerechnet werden, sondern wird separat ausgewiesen.
     func monteurszulage(for meal: MealEntry) -> Double {
         switch meal.region {
         case .inland:            return monteurszulageInland
@@ -241,10 +245,16 @@ class DataStore: ObservableObject {
         }
     }
 
+    /// Summe der Monteurszulage (Lohnbestandteil) über die übergebenen Einträge – getrennt
+    /// von der Spesen-Erstattung, z. B. zum Abgleich mit der Lohnabrechnung.
+    func totalMonteurszulage(_ entries: [MealEntry]) -> Double {
+        entries.reduce(0) { $0 + monteurszulage(for: $1) }
+    }
+
     // MARK: - Totals
     var totalKmAmount:    Double { trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km * kmRate } }
     var totalKm:          Double { trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km } }
-    var totalMeal:        Double { meals.reduce(0)           { $0 + $1.allowance(rates: mealRates(for: $1.region)) + monteurszulage(for: $1) } }
+    var totalMeal:        Double { meals.reduce(0)           { $0 + $1.allowance(rates: mealRates(for: $1.region)) } }
     var totalHotel:       Double { hotels.reduce(0)          { $0 + $1.amount(flat: hotelFlat) } }
     var totalVehicle:     Double { vehicleCosts.reduce(0)    { $0 + $1.amount } }
     var totalReiseSpesen: Double { reiseSpesen.reduce(0)     { $0 + $1.amount } }
@@ -428,7 +438,7 @@ extension DataStore {
         case ..<6:  raw = rates.rate3to6
         default:    raw = (returnsHome && !endsLate) ? rates.rate3to6 : rates.rate6plus
         }
-        return max(0, raw - meal.breakfastAmount) + meal.ownBreakfastAmount + monteurszulage(for: meal)
+        return max(0, raw - meal.breakfastAmount) + meal.ownBreakfastAmount
     }
 
     func totalWorkHours(for meal: MealEntry) -> Double {

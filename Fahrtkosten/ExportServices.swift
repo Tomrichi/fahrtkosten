@@ -53,11 +53,13 @@ struct PDFExportService {
 
         // Berechnungen
         let tripTotal    = trips.reduce(0.0)  { $0 + $1.km * store.kmRate }
-        let mealTotal    = meals.reduce(0.0)  { $0 + $1.allowance(rates: store.mealRates(for: $1.region)) + store.monteurszulage(for: $1) }
+        let mealTotal    = meals.reduce(0.0)  { $0 + $1.allowance(rates: store.mealRates(for: $1.region)) }
         let hotelTotal   = hotels.reduce(0.0) { $0 + $1.amount(flat: store.hotelFlat) }
         let spesenTotal  = reiseSpesen.reduce(0.0) { $0 + $1.amount }
         let vehicleTotal = vehicleCosts.reduce(0.0) { $0 + $1.amount }
         let privateTotal = privateExpenses.reduce(0.0) { $0 + $1.amount }
+        // Monteurszulage: Lohnbestandteil, NICHT Teil der Reisekosten-Erstattung – separat ausgewiesen
+        let monteurszulageTotal = store.totalMonteurszulage(meals)
         let grandTotal   = tripTotal + mealTotal + hotelTotal
 
         // Hilfsfunktionen
@@ -252,7 +254,6 @@ struct PDFExportService {
                 drawSectionHeader(title: "Verpflegung  (\(meals.count) Einträge)", subtotal: mealTotal)
                 for meal in meals.sorted(by: { $0.date > $1.date }) {
                     let allowance = meal.allowance(rates: store.mealRates(for: meal.region))
-                    let mz = store.monteurszulage(for: meal)
                     let h = String(format: "%.1f h", meal.hours)
                     let detail = "\(meal.region.localizedName)  ·  \(h)"
                     drawRow(
@@ -262,14 +263,22 @@ struct PDFExportService {
                         betrag: allowance,
                         highlight: allowance == 0
                     )
-                    if mz > 0 {
-                        drawRow(
-                            date: meal.date.formatted(date: .numeric, time: .omitted),
-                            desc: "Monteurszulage",
-                            detail: meal.workedAtPlant || meal.region == .inland ? "Inland" : "Ausland",
-                            betrag: mz
-                        )
-                    }
+                }
+                y += 6
+            }
+
+            // ── MONTEURSZULAGE (separat: Lohnbestandteil, NICHT Teil der Erstattung) ──
+            if monteurszulageTotal > 0 {
+                drawSectionHeader(title: "Monteurszulage – über Lohn ausbezahlt", subtotal: monteurszulageTotal)
+                for meal in meals.sorted(by: { $0.date > $1.date }) {
+                    let mz = store.monteurszulage(for: meal)
+                    guard mz > 0 else { continue }
+                    drawRow(
+                        date: meal.date.formatted(date: .numeric, time: .omitted),
+                        desc: "Monteurszulage",
+                        detail: meal.workedAtPlant || meal.region == .inland ? "Inland" : "Ausland",
+                        betrag: mz
+                    )
                 }
                 y += 6
             }
@@ -357,7 +366,7 @@ struct PDFExportService {
             y += 40
 
             // Hinweis
-            let hinweis = "* KFZ-Kosten und private Ausgaben sind in der Gesamterstattung nicht enthalten."
+            let hinweis = "* KFZ-Kosten, private Ausgaben und Monteurszulage (Lohnbestandteil) sind in der Gesamterstattung nicht enthalten."
             hinweis.draw(at: CGPoint(x: margin, y: y),
                          withAttributes: a(.systemFont(ofSize: 7.5), textSec))
 

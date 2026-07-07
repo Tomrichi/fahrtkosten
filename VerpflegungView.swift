@@ -46,7 +46,7 @@ struct VerpflegungView: View {
     }
 
     private var filteredTotal: Double {
-        filteredMeals.reduce(0) { $0 + $1.allowance(rates: store.mealRates(for: $1.region)) + store.monteurszulage(for: $1) }
+        filteredMeals.reduce(0) { $0 + $1.allowance(rates: store.mealRates(for: $1.region)) }
     }
 
     private var filterLabel: String {
@@ -284,7 +284,7 @@ struct MealRow: View {
     let rates: MealRates
 
     private var monteurszulage: Double { store.monteurszulage(for: meal) }
-    private var allowance: Double { meal.allowance(rates: rates) + monteurszulage }
+    private var allowance: Double { meal.allowance(rates: rates) }
 
     var body: some View {
         HStack(spacing: 14) {
@@ -341,7 +341,7 @@ struct MealRow: View {
                             .clipShape(Capsule())
                     }
                     if monteurszulage > 0 {
-                        Text("🔧 +\(monteurszulage.euroFormatted)")
+                        Text("🔧 Lohn +\(monteurszulage.euroFormatted)")
                             .font(.system(size: 9, weight: .regular))
                             .foregroundColor(.white)
                             .padding(.horizontal, 5)
@@ -638,8 +638,7 @@ struct MealFormView: View {
                         excludeTrips: !includeTodaysTrips,
                         workedAtPlant: workedAtPlant
                     )
-                    let effectiveMonteurszulage = store.monteurszulage(for: effectiveMeal)
-                    let effectiveAllowance = effectiveMeal.allowance(rates: rates) + effectiveMonteurszulage
+                    let effectiveAllowance = effectiveMeal.allowance(rates: rates)
                     LabeledRow(label: lm.t("meals.level"),
                                value: effectiveMeal.allowanceLabel(rates: rates),
                                valueColor: progressColor)
@@ -677,18 +676,6 @@ struct MealFormView: View {
                         }
                     }
 
-                    // Monteurszulage (nur anzeigen wenn Betrag > 0)
-                    if effectiveMonteurszulage > 0 {
-                        HStack {
-                            Label("Monteurszulage", systemImage: "wrench.and.screwdriver.fill")
-                                .foregroundColor(.blue)
-                            Spacer()
-                            Text("+\(effectiveMonteurszulage.euroFormatted)")
-                                .font(.system(size: 15, weight: .regular, design: .monospaced))
-                                .foregroundColor(.blue)
-                        }
-                    }
-
                     // Netto Verpflegung
                     HStack {
                         Text("Netto Verpflegung").foregroundColor(.secondary)
@@ -705,6 +692,22 @@ struct MealFormView: View {
                         Text(effectiveAllowance.euroFormatted)
                             .font(.system(size: 18, weight: .regular, design: .monospaced))
                             .foregroundColor(.iosGreen)
+                    }
+                }
+
+                // ── Monteurszulage (separat, NICHT Teil der Erstattung) ──
+                if currentMonteurszulage > 0 {
+                    Section {
+                        HStack {
+                            Label("Monteurszulage", systemImage: "wrench.and.screwdriver.fill")
+                                .foregroundColor(.blue)
+                            Spacer()
+                            Text("+\(currentMonteurszulage.euroFormatted)")
+                                .font(.system(size: 18, weight: .regular, design: .monospaced))
+                                .foregroundColor(.blue)
+                        }
+                    } footer: {
+                        Text("Wird über den Lohn ausbezahlt, nicht über die Spesen. Daher separat ausgewiesen und nicht in der Erstattung oben enthalten.")
                     }
                 }
 
