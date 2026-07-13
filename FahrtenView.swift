@@ -203,7 +203,9 @@ struct FahrtenView: View {
         }
     }
 
-    @StateObject private var locationTracker = LocationTracker()
+    // Geteilter Singleton statt eigener Instanz: die Aufzeichnung läuft prozessweit
+    // weiter (z. B. über CarPlay gestartet), auch wenn diese View neu erzeugt wird.
+    @ObservedObject private var locationTracker = LocationTracker.shared
 
     private func handleCarPlayStopGPS() {
         let ud = UserDefaults(suiteName: "group.de.tommwagner.fahrtkosten")
@@ -212,21 +214,11 @@ struct FahrtenView: View {
         if autoStopped {
             // CarPlay getrennt → Sheet öffnen, User prüft Daten selbst
             showGPSSheet = true
-        } else {
-            // Manuell per CarPlay-Button gestoppt → direkt speichern
-            let startDate = locationTracker.tripStartDate
-            locationTracker.stopAndGeocode { from, to, km in
-                let start = startDate ?? Date()
-                let trip = Trip(
-                    from: from.isEmpty ? "Startort" : from,
-                    to:   to.isEmpty   ? "Zielort"  : to,
-                    date: start, km: km,
-                    note: "GPS via CarPlay",
-                    startTime: start, endTime: Date()
-                )
-                store.addTrip(trip)
-            }
         }
+        // Manueller Stop per CarPlay-Button: CarPlaySceneDelegate stoppt und speichert
+        // die Fahrt bereits direkt über LocationTracker.shared/CarPlayDataAccess –
+        // das funktioniert auch, wenn diese View nie existiert hat. Hier ist nichts mehr zu tun
+        // (sonst würde die Fahrt doppelt gespeichert).
     }
 
     var body: some View {

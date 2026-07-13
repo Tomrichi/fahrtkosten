@@ -56,6 +56,11 @@ enum LocationTrackerPhase {
 
 final class LocationTracker: NSObject, ObservableObject {
 
+    /// Prozessweiter Singleton: GPS-Aufzeichnung darf nicht an die Lebensdauer einer
+    /// SwiftUI-View gebunden sein, da CarPlay die App starten kann, ohne dass je die
+    /// Telefon-UI (WindowGroup/ContentView/FahrtenView) gerendert wird.
+    static let shared = LocationTracker()
+
     @Published var phase: LocationTrackerPhase = .idle
     @Published var totalKm: Double             = 0
     @Published var elapsedSeconds: Int         = 0
@@ -81,7 +86,7 @@ final class LocationTracker: NSObject, ObservableObject {
     private var pausedSeconds     : Int = 0          // aufgelaufene Pausenzeit (wird nicht gezählt)
     private var pausedAt          : Date?            // Zeitpunkt des Pausierens
 
-    override init() {
+    private override init() {
         super.init()
         manager.delegate                           = self
         manager.desiredAccuracy                    = kCLLocationAccuracyBestForNavigation
@@ -99,6 +104,9 @@ final class LocationTracker: NSObject, ObservableObject {
     var isActive:    Bool { isTracking || isPaused }
 
     func requestAndStart() {
+        // Läuft bereits eine Aufzeichnung (z. B. über CarPlay gestartet) → nicht zurücksetzen,
+        // sonst gehen bisherige Strecke/Pause verloren, wenn das Sheet erneut erscheint.
+        guard !isActive else { return }
         errorMessage = nil
         switch manager.authorizationStatus {
         case .authorizedAlways, .authorizedWhenInUse:

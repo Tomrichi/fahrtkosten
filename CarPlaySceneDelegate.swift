@@ -140,12 +140,14 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
     }
 
     // MARK: - GPS über CarPlay starten
-    // Sendet ein Signal via App Group → die Haupt-App startet den LocationTracker
+    // Startet direkt gegen den LocationTracker-Singleton – funktioniert auch, wenn die
+    // Telefon-UI nie gerendert wurde (App nur über CarPlay gestartet).
     private func startGPSFromCarPlay() {
         guard let ud = UserDefaults(suiteName: Self.appGroup) else { return }
         ud.set(true, forKey: "carPlayStartGPS")
         ud.synchronize()
-        // Notification an die laufende App
+        LocationTracker.shared.requestAndStart()
+        // Notification für den Fall, dass die App-UI parallel offen ist (no-op dank Guard in requestAndStart)
         NotificationCenter.default.post(name: NSNotification.Name("carPlayStartGPS"), object: nil)
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             self?.renderDashboard()
@@ -153,11 +155,27 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
     }
 
     // MARK: - GPS über CarPlay stoppen
+    // Stoppt und speichert direkt über den Singleton – unabhängig davon, ob je eine
+    // FahrtenView existiert hat, die die Notification hätte empfangen können.
     private func stopGPSFromCarPlay() {
         guard let ud = UserDefaults(suiteName: Self.appGroup) else { return }
         ud.set(true, forKey: "carPlayStopGPS")
         ud.synchronize()
         NotificationCenter.default.post(name: NSNotification.Name("carPlayStopGPS"), object: nil)
+
+        let startDate = LocationTracker.shared.tripStartDate
+        LocationTracker.shared.stopAndGeocode { [weak self] from, to, km in
+            let start = startDate ?? Date()
+            let trip = Trip(
+                from: from.isEmpty ? "Startort" : from,
+                to:   to.isEmpty   ? "Zielort"  : to,
+                date: start, km: km,
+                note: "GPS via CarPlay",
+                startTime: start, endTime: Date()
+            )
+            CarPlayDataAccess.saveTrip(trip)
+            self?.renderDashboard()
+        }
 
         let items = [
             CPInformationItem(title: "✓ GPS wird gestoppt", detail: "Fahrt wird gespeichert…"),
@@ -225,7 +243,14 @@ private struct CarPlayDataAccess {
     }
 
     static func finishActiveTrip(_ trip: Trip) {
-        // Zur Fahrtenliste hinzufügen
+        saveTrip(trip)
+        // Aktive Fahrt löschen
+        defaults.removeObject(forKey: "activeTrip")
+    }
+
+    // Fahrt direkt in App Group + iCloud persistieren – unabhängig von einer
+    // laufenden DataStore-Instanz (die evtl. nie erzeugt wurde, s. o.)
+    static func saveTrip(_ trip: Trip) {
         var trips = loadTrips()
         trips.append(trip)
         if let data = try? JSONEncoder().encode(trips) {
@@ -233,8 +258,6 @@ private struct CarPlayDataAccess {
             NSUbiquitousKeyValueStore.default.set(data, forKey: "trips")
             NSUbiquitousKeyValueStore.default.synchronize()
         }
-        // Aktive Fahrt löschen
-        defaults.removeObject(forKey: "activeTrip")
     }
 
     static func monthlyData() -> (monthLabel: String, monthEuro: Double, monthKm: Double, tripCount: Int) {
