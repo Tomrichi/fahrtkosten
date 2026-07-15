@@ -1336,13 +1336,34 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.6 – aktuell -->
+<!-- 1.17.7 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.6
+        Version 1.17.7
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">CHF-Kurs jetzt auch direkt bei der Monteurszulage sichtbar</div>
+    </div>
+    <span class="build-info">15. Juli 2026 · Build 34</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-fix">FIX</span> <strong>CHF-Kurs bei Monteurszulage:</strong> Der Wechselkurs war zwar in der Berechnung schon berücksichtigt, aber in der Monteurszulage-Sektion nicht sichtbar/einstellbar. Jetzt steht das CHF-Kurs-Feld (identisch zu dem bei Verpflegungspauschalen) auch dort, inklusive Live-Anzeige des umgerechneten €-Betrags.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.6 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.6
       </div>
       <div class="preview-text">Verpflegung &amp; Monteurszulage Schweiz jetzt korrekt in CHF</div>
     </div>

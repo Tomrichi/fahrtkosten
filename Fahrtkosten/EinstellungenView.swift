@@ -308,6 +308,21 @@ struct EinstellungenView: View {
                     Text("CHF").foregroundStyle(.secondary).font(.subheadline)
                 }
                 HStack {
+                    Label("CHF-Kurs (1 CHF = … €)", systemImage: "arrow.left.arrow.right")
+                    Spacer()
+                    TextField("1,08", text: $chfRateStr)
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 80)
+                    Text("€").foregroundStyle(.secondary).font(.subheadline)
+                }
+                HStack {
+                    Spacer()
+                    Text("≈ \((parseCurrency(monteurszulageSchweizStr) * parseCurrency(chfRateStr)).euroFormatted)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                HStack {
                     Label("Zulage Ausland / Außerhalb des Werks und Deutschlands", systemImage: "globe.europe.africa.fill")
                     Spacer()
                     TextField("50,00", text: $monteurszulageAuslandStr)
@@ -322,7 +337,7 @@ struct EinstellungenView: View {
                     .fontWeight(.regular)
             }
         } footer: {
-            Text("Pauschale Zulage: 12 € bei Region Inland oder bei Arbeit am Werk (\(werkOrtStr.isEmpty ? "Steffisburg" : werkOrtStr)), 18 CHF außerhalb des Werks bei Region Schweiz (wird mit dem CHF-Kurs bei Verpflegungspauschalen in € umgerechnet), 50 € außerhalb des Werks bei Region Ausland. Wird über den Lohn ausbezahlt und ist daher NICHT Teil der Verpflegungspauschale/Erstattung – wird separat ausgewiesen. Beim Erfassen eines Verpflegungseintrags mit Region Schweiz oder Ausland kann „Am Werk gearbeitet\" angehakt werden, um die Inlands-Zulage anzuwenden.")
+            Text("Pauschale Zulage: 12 € bei Region Inland oder bei Arbeit am Werk (\(werkOrtStr.isEmpty ? "Steffisburg" : werkOrtStr)), 18 CHF außerhalb des Werks bei Region Schweiz (wird mit dem CHF-Kurs oben in € umgerechnet – derselbe Kurs wie bei Verpflegungspauschalen), 50 € außerhalb des Werks bei Region Ausland. Wird über den Lohn ausbezahlt und ist daher NICHT Teil der Verpflegungspauschale/Erstattung – wird separat ausgewiesen. Beim Erfassen eines Verpflegungseintrags mit Region Schweiz oder Ausland kann „Am Werk gearbeitet\" angehakt werden, um die Inlands-Zulage anzuwenden.")
         }
     }
 
