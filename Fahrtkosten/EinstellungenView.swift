@@ -337,7 +337,7 @@ struct EinstellungenView: View {
                     .fontWeight(.regular)
             }
         } footer: {
-            Text("Pauschale Zulage: 12 € bei Region Inland oder bei Arbeit am Werk (\(werkOrtStr.isEmpty ? "Steffisburg" : werkOrtStr)), 18 CHF außerhalb des Werks bei Region Schweiz (wird mit dem CHF-Kurs oben in € umgerechnet – derselbe Kurs wie bei Verpflegungspauschalen), 50 € außerhalb des Werks bei Region Ausland. Wird über den Lohn ausbezahlt und ist daher NICHT Teil der Verpflegungspauschale/Erstattung – wird separat ausgewiesen. Beim Erfassen eines Verpflegungseintrags mit Region Schweiz oder Ausland kann „Am Werk gearbeitet\" angehakt werden, um die Inlands-Zulage anzuwenden.")
+            Text("Pauschale Zulage: 12 € bei Region Inland. Das Werk (\(werkOrtStr.isEmpty ? "Steffisburg" : werkOrtStr)) liegt selbst in der Schweiz – bei Region Schweiz gilt daher immer die Schweiz-Zulage von 18 CHF (wird mit dem CHF-Kurs oben in € umgerechnet – derselbe Kurs wie bei Verpflegungspauschalen). Bei Region Ausland gilt die Auslands-Zulage von 50 €, außer „Am Werk gearbeitet\" ist angehakt – dann gilt ebenfalls die Schweiz-Zulage. Wird über den Lohn ausbezahlt und ist daher NICHT Teil der Verpflegungspauschale/Erstattung – wird separat ausgewiesen.")
         }
     }
 

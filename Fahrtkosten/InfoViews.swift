@@ -1143,7 +1143,7 @@ private let hilfeHTML = #"""
   <tr><td>Schweiz</td><td>0 €</td><td>20 €</td><td>35 €</td></tr>
   <tr><td>Ausland</td><td>0 €</td><td>20 €</td><td>35 €</td></tr>
 </table>
-<p>Zusätzlich kann eine <strong>Monteurszulage</strong> erfasst werden: 12 € bei Region Inland, 18 € bei Region Schweiz, 50 € bei Region Ausland (jeweils außerhalb des Werks). Wird bei Region Schweiz/Ausland am Werk (Standort in den Einstellungen hinterlegt, z. B. Steffisburg) gearbeitet, gilt statt der Auslands-/Schweiz- die Inlands-Zulage. Die Monteurszulage wird üblicherweise über den Lohn ausbezahlt (steuer- und sozialversicherungspflichtiger Arbeitslohn) und ist deshalb <strong>nicht</strong> Teil der steuerfreien Verpflegungspauschale/Erstattung – sie wird in Liste, Formular, PDF- und CSV-Export klar getrennt als eigene Position ausgewiesen.</p>
+<p>Zusätzlich kann eine <strong>Monteurszulage</strong> erfasst werden: 12 € bei Region Inland. Das Werk (Standort in den Einstellungen hinterlegt, z. B. Steffisburg) liegt selbst in der Schweiz – bei Region Schweiz gilt daher immer die Schweiz-Zulage (18 CHF, wird automatisch in € umgerechnet). Bei Region Ausland gilt die Auslands-Zulage (50 €), außer „Am Werk gearbeitet" ist angehakt – dann gilt ebenfalls die Schweiz-Zulage statt der Auslands-Zulage. Die Monteurszulage wird üblicherweise über den Lohn ausbezahlt (steuer- und sozialversicherungspflichtiger Arbeitslohn) und ist deshalb <strong>nicht</strong> Teil der steuerfreien Verpflegungspauschale/Erstattung – sie wird in Liste, Formular, PDF- und CSV-Export klar getrennt als eigene Position ausgewiesen.</p>
 
 <h2>Tab Übernachtung</h2>
 <p>Erfasse Hotelübernachtungen mit Check-in- und Check-out-Datum – die Anzahl der Nächte wird automatisch berechnet. Wähle zwischen <strong>Pauschale</strong> oder <strong>tatsächlichen Kosten</strong>. Belege per Kamera oder Foto-Import scannen – OCR erkennt Betrag, Datum und Hotelname automatisch.</p>
@@ -1336,13 +1336,34 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.7 – aktuell -->
+<!-- 1.17.8 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.7
+        Version 1.17.8
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">Monteurszulage Schweiz: falscher Betrag bei neuem Eintrag behoben</div>
+    </div>
+    <span class="build-info">16. Juli 2026 · Build 35</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-fix">FIX</span> <strong>Monteurszulage Schweiz:</strong> Da das Werk (Steffisburg) selbst in der Schweiz liegt, gilt bei Region Schweiz jetzt immer die Schweiz-Zulage (umgerechnet in €) – vorher wurde fälschlich die Inlands-Zulage (12 €) angezeigt. Bei Region Ausland mit „Am Werk gearbeitet" gilt jetzt ebenfalls die Schweiz-Zulage statt der Inlands-Zulage.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.7 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.7
       </div>
       <div class="preview-text">CHF-Kurs jetzt auch direkt bei der Monteurszulage sichtbar</div>
     </div>

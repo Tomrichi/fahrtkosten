@@ -497,7 +497,7 @@ struct MealFormView: View {
                     .pickerStyle(.segmented)
                     .padding(.vertical, 4)
 
-                    if region != .inland {
+                    if region == .ausland {
                         Toggle(isOn: $workedAtPlant) {
                             HStack(spacing: 8) {
                                 Label("Am Werk (\(store.werkOrt)) gearbeitet", systemImage: "building.2.fill")
@@ -508,13 +508,12 @@ struct MealFormView: View {
                 } header: {
                     Text(lm.t("meals.region"))
                 } footer: {
-                    if region != .inland {
-                        let auslandsRateFormatted = region == .schweiz
-                            ? store.monteurszulageSchweiz.chfFormatted
-                            : store.monteurszulageAusland.euroFormatted
+                    if region == .schweiz {
+                        Text("Schweiz-Zulage (\(store.monteurszulageSchweiz.chfFormatted)) gilt automatisch, da das Werk (\(store.werkOrt)) selbst in der Schweiz liegt.")
+                    } else if region == .ausland {
                         Text(workedAtPlant
-                             ? "Am Werk gilt die Inlands-Zulage (\(store.monteurszulageInland.euroFormatted))."
-                             : "Außerhalb des Werks gilt die Auslands-Zulage (\(auslandsRateFormatted)).")
+                             ? "Am Werk (\(store.werkOrt)) gilt die Schweiz-Zulage (\(store.monteurszulageSchweiz.chfFormatted))."
+                             : "Außerhalb des Werks gilt die Auslands-Zulage (\(store.monteurszulageAusland.euroFormatted)).")
                     }
                 }
 

@@ -276,7 +276,11 @@ struct PDFExportService {
                     drawRow(
                         date: meal.date.formatted(date: .numeric, time: .omitted),
                         desc: "Monteurszulage",
-                        detail: meal.workedAtPlant || meal.region == .inland ? "Inland" : "Ausland",
+                        detail: {
+                            if meal.region == .inland { return "Inland" }
+                            if meal.region == .schweiz { return "Schweiz" }
+                            return meal.workedAtPlant ? "Schweiz" : "Ausland"
+                        }(),
                         betrag: mz
                     )
                 }

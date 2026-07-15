@@ -241,7 +241,10 @@ class DataStore: ObservableObject {
 
     // MARK: - Monteurszulage
     /// Pauschale Zulage: 12 € Inland, 18 CHF Schweiz (umgerechnet via chfRate), 50 € Ausland.
-    /// Am Werk (Steffisburg) gearbeitet zählt auch bei Region Schweiz/Ausland als Inland.
+    /// Das Werk (Steffisburg) liegt selbst in der Schweiz: Bei Region Schweiz gilt daher immer
+    /// die Schweiz-Zulage. Bei Region Ausland mit „Am Werk gearbeitet" (man war faktisch am
+    /// Schweizer Werksstandort) gilt ebenfalls die Schweiz-Zulage statt der Auslands-Zulage.
+    /// Die Inlands-Zulage gilt ausschließlich, wenn Region Inland direkt gewählt ist.
     /// WICHTIG: Die Monteurszulage wird üblicherweise über den Lohn ausbezahlt (steuer- und
     /// sozialversicherungspflichtiger Arbeitslohn) – NICHT über die steuerfreie Reisekosten-
     /// erstattung nach § 9 EStG. Sie darf deshalb nicht in die Verpflegungspauschale/
@@ -252,8 +255,8 @@ class DataStore: ObservableObject {
         let rate: Double
         switch meal.region {
         case .inland:  rate = monteurszulageInland
-        case .schweiz: rate = meal.workedAtPlant ? monteurszulageInland : (monteurszulageSchweiz * chfRate)
-        case .ausland: rate = meal.workedAtPlant ? monteurszulageInland : monteurszulageAusland
+        case .schweiz: rate = monteurszulageSchweiz * chfRate
+        case .ausland: rate = meal.workedAtPlant ? (monteurszulageSchweiz * chfRate) : monteurszulageAusland
         }
         return h < 6 ? rate * 0.5 : rate         // 3–6 h: 50 %, ab 6 h: voll
     }
