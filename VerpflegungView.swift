@@ -509,10 +509,12 @@ struct MealFormView: View {
                     Text(lm.t("meals.region"))
                 } footer: {
                     if region != .inland {
-                        let auslandsRate = region == .schweiz ? store.monteurszulageSchweiz : store.monteurszulageAusland
+                        let auslandsRateFormatted = region == .schweiz
+                            ? store.monteurszulageSchweiz.chfFormatted
+                            : store.monteurszulageAusland.euroFormatted
                         Text(workedAtPlant
                              ? "Am Werk gilt die Inlands-Zulage (\(store.monteurszulageInland.euroFormatted))."
-                             : "Außerhalb des Werks gilt die Auslands-Zulage (\(auslandsRate.euroFormatted)).")
+                             : "Außerhalb des Werks gilt die Auslands-Zulage (\(auslandsRateFormatted)).")
                     }
                 }
 

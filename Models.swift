@@ -6,9 +6,10 @@ struct Constants {
     static let inlandMeal1to3:  Double = 0.0
     static let inlandMeal3to6:  Double = 0.0
     static let inlandMeal6plus: Double = 0.0
+    // Schweiz-Verpflegungssätze sind in CHF, siehe chfRate für Umrechnung in €
     static let swissMeal1to3:   Double = 0.0
-    static let swissMeal3to6:   Double = 0.0
-    static let swissMeal6plus:  Double = 0.0
+    static let swissMeal3to6:   Double = 65.0
+    static let swissMeal6plus:  Double = 65.0
     static let abroadMeal1to3:  Double = 0.0
     static let abroadMeal3to6:  Double = 0.0
     static let abroadMeal6plus: Double = 0.0
@@ -20,6 +21,8 @@ struct Constants {
     static let monteurszulageSchweiz: Double = 18.0
     static let monteurszulageAusland: Double = 50.0
     static let werkOrt: String = "Steffisburg"
+    // Wechselkurs CHF → € für Schweiz-Verpflegung und -Monteurszulage
+    static let chfRate: Double = 1.08
 }
 
 // MARK: - Reiseregion

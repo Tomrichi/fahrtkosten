@@ -14,6 +14,7 @@ struct EinstellungenView: View {
     @State private var swissMeal1to3Str   = ""
     @State private var swissMeal3to6Str   = ""
     @State private var swissMeal6plusStr  = ""
+    @State private var chfRateStr         = ""
     @State private var abroadMeal1to3Str  = ""
     @State private var abroadMeal3to6Str  = ""
     @State private var abroadMeal6plusStr = ""
@@ -249,11 +250,20 @@ struct EinstellungenView: View {
                     mealRow(label: "3 - 6 Stunden", icon: "2.circle.fill", color: .orange, binding: $inlandMeal3to6Str)
                     mealRow(label: "ab 6 Stunden",  icon: "3.circle.fill", color: .green,  binding: $inlandMeal6plusStr)
                     Divider().padding(.vertical, 6)
-                    Text("Schweiz").font(.caption).foregroundStyle(.secondary)
+                    Text("Schweiz (in CHF)").font(.caption).foregroundStyle(.secondary)
                         .padding(.bottom, 4)
-                    mealRow(label: "< 3 Stunden",   icon: "1.circle.fill", color: .gray,   binding: $swissMeal1to3Str)
-                    mealRow(label: "3 - 6 Stunden", icon: "2.circle.fill", color: .orange, binding: $swissMeal3to6Str)
-                    mealRow(label: "ab 6 Stunden",  icon: "3.circle.fill", color: .green,  binding: $swissMeal6plusStr)
+                    mealRow(label: "< 3 Stunden",   icon: "1.circle.fill", color: .gray,   binding: $swissMeal1to3Str,  currency: "CHF")
+                    mealRow(label: "3 - 6 Stunden", icon: "2.circle.fill", color: .orange, binding: $swissMeal3to6Str,  currency: "CHF")
+                    mealRow(label: "ab 6 Stunden",  icon: "3.circle.fill", color: .green,  binding: $swissMeal6plusStr, currency: "CHF")
+                    HStack {
+                        Label("CHF-Kurs (1 CHF = … €)", systemImage: "arrow.left.arrow.right")
+                        Spacer()
+                        TextField("1,08", text: $chfRateStr)
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: 80)
+                        Text("€").foregroundStyle(.secondary).font(.subheadline)
+                    }
                     Divider().padding(.vertical, 6)
                     Text("Ausland").font(.caption).foregroundStyle(.secondary)
                         .padding(.bottom, 4)
@@ -266,7 +276,7 @@ struct EinstellungenView: View {
                     .foregroundStyle(.primary)
                     .fontWeight(.regular)
             }
-        } footer: { Text("Inland: 0 € · 14 € · 28 €  |  Schweiz/Ausland: 0 € · 10 € · 35 €") }
+        } footer: { Text("Inland: 0 € · 14 € · 28 €  |  Schweiz: 0 · 65 · 65 CHF (wird mit obigem Kurs in € umgerechnet)  |  Ausland: 0 € · 10 € · 35 €") }
     }
 
     @ViewBuilder private var collapsibleMonteurszulage: some View {
@@ -295,7 +305,7 @@ struct EinstellungenView: View {
                         .keyboardType(.decimalPad)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 80)
-                    Text("€").foregroundStyle(.secondary).font(.subheadline)
+                    Text("CHF").foregroundStyle(.secondary).font(.subheadline)
                 }
                 HStack {
                     Label("Zulage Ausland / Außerhalb des Werks und Deutschlands", systemImage: "globe.europe.africa.fill")
@@ -312,7 +322,7 @@ struct EinstellungenView: View {
                     .fontWeight(.regular)
             }
         } footer: {
-            Text("Pauschale Zulage: 12 € bei Region Inland oder bei Arbeit am Werk (\(werkOrtStr.isEmpty ? "Steffisburg" : werkOrtStr)), 18 € außerhalb des Werks bei Region Schweiz, 50 € außerhalb des Werks bei Region Ausland. Wird über den Lohn ausbezahlt und ist daher NICHT Teil der Verpflegungspauschale/Erstattung – wird separat ausgewiesen. Beim Erfassen eines Verpflegungseintrags mit Region Schweiz oder Ausland kann „Am Werk gearbeitet\" angehakt werden, um die Inlands-Zulage anzuwenden.")
+            Text("Pauschale Zulage: 12 € bei Region Inland oder bei Arbeit am Werk (\(werkOrtStr.isEmpty ? "Steffisburg" : werkOrtStr)), 18 CHF außerhalb des Werks bei Region Schweiz (wird mit dem CHF-Kurs bei Verpflegungspauschalen in € umgerechnet), 50 € außerhalb des Werks bei Region Ausland. Wird über den Lohn ausbezahlt und ist daher NICHT Teil der Verpflegungspauschale/Erstattung – wird separat ausgewiesen. Beim Erfassen eines Verpflegungseintrags mit Region Schweiz oder Ausland kann „Am Werk gearbeitet\" angehakt werden, um die Inlands-Zulage anzuwenden.")
         }
     }
 
@@ -915,7 +925,7 @@ struct EinstellungenView: View {
 
     // MARK: - Helper Row
     @ViewBuilder
-    private func mealRow(label: String, icon: String, color: Color, binding: Binding<String>) -> some View {
+    private func mealRow(label: String, icon: String, color: Color, binding: Binding<String>, currency: String = "€") -> some View {
         HStack {
             Label(label, systemImage: icon).foregroundStyle(color)
             Spacer()
@@ -923,7 +933,7 @@ struct EinstellungenView: View {
                 .keyboardType(.decimalPad)
                 .multilineTextAlignment(.trailing)
                 .frame(width: 80)
-            Text("€")
+            Text(currency)
                 .foregroundStyle(.secondary)
                 .font(.subheadline)
         }
@@ -941,6 +951,7 @@ struct EinstellungenView: View {
         swissMeal1to3Str   = fmt(store.swissMeal1to3)
         swissMeal3to6Str   = fmt(store.swissMeal3to6)
         swissMeal6plusStr  = fmt(store.swissMeal6plus)
+        chfRateStr         = fmt(store.chfRate)
         abroadMeal1to3Str  = fmt(store.abroadMeal1to3)
         abroadMeal3to6Str  = fmt(store.abroadMeal3to6)
         abroadMeal6plusStr = fmt(store.abroadMeal6plus)
@@ -960,6 +971,7 @@ struct EinstellungenView: View {
         store.swissMeal1to3   = parseCurrency(swissMeal1to3Str)
         store.swissMeal3to6   = parseCurrency(swissMeal3to6Str)
         store.swissMeal6plus  = parseCurrency(swissMeal6plusStr)
+        store.chfRate         = parseCurrency(chfRateStr)
         store.abroadMeal1to3  = parseCurrency(abroadMeal1to3Str)
         store.abroadMeal3to6  = parseCurrency(abroadMeal3to6Str)
         store.abroadMeal6plus = parseCurrency(abroadMeal6plusStr)
@@ -985,6 +997,7 @@ struct EinstellungenView: View {
         store.swissMeal1to3   = Constants.swissMeal1to3
         store.swissMeal3to6   = Constants.swissMeal3to6
         store.swissMeal6plus  = Constants.swissMeal6plus
+        store.chfRate         = Constants.chfRate
         store.abroadMeal1to3  = Constants.abroadMeal1to3
         store.abroadMeal3to6  = Constants.abroadMeal3to6
         store.abroadMeal6plus = Constants.abroadMeal6plus

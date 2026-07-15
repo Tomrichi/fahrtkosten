@@ -1336,22 +1336,44 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.5 – aktuell -->
+<!-- 1.17.6 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.5
+        Version 1.17.6
         <span class="current-badge">● Aktuell</span>
       </div>
-      <div class="preview-text">Neu: Monteurszulage jetzt auch separat für die Schweiz einstellbar (18 €)</div>
+      <div class="preview-text">Verpflegung &amp; Monteurszulage Schweiz jetzt korrekt in CHF</div>
+    </div>
+    <span class="build-info">15. Juli 2026 · Build 33</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-fix">FIX</span> <strong>Schweiz-Beträge in CHF statt €:</strong> Verpflegungspauschale (65 CHF ab 3 Stunden) und Monteurszulage (18 CHF) für Region Schweiz werden jetzt korrekt in CHF geführt.</li>
+      <li><span class="badge-new">NEU</span> <strong>CHF-Kurs:</strong> Neuer, frei einstellbarer Wechselkurs unter Einstellungen → Verpflegungspauschalen – rechnet Schweiz-Beträge automatisch in € um, damit Gesamterstattung und Export stimmen.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.5 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.5
+      </div>
+      <div class="preview-text">Neu: Monteurszulage jetzt auch separat für die Schweiz einstellbar</div>
     </div>
     <span class="build-info">15. Juli 2026 · Build 32</span>
     <span class="chevron">›</span>
   </summary>
   <div class="detail-content">
     <ul>
-      <li><span class="badge-new">NEU</span> <strong>Monteurszulage – eigener Schweiz-Satz:</strong> Die Zulage bei Region Schweiz (außerhalb des Werks) nutzt jetzt einen eigenen, frei einstellbaren Satz (Standard 18 €) statt des Auslands-Satzes. Damit gilt jeweils ein eigener Satz für Inland (12 €), Schweiz (18 €) und Ausland (50 €).</li>
+      <li><span class="badge-new">NEU</span> <strong>Monteurszulage – eigener Schweiz-Satz:</strong> Die Zulage bei Region Schweiz (außerhalb des Werks) nutzt jetzt einen eigenen, frei einstellbaren Satz statt des Auslands-Satzes. Damit gilt jeweils ein eigener Satz für Inland, Schweiz und Ausland.</li>
     </ul>
   </div>
 </details>

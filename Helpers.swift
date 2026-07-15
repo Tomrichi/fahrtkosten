@@ -14,6 +14,16 @@ extension Double {
         return (f.string(from: NSNumber(value: self)) ?? "0,00") + " €"
     }
 
+    var chfFormatted: String {
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.minimumFractionDigits = 2
+        f.maximumFractionDigits = 2
+        f.decimalSeparator = ","
+        f.groupingSeparator = "."
+        return (f.string(from: NSNumber(value: self)) ?? "0,00") + " CHF"
+    }
+
     var kmFormatted: String {
         let f = NumberFormatter()
         f.numberStyle = .decimal

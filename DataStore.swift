@@ -39,6 +39,9 @@ class DataStore: ObservableObject {
     @Published var monteurszulageSchweiz: Double { didSet { local.set(monteurszulageSchweiz, forKey: "monteurszulageSchweiz") } }
     @Published var monteurszulageAusland: Double { didSet { local.set(monteurszulageAusland, forKey: "monteurszulageAusland") } }
     @Published var werkOrt: String { didSet { local.set(werkOrt, forKey: "werkOrt") } }
+    /// Wechselkurs CHF → € (1 CHF = chfRate €), da Verpflegung und Monteurszulage in der
+    /// Schweiz in CHF ausgezahlt werden, alle Summen/Erstattungen aber in € geführt werden.
+    @Published var chfRate: Double { didSet { local.set(chfRate, forKey: "chfRate") } }
 
     // MARK: - Init
     init() {
@@ -60,6 +63,7 @@ class DataStore: ObservableObject {
         monteurszulageSchweiz = local.double(forKey: "monteurszulageSchweiz").ifZeroAllowed(Constants.monteurszulageSchweiz)
         monteurszulageAusland = local.double(forKey: "monteurszulageAusland").ifZeroAllowed(Constants.monteurszulageAusland)
         werkOrt = local.string(forKey: "werkOrt") ?? Constants.werkOrt
+        chfRate = local.double(forKey: "chfRate").ifZero(Constants.chfRate)
 
         // SCHRITT 1: Migration einmalig ausführen (Standard → App Group)
         migrateFromStandardToAppGroup()
@@ -225,17 +229,19 @@ class DataStore: ObservableObject {
     }
 
     // MARK: - Meal Rates
+    // Schweiz-Sätze sind in CHF hinterlegt und werden hier in € umgerechnet, damit alle
+    // nachgelagerten Summen (Erstattung, Export) einheitlich in € rechnen können.
     func mealRates(for region: TravelRegion) -> MealRates {
         switch region {
         case .inland:  return MealRates(rate1to3: inlandMeal1to3,  rate3to6: inlandMeal3to6,  rate6plus: inlandMeal6plus)
-        case .schweiz: return MealRates(rate1to3: swissMeal1to3,   rate3to6: swissMeal3to6,   rate6plus: swissMeal6plus)
+        case .schweiz: return MealRates(rate1to3: swissMeal1to3 * chfRate, rate3to6: swissMeal3to6 * chfRate, rate6plus: swissMeal6plus * chfRate)
         case .ausland: return MealRates(rate1to3: abroadMeal1to3,  rate3to6: abroadMeal3to6,  rate6plus: abroadMeal6plus)
         }
     }
 
     // MARK: - Monteurszulage
-    /// Pauschale Zulage: 12 € Inland, 50 € Ausland/Schweiz. Am Werk (Steffisburg) gearbeitet
-    /// zählt auch bei Region Schweiz/Ausland als Inland.
+    /// Pauschale Zulage: 12 € Inland, 18 CHF Schweiz (umgerechnet via chfRate), 50 € Ausland.
+    /// Am Werk (Steffisburg) gearbeitet zählt auch bei Region Schweiz/Ausland als Inland.
     /// WICHTIG: Die Monteurszulage wird üblicherweise über den Lohn ausbezahlt (steuer- und
     /// sozialversicherungspflichtiger Arbeitslohn) – NICHT über die steuerfreie Reisekosten-
     /// erstattung nach § 9 EStG. Sie darf deshalb nicht in die Verpflegungspauschale/
@@ -246,7 +252,7 @@ class DataStore: ObservableObject {
         let rate: Double
         switch meal.region {
         case .inland:  rate = monteurszulageInland
-        case .schweiz: rate = meal.workedAtPlant ? monteurszulageInland : monteurszulageSchweiz
+        case .schweiz: rate = meal.workedAtPlant ? monteurszulageInland : (monteurszulageSchweiz * chfRate)
         case .ausland: rate = meal.workedAtPlant ? monteurszulageInland : monteurszulageAusland
         }
         return h < 6 ? rate * 0.5 : rate         // 3–6 h: 50 %, ab 6 h: voll
