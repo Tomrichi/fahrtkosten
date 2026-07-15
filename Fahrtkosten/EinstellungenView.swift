@@ -20,6 +20,7 @@ struct EinstellungenView: View {
     @State private var hotelFlatStr       = ""
     @State private var breakfastFlatStr   = ""
     @State private var monteurszulageInlandStr  = ""
+    @State private var monteurszulageSchweizStr = ""
     @State private var monteurszulageAuslandStr = ""
     @State private var werkOrtStr = ""
 
@@ -288,6 +289,15 @@ struct EinstellungenView: View {
                     Text("€").foregroundStyle(.secondary).font(.subheadline)
                 }
                 HStack {
+                    Label("Zulage Schweiz / Außerhalb des Werks", systemImage: "flag.checkered")
+                    Spacer()
+                    TextField("18,00", text: $monteurszulageSchweizStr)
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 80)
+                    Text("€").foregroundStyle(.secondary).font(.subheadline)
+                }
+                HStack {
                     Label("Zulage Ausland / Außerhalb des Werks und Deutschlands", systemImage: "globe.europe.africa.fill")
                     Spacer()
                     TextField("50,00", text: $monteurszulageAuslandStr)
@@ -302,7 +312,7 @@ struct EinstellungenView: View {
                     .fontWeight(.regular)
             }
         } footer: {
-            Text("Pauschale Zulage: 12 € bei Region Inland oder bei Arbeit am Werk (\(werkOrtStr.isEmpty ? "Steffisburg" : werkOrtStr)), 50 € außerhalb des Werks bei Region Schweiz/Ausland. Wird über den Lohn ausbezahlt und ist daher NICHT Teil der Verpflegungspauschale/Erstattung – wird separat ausgewiesen. Beim Erfassen eines Verpflegungseintrags mit Region Schweiz oder Ausland kann „Am Werk gearbeitet\" angehakt werden, um die Inlands-Zulage anzuwenden.")
+            Text("Pauschale Zulage: 12 € bei Region Inland oder bei Arbeit am Werk (\(werkOrtStr.isEmpty ? "Steffisburg" : werkOrtStr)), 18 € außerhalb des Werks bei Region Schweiz, 50 € außerhalb des Werks bei Region Ausland. Wird über den Lohn ausbezahlt und ist daher NICHT Teil der Verpflegungspauschale/Erstattung – wird separat ausgewiesen. Beim Erfassen eines Verpflegungseintrags mit Region Schweiz oder Ausland kann „Am Werk gearbeitet\" angehakt werden, um die Inlands-Zulage anzuwenden.")
         }
     }
 
@@ -937,6 +947,7 @@ struct EinstellungenView: View {
         hotelFlatStr       = fmt(store.hotelFlat)
         breakfastFlatStr   = fmt(store.breakfastFlat)
         monteurszulageInlandStr  = fmt(store.monteurszulageInland)
+        monteurszulageSchweizStr = fmt(store.monteurszulageSchweiz)
         monteurszulageAuslandStr = fmt(store.monteurszulageAusland)
         werkOrtStr = store.werkOrt
     }
@@ -955,6 +966,7 @@ struct EinstellungenView: View {
         store.hotelFlat       = parseCurrency(hotelFlatStr)
         store.breakfastFlat   = parseCurrency(breakfastFlatStr)
         store.monteurszulageInland  = parseCurrency(monteurszulageInlandStr)
+        store.monteurszulageSchweiz = parseCurrency(monteurszulageSchweizStr)
         store.monteurszulageAusland = parseCurrency(monteurszulageAuslandStr)
         store.werkOrt = werkOrtStr.trimmingCharacters(in: .whitespaces).isEmpty ? Constants.werkOrt : werkOrtStr
     }
@@ -979,6 +991,7 @@ struct EinstellungenView: View {
         store.hotelFlat       = Constants.hotelFlat
         store.breakfastFlat   = Constants.breakfastFlat
         store.monteurszulageInland  = Constants.monteurszulageInland
+        store.monteurszulageSchweiz = Constants.monteurszulageSchweiz
         store.monteurszulageAusland = Constants.monteurszulageAusland
         store.werkOrt = Constants.werkOrt
         AppLogger.shared.logTap("Einstellungen: Auf Standardwerte zurückgesetzt")

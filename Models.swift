@@ -17,6 +17,7 @@ struct Constants {
     static let defaultFuelConsumption: Double = 7.5
     // Monteurszulage: pauschale Zulage zusätzlich zur Verpflegungspauschale
     static let monteurszulageInland:  Double = 12.0
+    static let monteurszulageSchweiz: Double = 18.0
     static let monteurszulageAusland: Double = 50.0
     static let werkOrt: String = "Steffisburg"
 }

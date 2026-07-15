@@ -36,6 +36,7 @@ class DataStore: ObservableObject {
     @Published var hotelFlat:       Double { didSet { local.set(hotelFlat,       forKey: "hotelFlat") } }
     @Published var breakfastFlat:   Double { didSet { local.set(breakfastFlat,   forKey: "breakfastFlat") } }
     @Published var monteurszulageInland:  Double { didSet { local.set(monteurszulageInland,  forKey: "monteurszulageInland") } }
+    @Published var monteurszulageSchweiz: Double { didSet { local.set(monteurszulageSchweiz, forKey: "monteurszulageSchweiz") } }
     @Published var monteurszulageAusland: Double { didSet { local.set(monteurszulageAusland, forKey: "monteurszulageAusland") } }
     @Published var werkOrt: String { didSet { local.set(werkOrt, forKey: "werkOrt") } }
 
@@ -56,6 +57,7 @@ class DataStore: ObservableObject {
         hotelFlat       = local.double(forKey: "hotelFlat").ifZero(Constants.hotelFlat)
         breakfastFlat   = local.double(forKey: "breakfastFlat").ifZero(Constants.breakfastFlat)
         monteurszulageInland  = local.double(forKey: "monteurszulageInland").ifZeroAllowed(Constants.monteurszulageInland)
+        monteurszulageSchweiz = local.double(forKey: "monteurszulageSchweiz").ifZeroAllowed(Constants.monteurszulageSchweiz)
         monteurszulageAusland = local.double(forKey: "monteurszulageAusland").ifZeroAllowed(Constants.monteurszulageAusland)
         werkOrt = local.string(forKey: "werkOrt") ?? Constants.werkOrt
 
@@ -243,8 +245,9 @@ class DataStore: ObservableObject {
         guard h >= 3 else { return 0 }           // < 3 h: keine Zulage
         let rate: Double
         switch meal.region {
-        case .inland:            rate = monteurszulageInland
-        case .schweiz, .ausland: rate = meal.workedAtPlant ? monteurszulageInland : monteurszulageAusland
+        case .inland:  rate = monteurszulageInland
+        case .schweiz: rate = meal.workedAtPlant ? monteurszulageInland : monteurszulageSchweiz
+        case .ausland: rate = meal.workedAtPlant ? monteurszulageInland : monteurszulageAusland
         }
         return h < 6 ? rate * 0.5 : rate         // 3–6 h: 50 %, ab 6 h: voll
     }

@@ -1143,7 +1143,7 @@ private let hilfeHTML = #"""
   <tr><td>Schweiz</td><td>0 €</td><td>20 €</td><td>35 €</td></tr>
   <tr><td>Ausland</td><td>0 €</td><td>20 €</td><td>35 €</td></tr>
 </table>
-<p>Zusätzlich kann eine <strong>Monteurszulage</strong> erfasst werden: 12 € bei Region Inland, 50 € bei Region Schweiz oder Ausland. Wird bei Region Schweiz/Ausland am Werk (Standort in den Einstellungen hinterlegt, z. B. Steffisburg) gearbeitet, gilt statt der Auslands- die Inlands-Zulage. Die Monteurszulage wird üblicherweise über den Lohn ausbezahlt (steuer- und sozialversicherungspflichtiger Arbeitslohn) und ist deshalb <strong>nicht</strong> Teil der steuerfreien Verpflegungspauschale/Erstattung – sie wird in Liste, Formular, PDF- und CSV-Export klar getrennt als eigene Position ausgewiesen.</p>
+<p>Zusätzlich kann eine <strong>Monteurszulage</strong> erfasst werden: 12 € bei Region Inland, 18 € bei Region Schweiz, 50 € bei Region Ausland (jeweils außerhalb des Werks). Wird bei Region Schweiz/Ausland am Werk (Standort in den Einstellungen hinterlegt, z. B. Steffisburg) gearbeitet, gilt statt der Auslands-/Schweiz- die Inlands-Zulage. Die Monteurszulage wird üblicherweise über den Lohn ausbezahlt (steuer- und sozialversicherungspflichtiger Arbeitslohn) und ist deshalb <strong>nicht</strong> Teil der steuerfreien Verpflegungspauschale/Erstattung – sie wird in Liste, Formular, PDF- und CSV-Export klar getrennt als eigene Position ausgewiesen.</p>
 
 <h2>Tab Übernachtung</h2>
 <p>Erfasse Hotelübernachtungen mit Check-in- und Check-out-Datum – die Anzahl der Nächte wird automatisch berechnet. Wähle zwischen <strong>Pauschale</strong> oder <strong>tatsächlichen Kosten</strong>. Belege per Kamera oder Foto-Import scannen – OCR erkennt Betrag, Datum und Hotelname automatisch.</p>
@@ -1336,13 +1336,56 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.2 – aktuell -->
+<!-- 1.17.5 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.2
+        Version 1.17.5
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">Neu: Monteurszulage jetzt auch separat für die Schweiz einstellbar (18 €)</div>
+    </div>
+    <span class="build-info">15. Juli 2026 · Build 32</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEU</span> <strong>Monteurszulage – eigener Schweiz-Satz:</strong> Die Zulage bei Region Schweiz (außerhalb des Werks) nutzt jetzt einen eigenen, frei einstellbaren Satz (Standard 18 €) statt des Auslands-Satzes. Damit gilt jeweils ein eigener Satz für Inland (12 €), Schweiz (18 €) und Ausland (50 €).</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.4 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.4
+      </div>
+      <div class="preview-text">Monteurszulage-Stundenregel · CarPlay-Fix ohne App-Start</div>
+    </div>
+    <span class="build-info">14. Juli 2026 · Build 31</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEU</span> <strong>Monteurszulage – Stundenregel:</strong> Die Zulage wird jetzt nach der tatsächlichen Einsatzdauer gestaffelt – unter 3 Stunden keine Zulage, 3–6 Stunden 50 % der Pauschale, ab 6 Stunden volle Zulage.</li>
+      <li><span class="badge-fix">FIX</span> <strong>CarPlay:</strong> GPS-Fahrt starten/stoppen funktioniert jetzt zuverlässig auch ohne die App vorher am iPhone geöffnet zu haben.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.2 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.2
       </div>
       <div class="preview-text">Neu: Monteurszulage (12 € Inland / 50 € Ausland)</div>
     </div>
