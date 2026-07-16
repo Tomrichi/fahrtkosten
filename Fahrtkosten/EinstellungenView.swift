@@ -14,7 +14,7 @@ struct EinstellungenView: View {
     @State private var swissMeal1to3Str   = ""
     @State private var swissMeal3to6Str   = ""
     @State private var swissMeal6plusStr  = ""
-    @State private var chfRateStr         = ""
+    @State private var eurChfRateStr         = ""
     @State private var abroadMeal1to3Str  = ""
     @State private var abroadMeal3to6Str  = ""
     @State private var abroadMeal6plusStr = ""
@@ -256,13 +256,26 @@ struct EinstellungenView: View {
                     mealRow(label: "3 - 6 Stunden", icon: "2.circle.fill", color: .orange, binding: $swissMeal3to6Str,  currency: "CHF")
                     mealRow(label: "ab 6 Stunden",  icon: "3.circle.fill", color: .green,  binding: $swissMeal6plusStr, currency: "CHF")
                     HStack {
-                        Label("CHF-Kurs (1 CHF = … €)", systemImage: "arrow.left.arrow.right")
+                        Label("Kurs (EUR = … CHF)", systemImage: "arrow.left.arrow.right")
                         Spacer()
-                        TextField("1,08", text: $chfRateStr)
+                        TextField("0,93", text: $eurChfRateStr)
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
                             .frame(width: 80)
-                        Text("€").foregroundStyle(.secondary).font(.subheadline)
+                        Text("CHF").foregroundStyle(.secondary).font(.subheadline)
+                    }
+                    HStack {
+                        Spacer()
+                        Text(chfRateStatusText)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        Button {
+                            Task { await store.refreshEurChfRateIfNeeded(force: true) }
+                        } label: {
+                            Image(systemName: "arrow.clockwise")
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.blue)
                     }
                     Divider().padding(.vertical, 6)
                     Text("Ausland").font(.caption).foregroundStyle(.secondary)
@@ -308,17 +321,17 @@ struct EinstellungenView: View {
                     Text("CHF").foregroundStyle(.secondary).font(.subheadline)
                 }
                 HStack {
-                    Label("CHF-Kurs (1 CHF = … €)", systemImage: "arrow.left.arrow.right")
+                    Label("Kurs (EUR = … CHF)", systemImage: "arrow.left.arrow.right")
                     Spacer()
-                    TextField("1,08", text: $chfRateStr)
+                    TextField("0,93", text: $eurChfRateStr)
                         .keyboardType(.decimalPad)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 80)
-                    Text("€").foregroundStyle(.secondary).font(.subheadline)
+                    Text("CHF").foregroundStyle(.secondary).font(.subheadline)
                 }
                 HStack {
                     Spacer()
-                    Text("≈ \((parseCurrency(monteurszulageSchweizStr) * parseCurrency(chfRateStr)).euroFormatted)")
+                    Text("≈ \(chfToEuro(parseCurrency(monteurszulageSchweizStr)).euroFormatted)")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
@@ -966,7 +979,7 @@ struct EinstellungenView: View {
         swissMeal1to3Str   = fmt(store.swissMeal1to3)
         swissMeal3to6Str   = fmt(store.swissMeal3to6)
         swissMeal6plusStr  = fmt(store.swissMeal6plus)
-        chfRateStr         = fmt(store.chfRate)
+        eurChfRateStr         = fmt(store.eurChfRate)
         abroadMeal1to3Str  = fmt(store.abroadMeal1to3)
         abroadMeal3to6Str  = fmt(store.abroadMeal3to6)
         abroadMeal6plusStr = fmt(store.abroadMeal6plus)
@@ -986,7 +999,7 @@ struct EinstellungenView: View {
         store.swissMeal1to3   = parseCurrency(swissMeal1to3Str)
         store.swissMeal3to6   = parseCurrency(swissMeal3to6Str)
         store.swissMeal6plus  = parseCurrency(swissMeal6plusStr)
-        store.chfRate         = parseCurrency(chfRateStr)
+        store.eurChfRate      = parseCurrency(eurChfRateStr)
         store.abroadMeal1to3  = parseCurrency(abroadMeal1to3Str)
         store.abroadMeal3to6  = parseCurrency(abroadMeal3to6Str)
         store.abroadMeal6plus = parseCurrency(abroadMeal6plusStr)
@@ -1012,7 +1025,7 @@ struct EinstellungenView: View {
         store.swissMeal1to3   = Constants.swissMeal1to3
         store.swissMeal3to6   = Constants.swissMeal3to6
         store.swissMeal6plus  = Constants.swissMeal6plus
-        store.chfRate         = Constants.chfRate
+        store.eurChfRate      = Constants.eurChfRate
         store.abroadMeal1to3  = Constants.abroadMeal1to3
         store.abroadMeal3to6  = Constants.abroadMeal3to6
         store.abroadMeal6plus = Constants.abroadMeal6plus
@@ -1028,6 +1041,22 @@ struct EinstellungenView: View {
 
     private func parseCurrency(_ s: String) -> Double {
         Double(s.replacingOccurrences(of: ",", with: ".")) ?? 0
+    }
+
+    /// CHF → € mit Schutz gegen Division durch 0 (leeres/ungültiges Kurs-Feld)
+    private func chfToEuro(_ chf: Double) -> Double {
+        let rate = parseCurrency(eurChfRateStr)
+        guard rate > 0 else { return 0 }
+        return chf / rate
+    }
+
+    private var chfRateStatusText: String {
+        guard let updated = store.chfRateUpdatedAt else {
+            return "Noch nicht automatisch aktualisiert"
+        }
+        let fmt = DateFormatter()
+        fmt.dateStyle = .medium
+        return "Kurs vom \(fmt.string(from: updated))"
     }
 }
 

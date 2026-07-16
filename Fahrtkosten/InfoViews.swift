@@ -1336,13 +1336,35 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.8 – aktuell -->
+<!-- 1.17.9 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.8
+        Version 1.17.9
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">CHF-Kurs jetzt offiziell notiert (EUR = … CHF) und automatisch aktuell</div>
+    </div>
+    <span class="build-info">16. Juli 2026 · Build 36</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-fix">FIX</span> <strong>CHF-Kurs in offizieller Notierungsrichtung:</strong> Der Wechselkurs wird jetzt wie bei Banken/EZB üblich als „EUR = … CHF" geführt statt umgekehrt.</li>
+      <li><span class="badge-new">NEU</span> <strong>Automatische Aktualisierung:</strong> Der Kurs wird alle 14 Tage automatisch über die EZB-Referenzkurse aktualisiert (Frankfurter-API) – manuelles Aktualisieren jederzeit per Knopf möglich. Zuletzt-aktualisiert-Datum wird angezeigt.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.8 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.8
       </div>
       <div class="preview-text">Monteurszulage Schweiz: falscher Betrag bei neuem Eintrag behoben</div>
     </div>

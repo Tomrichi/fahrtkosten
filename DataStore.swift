@@ -1,6 +1,12 @@
 import Foundation
 import Combine
 
+/// Antwortformat der Frankfurter-API (https://api.frankfurter.dev/v2/rate/EUR/CHF),
+/// liefert EZB-Referenzkurse: {"date":"...","base":"EUR","quote":"CHF","rate":0.925}
+private struct FrankfurterRateResponse: Decodable {
+    let rate: Double
+}
+
 class DataStore: ObservableObject {
 
     // MARK: - Storage
@@ -39,9 +45,14 @@ class DataStore: ObservableObject {
     @Published var monteurszulageSchweiz: Double { didSet { local.set(monteurszulageSchweiz, forKey: "monteurszulageSchweiz") } }
     @Published var monteurszulageAusland: Double { didSet { local.set(monteurszulageAusland, forKey: "monteurszulageAusland") } }
     @Published var werkOrt: String { didSet { local.set(werkOrt, forKey: "werkOrt") } }
-    /// Wechselkurs CHF → € (1 CHF = chfRate €), da Verpflegung und Monteurszulage in der
-    /// Schweiz in CHF ausgezahlt werden, alle Summen/Erstattungen aber in € geführt werden.
-    @Published var chfRate: Double { didSet { local.set(chfRate, forKey: "chfRate") } }
+    /// Wechselkurs 1 EUR = eurChfRate CHF (offizielle Notierungsrichtung), da Verpflegung
+    /// und Monteurszulage in der Schweiz in CHF ausgezahlt werden, alle Summen/Erstattungen
+    /// aber in € geführt werden. Wird automatisch alle 14 Tage aktualisiert (Frankfurter-API,
+    /// EZB-Referenzkurse) – siehe refreshEurChfRateIfNeeded().
+    @Published var eurChfRate: Double { didSet { local.set(eurChfRate, forKey: "eurChfRate") } }
+    @Published var chfRateUpdatedAt: Date? {
+        didSet { local.set(chfRateUpdatedAt?.timeIntervalSince1970, forKey: "chfRateUpdatedAt") }
+    }
 
     // MARK: - Init
     init() {
@@ -63,7 +74,12 @@ class DataStore: ObservableObject {
         monteurszulageSchweiz = local.double(forKey: "monteurszulageSchweiz").ifZeroAllowed(Constants.monteurszulageSchweiz)
         monteurszulageAusland = local.double(forKey: "monteurszulageAusland").ifZeroAllowed(Constants.monteurszulageAusland)
         werkOrt = local.string(forKey: "werkOrt") ?? Constants.werkOrt
-        chfRate = local.double(forKey: "chfRate").ifZero(Constants.chfRate)
+        eurChfRate = local.double(forKey: "eurChfRate").ifZero(Constants.eurChfRate)
+        if let ts = local.object(forKey: "chfRateUpdatedAt") as? Double {
+            chfRateUpdatedAt = Date(timeIntervalSince1970: ts)
+        } else {
+            chfRateUpdatedAt = nil
+        }
 
         // SCHRITT 1: Migration einmalig ausführen (Standard → App Group)
         migrateFromStandardToAppGroup()
@@ -93,6 +109,35 @@ class DataStore: ObservableObject {
         // SCHRITT 5: iCloud-Daten verzögert zusammenführen (nach synchronize)
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             self.mergeFromiCloud()
+        }
+
+        // SCHRITT 6: EUR/CHF-Kurs bei Bedarf aktualisieren (alle 14 Tage)
+        Task { @MainActor [weak self] in
+            await self?.refreshEurChfRateIfNeeded()
+        }
+    }
+
+    // MARK: - EUR/CHF-Wechselkurs (automatisch alle 14 Tage, Frankfurter-API/EZB)
+    private static let chfRateMaxAge: TimeInterval = 14 * 24 * 60 * 60
+
+    /// Lädt bei Bedarf den aktuellen EUR→CHF-Referenzkurs nach – nur wenn seit dem letzten
+    /// erfolgreichen Abruf mindestens 14 Tage vergangen sind (oder noch nie abgerufen wurde).
+    /// Schlägt der Abruf fehl (z. B. kein Internet), bleibt der bisherige Kurs unverändert und
+    /// wird beim nächsten App-Start erneut versucht.
+    func refreshEurChfRateIfNeeded(force: Bool = false) async {
+        if !force, let last = chfRateUpdatedAt, Date().timeIntervalSince(last) < Self.chfRateMaxAge {
+            return
+        }
+        guard let url = URL(string: "https://api.frankfurter.dev/v2/rate/EUR/CHF") else { return }
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            let decoded = try JSONDecoder().decode(FrankfurterRateResponse.self, from: data)
+            guard decoded.rate > 0 else { return }
+            eurChfRate = decoded.rate
+            chfRateUpdatedAt = Date()
+            AppLogger.shared.log("EUR/CHF-Kurs aktualisiert: 1 EUR = \(decoded.rate) CHF", level: .store)
+        } catch {
+            AppLogger.shared.logError("EUR/CHF-Kurs konnte nicht aktualisiert werden: \(error.localizedDescription)")
         }
     }
 
@@ -234,13 +279,13 @@ class DataStore: ObservableObject {
     func mealRates(for region: TravelRegion) -> MealRates {
         switch region {
         case .inland:  return MealRates(rate1to3: inlandMeal1to3,  rate3to6: inlandMeal3to6,  rate6plus: inlandMeal6plus)
-        case .schweiz: return MealRates(rate1to3: swissMeal1to3 * chfRate, rate3to6: swissMeal3to6 * chfRate, rate6plus: swissMeal6plus * chfRate)
+        case .schweiz: return MealRates(rate1to3: swissMeal1to3 / eurChfRate, rate3to6: swissMeal3to6 / eurChfRate, rate6plus: swissMeal6plus / eurChfRate)
         case .ausland: return MealRates(rate1to3: abroadMeal1to3,  rate3to6: abroadMeal3to6,  rate6plus: abroadMeal6plus)
         }
     }
 
     // MARK: - Monteurszulage
-    /// Pauschale Zulage: 12 € Inland, 18 CHF Schweiz (umgerechnet via chfRate), 50 € Ausland.
+    /// Pauschale Zulage: 12 € Inland, 18 CHF Schweiz (umgerechnet via eurChfRate), 50 € Ausland.
     /// Das Werk (Steffisburg) liegt selbst in der Schweiz: Bei Region Schweiz gilt daher immer
     /// die Schweiz-Zulage. Bei Region Ausland mit „Am Werk gearbeitet" (man war faktisch am
     /// Schweizer Werksstandort) gilt ebenfalls die Schweiz-Zulage statt der Auslands-Zulage.
@@ -255,8 +300,8 @@ class DataStore: ObservableObject {
         let rate: Double
         switch meal.region {
         case .inland:  rate = monteurszulageInland
-        case .schweiz: rate = monteurszulageSchweiz * chfRate
-        case .ausland: rate = meal.workedAtPlant ? (monteurszulageSchweiz * chfRate) : monteurszulageAusland
+        case .schweiz: rate = monteurszulageSchweiz / eurChfRate
+        case .ausland: rate = meal.workedAtPlant ? (monteurszulageSchweiz / eurChfRate) : monteurszulageAusland
         }
         return h < 6 ? rate * 0.5 : rate         // 3–6 h: 50 %, ab 6 h: voll
     }

@@ -6,7 +6,7 @@ struct Constants {
     static let inlandMeal1to3:  Double = 0.0
     static let inlandMeal3to6:  Double = 0.0
     static let inlandMeal6plus: Double = 0.0
-    // Schweiz-Verpflegungssätze sind in CHF, siehe chfRate für Umrechnung in €
+    // Schweiz-Verpflegungssätze sind in CHF, siehe eurChfRate für Umrechnung in €
     static let swissMeal1to3:   Double = 0.0
     static let swissMeal3to6:   Double = 65.0
     static let swissMeal6plus:  Double = 65.0
@@ -21,8 +21,10 @@ struct Constants {
     static let monteurszulageSchweiz: Double = 18.0
     static let monteurszulageAusland: Double = 50.0
     static let werkOrt: String = "Steffisburg"
-    // Wechselkurs CHF → € für Schweiz-Verpflegung und -Monteurszulage
-    static let chfRate: Double = 1.08
+    // Wechselkurs für Schweiz-Verpflegung und -Monteurszulage: 1 EUR = eurChfRate CHF
+    // (offizielle Notierungsrichtung, z. B. EZB-Referenzkurs). Wird automatisch alle
+    // 14 Tage über die Frankfurter-API aktualisiert; dieser Wert ist nur der Startwert.
+    static let eurChfRate: Double = 0.93
 }
 
 // MARK: - Reiseregion
