@@ -53,6 +53,11 @@ class DataStore: ObservableObject {
     @Published var chfRateUpdatedAt: Date? {
         didSet { local.set(chfRateUpdatedAt?.timeIntervalSince1970, forKey: "chfRateUpdatedAt") }
     }
+    /// Wochenend-/Feiertagszulage pauschal pro Tag: Inland (€) + Schweiz (CHF) = "Europa"-Tarif,
+    /// Ausland (€) = "Übrige Gebiete"-Tarif.
+    @Published var wochenendzulageInland:  Double { didSet { local.set(wochenendzulageInland,  forKey: "wochenendzulageInland") } }
+    @Published var wochenendzulageSchweiz: Double { didSet { local.set(wochenendzulageSchweiz, forKey: "wochenendzulageSchweiz") } }
+    @Published var wochenendzulageAusland: Double { didSet { local.set(wochenendzulageAusland, forKey: "wochenendzulageAusland") } }
 
     // MARK: - Init
     init() {
@@ -80,6 +85,9 @@ class DataStore: ObservableObject {
         } else {
             chfRateUpdatedAt = nil
         }
+        wochenendzulageInland  = local.double(forKey: "wochenendzulageInland").ifZeroAllowed(Constants.wochenendzulageInland)
+        wochenendzulageSchweiz = local.double(forKey: "wochenendzulageSchweiz").ifZeroAllowed(Constants.wochenendzulageSchweiz)
+        wochenendzulageAusland = local.double(forKey: "wochenendzulageAusland").ifZeroAllowed(Constants.wochenendzulageAusland)
 
         // SCHRITT 1: Migration einmalig ausführen (Standard → App Group)
         migrateFromStandardToAppGroup()
@@ -310,6 +318,31 @@ class DataStore: ObservableObject {
     /// von der Spesen-Erstattung, z. B. zum Abgleich mit der Lohnabrechnung.
     func totalMonteurszulage(_ entries: [MealEntry]) -> Double {
         entries.reduce(0) { $0 + monteurszulage(for: $1) }
+    }
+
+    // MARK: - Wochenend-/Feiertagszulage
+    /// Pauschale Tageszulage: 60 € Inland, 90 CHF Schweiz (umgerechnet via eurChfRate) = "Europa"-
+    /// Tarif, 72 € Ausland = "Übrige Gebiete"-Tarif. Gleiche Werk-Logik wie Monteurszulage: bei
+    /// Region Ausland mit „Am Werk gearbeitet" gilt die Schweiz-Zulage statt der Auslands-Zulage.
+    /// Gilt an Samstagen/Sonntagen oder manuell markierten Feiertagen – NICHT bei Weiterbildung/
+    /// Schulung. Kein Stunden-Mindestmaß (Pauschale pro Tag, nicht gestaffelt).
+    /// WICHTIG: Wird wie die Monteurszulage über den Lohn ausbezahlt – NICHT Teil der
+    /// steuerfreien Verpflegungspauschale/Gesamterstattung, sondern separat ausgewiesen.
+    func wochenendzulage(for meal: MealEntry) -> Double {
+        guard !meal.isTraining else { return 0 }
+        let weekday = Calendar.current.component(.weekday, from: meal.date) // 1 = Sonntag, 7 = Samstag
+        let isWeekend = weekday == 1 || weekday == 7
+        guard isWeekend || meal.isHoliday else { return 0 }
+        switch meal.region {
+        case .inland:  return wochenendzulageInland
+        case .schweiz: return wochenendzulageSchweiz / eurChfRate
+        case .ausland: return meal.workedAtPlant ? (wochenendzulageSchweiz / eurChfRate) : wochenendzulageAusland
+        }
+    }
+
+    /// Summe der Wochenend-/Feiertagszulage (Lohnbestandteil) über die übergebenen Einträge.
+    func totalWochenendzulage(_ entries: [MealEntry]) -> Double {
+        entries.reduce(0) { $0 + wochenendzulage(for: $1) }
     }
 
     // MARK: - Totals

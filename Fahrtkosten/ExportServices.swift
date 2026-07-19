@@ -60,6 +60,8 @@ struct PDFExportService {
         let privateTotal = privateExpenses.reduce(0.0) { $0 + $1.amount }
         // Monteurszulage: Lohnbestandteil, NICHT Teil der Reisekosten-Erstattung – separat ausgewiesen
         let monteurszulageTotal = store.totalMonteurszulage(meals)
+        // Wochenend-/Feiertagszulage: ebenfalls Lohnbestandteil, separat ausgewiesen
+        let wochenendzulageTotal = store.totalWochenendzulage(meals)
         let grandTotal   = tripTotal + mealTotal + hotelTotal
 
         // Hilfsfunktionen
@@ -287,6 +289,26 @@ struct PDFExportService {
                 y += 6
             }
 
+            // ── WOCHENEND-/FEIERTAGSZULAGE (separat: Lohnbestandteil, NICHT Teil der Erstattung) ──
+            if wochenendzulageTotal > 0 {
+                drawSectionHeader(title: "Wochenend-/Feiertagszulage – über Lohn ausbezahlt", subtotal: wochenendzulageTotal)
+                for meal in meals.sorted(by: { $0.date > $1.date }) {
+                    let wz = store.wochenendzulage(for: meal)
+                    guard wz > 0 else { continue }
+                    drawRow(
+                        date: meal.date.formatted(date: .numeric, time: .omitted),
+                        desc: "Wochenend-/Feiertagszulage",
+                        detail: {
+                            if meal.region == .inland { return "Inland" }
+                            if meal.region == .schweiz { return "Schweiz" }
+                            return meal.workedAtPlant ? "Schweiz" : "Ausland"
+                        }(),
+                        betrag: wz
+                    )
+                }
+                y += 6
+            }
+
             // ── ÜBERNACHTUNGEN ───────────────────────────────────────────────
             if !hotels.isEmpty {
                 drawSectionHeader(title: "Übernachtungen  (\(hotels.count) Einträge)", subtotal: hotelTotal)
@@ -370,7 +392,7 @@ struct PDFExportService {
             y += 40
 
             // Hinweis
-            let hinweis = "* KFZ-Kosten, private Ausgaben und Monteurszulage (Lohnbestandteil) sind in der Gesamterstattung nicht enthalten."
+            let hinweis = "* KFZ-Kosten, private Ausgaben, Monteurszulage und Wochenend-/Feiertagszulage (Lohnbestandteile) sind in der Gesamterstattung nicht enthalten."
             hinweis.draw(at: CGPoint(x: margin, y: y),
                          withAttributes: a(.systemFont(ofSize: 7.5), textSec))
 
@@ -469,10 +491,14 @@ struct CSVExportService {
         for meal in meals.sorted(by: { $0.date > $1.date }) {
             let amt = meal.allowance(rates: store.mealRates(for: meal.region))
             let mz = store.monteurszulage(for: meal)
+            let wz = store.wochenendzulage(for: meal)
             let date = meal.date.formatted(date: .numeric, time: .omitted)
             csv += "\(date);Verpflegung;\(meal.region.localizedName);;;;;;;;\(String(format: "%.2f", amt));\(meal.note)\n"
             if mz > 0 {
                 csv += "\(date);Monteurszulage;\(meal.region.localizedName);;;;;;;;\(String(format: "%.2f", mz));\n"
+            }
+            if wz > 0 {
+                csv += "\(date);Wochenend-/Feiertagszulage;\(meal.region.localizedName);;;;;;;;\(String(format: "%.2f", wz));\n"
             }
         }
 

@@ -24,6 +24,9 @@ struct EinstellungenView: View {
     @State private var monteurszulageSchweizStr = ""
     @State private var monteurszulageAuslandStr = ""
     @State private var werkOrtStr = ""
+    @State private var wochenendzulageInlandStr  = ""
+    @State private var wochenendzulageSchweizStr = ""
+    @State private var wochenendzulageAuslandStr = ""
 
     @State private var showResetAlert       = false
     @State private var showDeleteAllAlert   = false
@@ -91,6 +94,7 @@ struct EinstellungenView: View {
     @State private var expandRates   = false
     @State private var expandMeals   = false
     @State private var expandMonteurszulage = false
+    @State private var expandWochenendzulage = false
     @State private var expandHotel   = false
     @State private var expandFuel    = false
     @State private var expandLang    = false
@@ -114,6 +118,7 @@ struct EinstellungenView: View {
                 collapsibleFuel
                 collapsibleMeals
                 collapsibleMonteurszulage
+                collapsibleWochenendzulage
                 collapsibleHotel
                 resetSection
                 backupSection
@@ -351,6 +356,52 @@ struct EinstellungenView: View {
             }
         } footer: {
             Text("Pauschale Zulage: 12 € bei Region Inland. Das Werk (\(werkOrtStr.isEmpty ? "Steffisburg" : werkOrtStr)) liegt selbst in der Schweiz – bei Region Schweiz gilt daher immer die Schweiz-Zulage von 18 CHF (wird mit dem CHF-Kurs oben in € umgerechnet – derselbe Kurs wie bei Verpflegungspauschalen). Bei Region Ausland gilt die Auslands-Zulage von 50 €, außer „Am Werk gearbeitet\" ist angehakt – dann gilt ebenfalls die Schweiz-Zulage. Wird über den Lohn ausbezahlt und ist daher NICHT Teil der Verpflegungspauschale/Erstattung – wird separat ausgewiesen.")
+        }
+    }
+
+    @ViewBuilder private var collapsibleWochenendzulage: some View {
+        Section {
+            DisclosureGroup(isExpanded: $expandWochenendzulage) {
+                HStack {
+                    Label("Zulage Inland / Europa", systemImage: "flag.fill")
+                    Spacer()
+                    TextField("60,00", text: $wochenendzulageInlandStr)
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 80)
+                    Text("€").foregroundStyle(.secondary).font(.subheadline)
+                }
+                HStack {
+                    Label("Zulage Schweiz / Europa", systemImage: "flag.checkered")
+                    Spacer()
+                    TextField("90,00", text: $wochenendzulageSchweizStr)
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 80)
+                    Text("CHF").foregroundStyle(.secondary).font(.subheadline)
+                }
+                HStack {
+                    Spacer()
+                    Text("≈ \(chfToEuro(parseCurrency(wochenendzulageSchweizStr)).euroFormatted)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                HStack {
+                    Label("Zulage Ausland / Übrige Gebiete", systemImage: "globe.europe.africa.fill")
+                    Spacer()
+                    TextField("72,00", text: $wochenendzulageAuslandStr)
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 80)
+                    Text("€").foregroundStyle(.secondary).font(.subheadline)
+                }
+            } label: {
+                Label("Wochenend-/Feiertagszulage", systemImage: "calendar.badge.exclamationmark")
+                    .foregroundStyle(.primary)
+                    .fontWeight(.regular)
+            }
+        } footer: {
+            Text("Pauschale Tageszulage bei Region Inland/Schweiz (\"Europa\"-Tarif: 60 € / 90 CHF, umgerechnet mit dem Kurs oben bei Monteurszulage) bzw. Region Ausland (\"Übrige Gebiete\": 72 €). Gilt an Samstagen/Sonntagen oder manuell markierten Feiertagen, nicht bei Weiterbildung/Schulung. Wird über den Lohn ausbezahlt und ist daher NICHT Teil der Verpflegungspauschale/Erstattung – wird separat ausgewiesen.")
         }
     }
 
@@ -989,6 +1040,9 @@ struct EinstellungenView: View {
         monteurszulageSchweizStr = fmt(store.monteurszulageSchweiz)
         monteurszulageAuslandStr = fmt(store.monteurszulageAusland)
         werkOrtStr = store.werkOrt
+        wochenendzulageInlandStr  = fmt(store.wochenendzulageInland)
+        wochenendzulageSchweizStr = fmt(store.wochenendzulageSchweiz)
+        wochenendzulageAuslandStr = fmt(store.wochenendzulageAusland)
     }
 
     private func saveAndApply() {
@@ -1009,6 +1063,9 @@ struct EinstellungenView: View {
         store.monteurszulageSchweiz = parseCurrency(monteurszulageSchweizStr)
         store.monteurszulageAusland = parseCurrency(monteurszulageAuslandStr)
         store.werkOrt = werkOrtStr.trimmingCharacters(in: .whitespaces).isEmpty ? Constants.werkOrt : werkOrtStr
+        store.wochenendzulageInland  = parseCurrency(wochenendzulageInlandStr)
+        store.wochenendzulageSchweiz = parseCurrency(wochenendzulageSchweizStr)
+        store.wochenendzulageAusland = parseCurrency(wochenendzulageAuslandStr)
     }
 
     private func saveAndDismiss() {
@@ -1035,6 +1092,9 @@ struct EinstellungenView: View {
         store.monteurszulageSchweiz = Constants.monteurszulageSchweiz
         store.monteurszulageAusland = Constants.monteurszulageAusland
         store.werkOrt = Constants.werkOrt
+        store.wochenendzulageInland  = Constants.wochenendzulageInland
+        store.wochenendzulageSchweiz = Constants.wochenendzulageSchweiz
+        store.wochenendzulageAusland = Constants.wochenendzulageAusland
         AppLogger.shared.logTap("Einstellungen: Auf Standardwerte zurückgesetzt")
         loadValues()
     }

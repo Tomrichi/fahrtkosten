@@ -25,6 +25,12 @@ struct Constants {
     // (offizielle Notierungsrichtung, z. B. EZB-Referenzkurs). Wird automatisch alle
     // 14 Tage über die Frankfurter-API aktualisiert; dieser Wert ist nur der Startwert.
     static let eurChfRate: Double = 0.93
+    // Wochenend-/Feiertagszulage: pauschal pro Tag, zusätzlich zur Verpflegungspauschale.
+    // Inland + Schweiz gelten als "Europa"-Tarif (Schweiz in CHF, wie Monteurszulage),
+    // Ausland als "Übrige Gebiete"-Tarif.
+    static let wochenendzulageInland:  Double = 60.0
+    static let wochenendzulageSchweiz: Double = 90.0
+    static let wochenendzulageAusland: Double = 72.0
 }
 
 // MARK: - Reiseregion
@@ -180,18 +186,23 @@ struct MealEntry: Identifiable, Codable {
     var excludeTrips: Bool = false
     /// Am Werk (Heimatbetrieb) gearbeitet – auch bei Region Schweiz/Ausland gilt dann die Inlands-Zulage
     var workedAtPlant: Bool = false
+    /// Manuell markierter Feiertag (löst zusammen mit Sa/So die Wochenendzulage aus)
+    var isHoliday: Bool = false
+    /// Weiterbildung/Schulung – schließt die Wochenend-/Feiertagszulage aus
+    var isTraining: Bool = false
 
     enum CodingKeys: String, CodingKey {
-        case id, date, startTime, endTime, note, region, breakfastAmount, ownBreakfastAmount, pauseMinutes, excludeTrips, workedAtPlant
+        case id, date, startTime, endTime, note, region, breakfastAmount, ownBreakfastAmount, pauseMinutes, excludeTrips, workedAtPlant, isHoliday, isTraining
     }
     init(id: UUID = UUID(), date: Date, startTime: Date, endTime: Date, note: String,
          region: TravelRegion = .inland, breakfastAmount: Double = 0.0,
          ownBreakfastAmount: Double = 0.0, pauseMinutes: Int = 0, excludeTrips: Bool = false,
-         workedAtPlant: Bool = false) {
+         workedAtPlant: Bool = false, isHoliday: Bool = false, isTraining: Bool = false) {
         self.id = id; self.date = date; self.startTime = startTime; self.endTime = endTime
         self.note = note; self.region = region; self.breakfastAmount = breakfastAmount
         self.ownBreakfastAmount = ownBreakfastAmount; self.pauseMinutes = pauseMinutes
         self.excludeTrips = excludeTrips; self.workedAtPlant = workedAtPlant
+        self.isHoliday = isHoliday; self.isTraining = isTraining
     }
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -206,6 +217,8 @@ struct MealEntry: Identifiable, Codable {
         pauseMinutes = try c.decodeIfPresent(Int.self, forKey: .pauseMinutes) ?? 0
         excludeTrips = try c.decodeIfPresent(Bool.self, forKey: .excludeTrips) ?? false
         workedAtPlant = try c.decodeIfPresent(Bool.self, forKey: .workedAtPlant) ?? false
+        isHoliday = try c.decodeIfPresent(Bool.self, forKey: .isHoliday) ?? false
+        isTraining = try c.decodeIfPresent(Bool.self, forKey: .isTraining) ?? false
     }
     var hours: Double { max(0, endTime.timeIntervalSince(startTime) / 3600 - Double(pauseMinutes) / 60) }
     func mealAllowance(rates: MealRates) -> Double {

@@ -14,9 +14,9 @@ Version 1.17.9 · Build 36 · Thomas Wagner · 16. Juli 2026
 ## Promotional Text (170 Zeichen) – aktualisiert
 
 ```
-CHF-Kurs jetzt in offizieller Notierung (EUR = CHF) und automatisch alle 14 Tage aktuell über die EZB-Referenzkurse.
+Fahrtkosten automatisch per GPS erfassen, Spesen & Monteurszulage berechnen – jetzt auch für die Schweiz mit aktuellem Wechselkurs. Für iPhone, Apple Watch & CarPlay.
 ```
-*(116 Zeichen)*
+*(166 Zeichen)*
 
 ---
 

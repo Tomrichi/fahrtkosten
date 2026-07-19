@@ -1144,6 +1144,7 @@ private let hilfeHTML = #"""
   <tr><td>Ausland</td><td>0 €</td><td>20 €</td><td>35 €</td></tr>
 </table>
 <p>Zusätzlich kann eine <strong>Monteurszulage</strong> erfasst werden: 12 € bei Region Inland. Das Werk (Standort in den Einstellungen hinterlegt, z. B. Steffisburg) liegt selbst in der Schweiz – bei Region Schweiz gilt daher immer die Schweiz-Zulage (18 CHF, wird automatisch in € umgerechnet). Bei Region Ausland gilt die Auslands-Zulage (50 €), außer „Am Werk gearbeitet" ist angehakt – dann gilt ebenfalls die Schweiz-Zulage statt der Auslands-Zulage. Die Monteurszulage wird üblicherweise über den Lohn ausbezahlt (steuer- und sozialversicherungspflichtiger Arbeitslohn) und ist deshalb <strong>nicht</strong> Teil der steuerfreien Verpflegungspauschale/Erstattung – sie wird in Liste, Formular, PDF- und CSV-Export klar getrennt als eigene Position ausgewiesen.</p>
+<p>Ebenfalls separat: die <strong>Wochenend-/Feiertagszulage</strong> – eine Tagespauschale für Einsätze an Samstagen, Sonntagen oder manuell markierten Feiertagen. Bei Region Inland/Schweiz gilt der „Europa"-Tarif (60 € bzw. 90 CHF, automatisch in € umgerechnet), bei Region Ausland der „Übrige Gebiete"-Tarif (72 €) – außer „Am Werk gearbeitet" ist angehakt, dann gilt ebenfalls der Schweiz-Satz. Bei Weiterbildung/Schulung entfällt die Zulage. Wie die Monteurszulage wird sie über den Lohn ausbezahlt und getrennt von der Verpflegungspauschale ausgewiesen.</p>
 
 <h2>Tab Übernachtung</h2>
 <p>Erfasse Hotelübernachtungen mit Check-in- und Check-out-Datum – die Anzahl der Nächte wird automatisch berechnet. Wähle zwischen <strong>Pauschale</strong> oder <strong>tatsächlichen Kosten</strong>. Belege per Kamera oder Foto-Import scannen – OCR erkennt Betrag, Datum und Hotelname automatisch.</p>
@@ -1336,13 +1337,36 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.9 – aktuell -->
+<!-- 1.17.10 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.9
+        Version 1.17.10
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">Neu: Wochenend-/Feiertagszulage</div>
+    </div>
+    <span class="build-info">17. Juli 2026 · Build 37</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEU</span> <strong>Wochenend-/Feiertagszulage:</strong> Pauschale Tageszulage für Einsätze an Samstagen, Sonntagen oder manuell markierten Feiertagen – 60 € (Inland) bzw. 90 CHF (Schweiz, „Europa"-Tarif) oder 72 € (Ausland, „Übrige Gebiete"-Tarif). Bei „Am Werk gearbeitet" gilt auch bei Region Ausland der Schweiz-Satz.</li>
+      <li><span class="badge-new">NEU</span> <strong>Weiterbildung/Schulung:</strong> Neue Markierung am Eintrag – schließt die Wochenend-/Feiertagszulage aus.</li>
+      <li><span class="badge-change">INFO</span> Wie die Monteurszulage wird die Wochenend-/Feiertagszulage über den Lohn ausbezahlt und getrennt von der Verpflegungspauschale in Liste, PDF- und CSV-Export ausgewiesen.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.9 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.9
       </div>
       <div class="preview-text">CHF-Kurs jetzt offiziell notiert (EUR = … CHF) und automatisch aktuell</div>
     </div>

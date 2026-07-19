@@ -284,6 +284,7 @@ struct MealRow: View {
     let rates: MealRates
 
     private var monteurszulage: Double { store.monteurszulage(for: meal) }
+    private var wochenendzulage: Double { store.wochenendzulage(for: meal) }
     private var allowance: Double { meal.allowance(rates: rates) }
 
     var body: some View {
@@ -342,6 +343,15 @@ struct MealRow: View {
                     }
                     if monteurszulage > 0 {
                         Text("🔧 Lohn +\(monteurszulage.euroFormatted)")
+                            .font(.system(size: 9, weight: .regular))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
+                            .background(Color.blue.opacity(0.75))
+                            .clipShape(Capsule())
+                    }
+                    if wochenendzulage > 0 {
+                        Text("📅 Lohn +\(wochenendzulage.euroFormatted)")
                             .font(.system(size: 9, weight: .regular))
                             .foregroundColor(.white)
                             .padding(.horizontal, 5)
@@ -409,6 +419,8 @@ struct MealFormView: View {
     @State private var pauseMinutes: Int = 0
     @State private var includeTodaysTrips: Bool = true
     @State private var workedAtPlant: Bool = false  // Am Werk (Heimatbetrieb) gearbeitet
+    @State private var isHoliday: Bool = false       // Feiertag (löst mit Sa/So die Wochenendzulage aus)
+    @State private var isTraining: Bool = false      // Weiterbildung/Schulung (schließt Wochenendzulage aus)
 
     private var isEdit: Bool { if case .edit = mode { return true }; return false }
     private var editingMeal: MealEntry? { if case .edit(let m) = mode { return m }; return nil }
@@ -426,11 +438,16 @@ struct MealFormView: View {
                   breakfastAmount: breakfastAmt, ownBreakfastAmount: ownBreakfastAmt,
                   pauseMinutes: pauseMinutes,
                   excludeTrips: !includeTodaysTrips,
-                  workedAtPlant: workedAtPlant)
+                  workedAtPlant: workedAtPlant, isHoliday: isHoliday, isTraining: isTraining)
     }
     private var currentAllowance: Double { currentMeal.allowance(rates: rates) }
     private var currentLabel: String { currentMeal.allowanceLabel(rates: rates) }
     private var currentMonteurszulage: Double { store.monteurszulage(for: currentMeal) }
+    private var currentWochenendzulage: Double { store.wochenendzulage(for: currentMeal) }
+    private var isWeekend: Bool {
+        let weekday = Calendar.current.component(.weekday, from: date)
+        return weekday == 1 || weekday == 7
+    }
 
     var body: some View {
         NavigationStack {
@@ -515,6 +532,20 @@ struct MealFormView: View {
                              ? "Am Werk (\(store.werkOrt)) gilt die Schweiz-Zulage (\(store.monteurszulageSchweiz.chfFormatted))."
                              : "Außerhalb des Werks gilt die Auslands-Zulage (\(store.monteurszulageAusland.euroFormatted)).")
                     }
+                }
+
+                // ── Feiertag / Weiterbildung (für Wochenendzulage) ──
+                Section {
+                    Toggle(isOn: $isHoliday) {
+                        Label("Feiertag", systemImage: "calendar.badge.exclamationmark")
+                    }
+                    .tint(.blue)
+                    Toggle(isOn: $isTraining) {
+                        Label("Weiterbildung / Schulung", systemImage: "graduationcap.fill")
+                    }
+                    .tint(.blue)
+                } footer: {
+                    Text("An Samstagen, Sonntagen oder Feiertagen gilt zusätzlich eine Wochenendzulage – außer bei Weiterbildung/Schulung.")
                 }
 
                 // ── Arbeitszeit ──
@@ -713,6 +744,22 @@ struct MealFormView: View {
                     }
                 }
 
+                // ── Wochenend-/Feiertagszulage (separat, NICHT Teil der Erstattung) ──
+                if currentWochenendzulage > 0 {
+                    Section {
+                        HStack {
+                            Label("Wochenend-/Feiertagszulage", systemImage: "calendar.badge.exclamationmark")
+                                .foregroundColor(.blue)
+                            Spacer()
+                            Text("+\(currentWochenendzulage.euroFormatted)")
+                                .font(.system(size: 18, weight: .regular, design: .monospaced))
+                                .foregroundColor(.blue)
+                        }
+                    } footer: {
+                        Text("Wird über den Lohn ausbezahlt, nicht über die Spesen. Daher separat ausgewiesen und nicht in der Erstattung oben enthalten.")
+                    }
+                }
+
                 // ── Info-Tabelle ──
                 Section {
                     VStack(alignment: .leading, spacing: 4) {
@@ -768,6 +815,8 @@ struct MealFormView: View {
             pauseMinutes        = m.pauseMinutes
             includeTodaysTrips  = !m.excludeTrips
             workedAtPlant       = m.workedAtPlant
+            isHoliday           = m.isHoliday
+            isTraining          = m.isTraining
             if m.ownBreakfastAmount > 0 {
                 ownBreakfastStr = String(format: "%.2f", m.ownBreakfastAmount).replacingOccurrences(of: ".", with: ",")
             }
@@ -792,7 +841,7 @@ struct MealFormView: View {
                              ownBreakfastAmount: ownBreakfastAmt,
                              pauseMinutes: pauseMinutes,
                              excludeTrips: !includeTodaysTrips,
-                             workedAtPlant: workedAtPlant)
+                             workedAtPlant: workedAtPlant, isHoliday: isHoliday, isTraining: isTraining)
         if isEdit {
             store.updateMeal(meal)
             AppLogger.shared.log("Verpflegung aktualisiert: \(meal.date.shortDate), \(meal.startTime.timeOnly)–\(meal.endTime.timeOnly)", level: .store)

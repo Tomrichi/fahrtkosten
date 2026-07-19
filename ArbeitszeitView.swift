@@ -110,6 +110,11 @@ struct ArbeitszeitView: View {
         store.totalMonteurszulage(filteredMeals)
     }
 
+    /// Wochenend-/Feiertagszulage-Summe (Lohnbestandteil, separat von der Spesen-Erstattung)
+    private var filteredWochenendzulage: Double {
+        store.totalWochenendzulage(filteredMeals)
+    }
+
     private func tripsForMeal(_ meal: MealEntry) -> [Trip] {
         let cal = Calendar.current
         return store.trips.filter { cal.isDate($0.date, inSameDayAs: meal.date) }
@@ -343,6 +348,21 @@ struct ArbeitszeitView: View {
                 }
                 .listRowBackground(Color.clear)
             }
+            if filteredWochenendzulage > 0 {
+                HStack(spacing: 8) {
+                    Image(systemName: "calendar.badge.exclamationmark")
+                        .font(.caption)
+                        .foregroundColor(.blue)
+                    Text("Wochenend-/Feiertagszulage (über Lohn, separat)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text(filteredWochenendzulage.euroFormatted)
+                        .font(.system(size: 13, weight: .medium, design: .monospaced))
+                        .foregroundColor(.blue)
+                }
+                .listRowBackground(Color.clear)
+            }
         }
     }
 
@@ -452,6 +472,7 @@ struct ArbeitszeitRow: View {
     let onToggle:   () -> Void
 
     private var monteurszulage: Double { store.monteurszulage(for: meal) }
+    private var wochenendzulage: Double { store.wochenendzulage(for: meal) }
 
     /// Zeigt immer die eingetragene Arbeitszeit (Meal-Zeiten). Die Gesamtstunden inkl. Fahrzeit stehen separat dahinter.
     private var displayRange: (start: Date, end: Date) {
@@ -495,6 +516,10 @@ struct ArbeitszeitRow: View {
                             .fontWeight(totalH >= 6 ? .semibold : .regular)
                         if monteurszulage > 0 {
                             Text("· 🔧 Lohn +\(monteurszulage.euroFormatted)")
+                                .foregroundColor(.blue)
+                        }
+                        if wochenendzulage > 0 {
+                            Text("· 📅 Lohn +\(wochenendzulage.euroFormatted)")
                                 .foregroundColor(.blue)
                         }
                     }
