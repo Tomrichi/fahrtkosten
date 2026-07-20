@@ -402,6 +402,12 @@ struct MealRow: View {
 // MARK: - Meal Form
 enum MealFormMode { case add; case edit(MealEntry) }
 
+/// Grund für einen Wochenend-/Feiertagseintrag – muss bei Sa/So explizit gewählt werden,
+/// bevor gespeichert werden kann (Schutz gegen versehentliche Einträge durch Tippfehler beim Datum).
+enum WeekendReason {
+    case none, worked, awayOnly
+}
+
 struct MealFormView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var store: DataStore
@@ -421,7 +427,7 @@ struct MealFormView: View {
     @State private var workedAtPlant: Bool = false  // Am Werk (Heimatbetrieb) gearbeitet
     @State private var isHoliday: Bool = false       // Feiertag (löst mit Sa/So die Wochenendzulage aus)
     @State private var isTraining: Bool = false      // Weiterbildung/Schulung (schließt Wochenendzulage aus)
-    @State private var weekendConfirmed: Bool = false // Schutz gegen versehentliche Wochenend-Einträge
+    @State private var weekendReason: WeekendReason = .none // Schutz gegen versehentliche Wochenend-Einträge
 
     private var isEdit: Bool { if case .edit = mode { return true }; return false }
     private var editingMeal: MealEntry? { if case .edit(let m) = mode { return m }; return nil }
@@ -439,7 +445,8 @@ struct MealFormView: View {
                   breakfastAmount: breakfastAmt, ownBreakfastAmount: ownBreakfastAmt,
                   pauseMinutes: pauseMinutes,
                   excludeTrips: !includeTodaysTrips,
-                  workedAtPlant: workedAtPlant, isHoliday: isHoliday, isTraining: isTraining)
+                  workedAtPlant: workedAtPlant, isHoliday: isHoliday, isTraining: isTraining,
+                  weekendAwayOnly: weekendReason == .awayOnly)
     }
     private var currentAllowance: Double { currentMeal.allowance(rates: rates) }
     private var currentLabel: String { currentMeal.allowanceLabel(rates: rates) }
@@ -449,9 +456,9 @@ struct MealFormView: View {
         let weekday = Calendar.current.component(.weekday, from: date)
         return weekday == 1 || weekday == 7
     }
-    /// An Sa/So darf nur gespeichert werden, wenn explizit bestätigt wurde,
-    /// dass an diesem Tag tatsächlich gearbeitet wurde (Schutz gegen Tippfehler beim Datum).
-    private var canSave: Bool { !isWeekend || weekendConfirmed }
+    /// An Sa/So muss explizit gewählt werden, ob gearbeitet wurde oder man nur unterwegs/nicht
+    /// zuhause war – bevor gespeichert werden kann (Schutz gegen Tippfehler beim Datum).
+    private var canSave: Bool { !isWeekend || weekendReason != .none }
 
     var body: some View {
         NavigationStack {
@@ -577,16 +584,28 @@ struct MealFormView: View {
                 // ── Wochenend-Schutz ──
                 if isWeekend {
                     Section {
-                        Toggle(isOn: $weekendConfirmed) {
+                        Button {
+                            weekendReason = .worked
+                        } label: {
                             HStack(spacing: 8) {
-                                Image(systemName: "exclamationmark.triangle.fill")
+                                Image(systemName: weekendReason == .worked ? "largecircle.fill.circle" : "circle")
                                     .foregroundColor(.orange)
-                                Text("Ich habe an diesem Tag tatsächlich gearbeitet")
+                                Text("Gearbeitet")
+                                    .foregroundColor(.primary)
                             }
                         }
-                        .tint(.orange)
+                        Button {
+                            weekendReason = .awayOnly
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: weekendReason == .awayOnly ? "largecircle.fill.circle" : "circle")
+                                    .foregroundColor(.orange)
+                                Text("Unterwegs / nicht zuhause (nur Pauschale)")
+                                    .foregroundColor(.primary)
+                            }
+                        }
                     } footer: {
-                        Text("An Samstagen und Sonntagen wird normalerweise keine Arbeitszeit erfasst. Bitte bestätige, falls du an diesem Wochenendtag wirklich gearbeitet hast – sonst lässt sich der Eintrag nicht speichern.")
+                        Text("An Samstagen und Sonntagen wird normalerweise keine Arbeitszeit erfasst. Bitte wähle, ob du gearbeitet hast (dann gilt zusätzlich die Wochenendzulage) oder nur unterwegs/nicht zuhause warst (dann gilt nur die normale Verpflegungspauschale, keine Wochenendzulage) – sonst lässt sich der Eintrag nicht speichern.")
                     }
                 }
 
@@ -839,7 +858,8 @@ struct MealFormView: View {
             workedAtPlant       = m.workedAtPlant
             isHoliday           = m.isHoliday
             isTraining          = m.isTraining
-            weekendConfirmed    = true // bestehender Eintrag: keine erneute Bestätigung nötig
+            // bestehender Eintrag: keine erneute Bestätigung nötig – Grund aus dem Eintrag übernehmen
+            weekendReason       = m.weekendAwayOnly ? .awayOnly : .worked
             if m.ownBreakfastAmount > 0 {
                 ownBreakfastStr = String(format: "%.2f", m.ownBreakfastAmount).replacingOccurrences(of: ".", with: ",")
             }
@@ -864,7 +884,8 @@ struct MealFormView: View {
                              ownBreakfastAmount: ownBreakfastAmt,
                              pauseMinutes: pauseMinutes,
                              excludeTrips: !includeTodaysTrips,
-                             workedAtPlant: workedAtPlant, isHoliday: isHoliday, isTraining: isTraining)
+                             workedAtPlant: workedAtPlant, isHoliday: isHoliday, isTraining: isTraining,
+                             weekendAwayOnly: weekendReason == .awayOnly)
         if isEdit {
             store.updateMeal(meal)
             AppLogger.shared.log("Verpflegung aktualisiert: \(meal.date.shortDate), \(meal.startTime.timeOnly)–\(meal.endTime.timeOnly)", level: .store)

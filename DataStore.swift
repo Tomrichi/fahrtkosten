@@ -329,7 +329,7 @@ class DataStore: ObservableObject {
     /// WICHTIG: Wird wie die Monteurszulage über den Lohn ausbezahlt – NICHT Teil der
     /// steuerfreien Verpflegungspauschale/Gesamterstattung, sondern separat ausgewiesen.
     func wochenendzulage(for meal: MealEntry) -> Double {
-        guard !meal.isTraining else { return 0 }
+        guard !meal.isTraining, !meal.weekendAwayOnly else { return 0 }
         let weekday = Calendar.current.component(.weekday, from: meal.date) // 1 = Sonntag, 7 = Samstag
         let isWeekend = weekday == 1 || weekday == 7
         guard isWeekend || meal.isHoliday else { return 0 }

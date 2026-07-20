@@ -190,19 +190,24 @@ struct MealEntry: Identifiable, Codable {
     var isHoliday: Bool = false
     /// Weiterbildung/Schulung – schließt die Wochenend-/Feiertagszulage aus
     var isTraining: Bool = false
+    /// An einem Wochenend-/Feiertag nur unterwegs/nicht zuhause gewesen, aber nicht gearbeitet –
+    /// Verpflegungspauschale gilt trotzdem, aber KEINE Wochenendzulage (die ist an tatsächliche Arbeit gebunden)
+    var weekendAwayOnly: Bool = false
 
     enum CodingKeys: String, CodingKey {
-        case id, date, startTime, endTime, note, region, breakfastAmount, ownBreakfastAmount, pauseMinutes, excludeTrips, workedAtPlant, isHoliday, isTraining
+        case id, date, startTime, endTime, note, region, breakfastAmount, ownBreakfastAmount, pauseMinutes, excludeTrips, workedAtPlant, isHoliday, isTraining, weekendAwayOnly
     }
     init(id: UUID = UUID(), date: Date, startTime: Date, endTime: Date, note: String,
          region: TravelRegion = .inland, breakfastAmount: Double = 0.0,
          ownBreakfastAmount: Double = 0.0, pauseMinutes: Int = 0, excludeTrips: Bool = false,
-         workedAtPlant: Bool = false, isHoliday: Bool = false, isTraining: Bool = false) {
+         workedAtPlant: Bool = false, isHoliday: Bool = false, isTraining: Bool = false,
+         weekendAwayOnly: Bool = false) {
         self.id = id; self.date = date; self.startTime = startTime; self.endTime = endTime
         self.note = note; self.region = region; self.breakfastAmount = breakfastAmount
         self.ownBreakfastAmount = ownBreakfastAmount; self.pauseMinutes = pauseMinutes
         self.excludeTrips = excludeTrips; self.workedAtPlant = workedAtPlant
         self.isHoliday = isHoliday; self.isTraining = isTraining
+        self.weekendAwayOnly = weekendAwayOnly
     }
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -219,6 +224,7 @@ struct MealEntry: Identifiable, Codable {
         workedAtPlant = try c.decodeIfPresent(Bool.self, forKey: .workedAtPlant) ?? false
         isHoliday = try c.decodeIfPresent(Bool.self, forKey: .isHoliday) ?? false
         isTraining = try c.decodeIfPresent(Bool.self, forKey: .isTraining) ?? false
+        weekendAwayOnly = try c.decodeIfPresent(Bool.self, forKey: .weekendAwayOnly) ?? false
     }
     var hours: Double { max(0, endTime.timeIntervalSince(startTime) / 3600 - Double(pauseMinutes) / 60) }
     func mealAllowance(rates: MealRates) -> Double {
