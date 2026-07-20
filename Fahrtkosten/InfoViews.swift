@@ -1145,6 +1145,7 @@ private let hilfeHTML = #"""
 </table>
 <p>Zusätzlich kann eine <strong>Monteurszulage</strong> erfasst werden: 12 € bei Region Inland. Das Werk (Standort in den Einstellungen hinterlegt, z. B. Steffisburg) liegt selbst in der Schweiz – bei Region Schweiz gilt daher immer die Schweiz-Zulage (18 CHF, wird automatisch in € umgerechnet). Bei Region Ausland gilt die Auslands-Zulage (50 €), außer „Am Werk gearbeitet" ist angehakt – dann gilt ebenfalls die Schweiz-Zulage statt der Auslands-Zulage. Die Monteurszulage wird üblicherweise über den Lohn ausbezahlt (steuer- und sozialversicherungspflichtiger Arbeitslohn) und ist deshalb <strong>nicht</strong> Teil der steuerfreien Verpflegungspauschale/Erstattung – sie wird in Liste, Formular, PDF- und CSV-Export klar getrennt als eigene Position ausgewiesen.</p>
 <p>Ebenfalls separat: die <strong>Wochenend-/Feiertagszulage</strong> – eine Tagespauschale für Einsätze an Samstagen, Sonntagen oder manuell markierten Feiertagen. Bei Region Inland/Schweiz gilt der „Europa"-Tarif (60 € bzw. 90 CHF, automatisch in € umgerechnet), bei Region Ausland der „Übrige Gebiete"-Tarif (72 €) – außer „Am Werk gearbeitet" ist angehakt, dann gilt ebenfalls der Schweiz-Satz. Bei Weiterbildung/Schulung entfällt die Zulage. Wie die Monteurszulage wird sie über den Lohn ausbezahlt und getrennt von der Verpflegungspauschale ausgewiesen.</p>
+<p>Fällt das gewählte Datum auf einen Samstag oder Sonntag, muss vor dem Speichern bestätigt werden, dass an diesem Tag tatsächlich gearbeitet wurde – so verhindern Tippfehler beim Datum versehentliche Wochenend-Einträge.</p>
 
 <h2>Tab Übernachtung</h2>
 <p>Erfasse Hotelübernachtungen mit Check-in- und Check-out-Datum – die Anzahl der Nächte wird automatisch berechnet. Wähle zwischen <strong>Pauschale</strong> oder <strong>tatsächlichen Kosten</strong>. Belege per Kamera oder Foto-Import scannen – OCR erkennt Betrag, Datum und Hotelname automatisch.</p>
@@ -1337,13 +1338,34 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.10 – aktuell -->
+<!-- 1.17.11 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.10
+        Version 1.17.11
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">Schutz gegen versehentliche Wochenend-Einträge</div>
+    </div>
+    <span class="build-info">20. Juli 2026 · Build 38</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEU</span> <strong>Wochenend-Schutz bei Arbeitszeit-Einträgen:</strong> An Samstagen und Sonntagen muss jetzt explizit bestätigt werden, dass tatsächlich gearbeitet wurde – so verhindern Tippfehler beim Datum versehentliche Einträge (und damit versehentliche Wochenendzulage). Bestehende Einträge sind davon nicht betroffen.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.10 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.10
       </div>
       <div class="preview-text">Neu: Wochenend-/Feiertagszulage</div>
     </div>

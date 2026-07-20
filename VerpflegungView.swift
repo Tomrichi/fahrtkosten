@@ -421,6 +421,7 @@ struct MealFormView: View {
     @State private var workedAtPlant: Bool = false  // Am Werk (Heimatbetrieb) gearbeitet
     @State private var isHoliday: Bool = false       // Feiertag (löst mit Sa/So die Wochenendzulage aus)
     @State private var isTraining: Bool = false      // Weiterbildung/Schulung (schließt Wochenendzulage aus)
+    @State private var weekendConfirmed: Bool = false // Schutz gegen versehentliche Wochenend-Einträge
 
     private var isEdit: Bool { if case .edit = mode { return true }; return false }
     private var editingMeal: MealEntry? { if case .edit(let m) = mode { return m }; return nil }
@@ -448,6 +449,9 @@ struct MealFormView: View {
         let weekday = Calendar.current.component(.weekday, from: date)
         return weekday == 1 || weekday == 7
     }
+    /// An Sa/So darf nur gespeichert werden, wenn explizit bestätigt wurde,
+    /// dass an diesem Tag tatsächlich gearbeitet wurde (Schutz gegen Tippfehler beim Datum).
+    private var canSave: Bool { !isWeekend || weekendConfirmed }
 
     var body: some View {
         NavigationStack {
@@ -567,6 +571,22 @@ struct MealFormView: View {
                         Label(lm.t("common.note"), systemImage: "note.text")
                         Spacer()
                         TextField(lm.t("common.optional"), text: $note).multilineTextAlignment(.trailing)
+                    }
+                }
+
+                // ── Wochenend-Schutz ──
+                if isWeekend {
+                    Section {
+                        Toggle(isOn: $weekendConfirmed) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundColor(.orange)
+                                Text("Ich habe an diesem Tag tatsächlich gearbeitet")
+                            }
+                        }
+                        .tint(.orange)
+                    } footer: {
+                        Text("An Samstagen und Sonntagen wird normalerweise keine Arbeitszeit erfasst. Bitte bestätige, falls du an diesem Wochenendtag wirklich gearbeitet hast – sonst lässt sich der Eintrag nicht speichern.")
                     }
                 }
 
@@ -780,7 +800,9 @@ struct MealFormView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button(lm.t("action.cancel")) { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(isEdit ? lm.t("action.save") : lm.t("action.add")) { save() }.fontWeight(.regular)
+                    Button(isEdit ? lm.t("action.save") : lm.t("action.add")) { save() }
+                        .fontWeight(.regular)
+                        .disabled(!canSave)
                 }
             }
             .onAppear { prefill() }
@@ -817,6 +839,7 @@ struct MealFormView: View {
             workedAtPlant       = m.workedAtPlant
             isHoliday           = m.isHoliday
             isTraining          = m.isTraining
+            weekendConfirmed    = true // bestehender Eintrag: keine erneute Bestätigung nötig
             if m.ownBreakfastAmount > 0 {
                 ownBreakfastStr = String(format: "%.2f", m.ownBreakfastAmount).replacingOccurrences(of: ".", with: ",")
             }
