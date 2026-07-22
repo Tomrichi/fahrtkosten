@@ -457,10 +457,14 @@ struct UebersichtView: View {
                         )
                         .contentShape(Rectangle())
                         .onTapGesture { editVerpflegungSpese = spese }
-                        .dynamicSwipeActions(
-                            onDelete: { store.deleteReiseSpese(spese.id) },
-                            onEdit: { editVerpflegungSpese = spese }
-                        )
+                        .contextMenu {
+                            Button { editVerpflegungSpese = spese } label: {
+                                Label("Bearbeiten", systemImage: "pencil")
+                            }
+                            Button(role: .destructive) { store.deleteReiseSpese(spese.id) } label: {
+                                Label("Löschen", systemImage: "trash")
+                            }
+                        }
                     }
                 }
 
@@ -531,10 +535,14 @@ struct UebersichtView: View {
                         )
                         .contentShape(Rectangle())
                         .onTapGesture { editPrivateExpense = p }
-                        .dynamicSwipeActions(
-                            onDelete: { store.deletePrivateExpense(p.id) },
-                            onEdit: { editPrivateExpense = p }
-                        )
+                        .contextMenu {
+                            Button { editPrivateExpense = p } label: {
+                                Label("Bearbeiten", systemImage: "pencil")
+                            }
+                            Button(role: .destructive) { store.deletePrivateExpense(p.id) } label: {
+                                Label("Löschen", systemImage: "trash")
+                            }
+                        }
                     }
                 }
 

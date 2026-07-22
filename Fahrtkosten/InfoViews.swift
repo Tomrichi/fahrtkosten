@@ -1338,13 +1338,34 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.17 – aktuell -->
+<!-- 1.17.18 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.17
+        Version 1.17.18
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">Fix: Übersicht – Private Ausgaben nicht änderbar</div>
+    </div>
+    <span class="build-info">22. Juli 2026 · Build 45</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-fix">FIX</span> <strong>Übersicht: „Private Ausgaben" und „Verpflegungsausgaben" ließen sich nur hinzufügen, aber nicht bearbeiten oder löschen:</strong> Das Wischen zum Löschen/Bearbeiten hat technisch nie funktioniert, da es eine Liste voraussetzt, die Übersicht aber als scrollbare Ansicht gebaut ist. Jetzt per Antippen und Halten (Kontextmenü) mit „Bearbeiten" und „Löschen" erreichbar.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.17 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.17
       </div>
       <div class="preview-text">Fahrzeiten einzeln statt zusammengezählt</div>
     </div>
