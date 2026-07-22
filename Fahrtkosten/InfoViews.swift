@@ -1338,13 +1338,76 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.14 – aktuell -->
+<!-- 1.17.17 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.14
+        Version 1.17.17
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">Fahrzeiten einzeln statt zusammengezählt</div>
+    </div>
+    <span class="build-info">22. Juli 2026 · Build 44</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-change">INFO</span> <strong>Fahrzeiten bei reinen Fahrt-Tagen:</strong> Statt einer zusammengezählten Gesamtdauer neben dem 🚗-Symbol werden jetzt die einzelnen Fahrzeiten aufgelistet (z. B. „30min + 30min" statt „1,0h").</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.16 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.16
+      </div>
+      <div class="preview-text">Fix: Fahrzeit-Anzeige bei reinen Fahrt-Tagen</div>
+    </div>
+    <span class="build-info">22. Juli 2026 · Build 43</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-fix">FIX</span> <strong>Arbeitszeit-Tab zeigte bei reinen Fahrt-Tagen (ohne separaten Arbeitszeit-Eintrag) die Abwesenheitsspanne statt der reinen Fahrzeit:</strong> Bei 2 Fahrten à 30 Minuten mit großer Lücke dazwischen (z. B. 07:00–07:30 und 17:15–17:45) stand neben dem 🚗-Symbol „10,8h" statt „1,0h" – das war die Zeitspanne von Abfahrt bis Rückkehr (korrekt für die Verpflegungspauschale), sah aber wie eine falsche Fahrzeit aus. Jetzt wird dort die reine Summe der einzelnen Fahrzeiten angezeigt.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.15 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.15
+      </div>
+      <div class="preview-text">Fix: CarPlay-Anzeige zappelte alle 5 Sekunden</div>
+    </div>
+    <span class="build-info">22. Juli 2026 · Build 42</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-fix">FIX</span> <strong>CarPlay-Dashboard zappelte alle 5 Sekunden:</strong> Die Anzeige (z. B. „GPS · Fahrt") wurde bei jeder automatischen Aktualisierung komplett neu aufgebaut statt nur die Werte zu aktualisieren – das verursachte ein sichtbares Flackern des Schriftzugs. Die Anzeige wird jetzt ruhig in-place aktualisiert.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.14 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.14
       </div>
       <div class="preview-text">Fix: Arbeitszeit teils über 30 Std. berechnet</div>
     </div>

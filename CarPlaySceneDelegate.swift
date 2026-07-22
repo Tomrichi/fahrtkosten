@@ -8,6 +8,10 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
     var interfaceController: CPInterfaceController?
 
     private var refreshTimer: Timer?
+    /// Bestehendes Template wird bei jedem Refresh nur noch aktualisiert (title/items/actions),
+    /// statt per setRootTemplate komplett ersetzt zu werden – sonst zappelt/blinkt der Bildschirm
+    /// alle 5 Sekunden sichtbar, weil CarPlay das komplette Template neu einblendet.
+    private var currentTemplate: CPInformationTemplate?
     private static let appGroup = "group.de.tommwagner.fahrtkosten"
 
     // MARK: - Connect / Disconnect
@@ -27,6 +31,7 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
     func templateApplicationScene(_ scene: CPTemplateApplicationScene,
                                   didDisconnectInterfaceController ic: CPInterfaceController) {
         interfaceController = nil
+        currentTemplate = nil
         refreshTimer?.invalidate()
         refreshTimer = nil
 
@@ -129,14 +134,22 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
                 ? "GPS · Fahrt"
                 : "Fahrtkosten"
 
-        let tpl = CPInformationTemplate(
-            title: title,
-            layout: .leading,
-            items: items,
-            actions: actions
-        )
-
-        interfaceController?.setRootTemplate(tpl, animated: false, completion: nil)
+        // Bestehendes Template nur aktualisieren statt komplett neu zu setzen – verhindert das
+        // sichtbare Zappeln alle 5 Sekunden, das durch ein wiederholtes setRootTemplate entsteht.
+        if let existing = currentTemplate {
+            existing.title = title
+            existing.items = items
+            existing.actions = actions
+        } else {
+            let tpl = CPInformationTemplate(
+                title: title,
+                layout: .leading,
+                items: items,
+                actions: actions
+            )
+            currentTemplate = tpl
+            interfaceController?.setRootTemplate(tpl, animated: false, completion: nil)
+        }
     }
 
     // MARK: - GPS über CarPlay starten
@@ -182,6 +195,7 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
             CPInformationItem(title: "Hinweis", detail: "Details in der App prüfen")
         ]
         let tpl = CPInformationTemplate(title: "Fahrt beendet", layout: .leading, items: items, actions: [])
+        currentTemplate = nil // Zwischenbildschirm ist jetzt aktiv – nächstes renderDashboard() muss neu setzen
         interfaceController?.setRootTemplate(tpl, animated: true, completion: nil)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
@@ -210,6 +224,7 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
             items: items,
             actions: []
         )
+        currentTemplate = nil // Zwischenbildschirm ist jetzt aktiv – nächstes renderDashboard() muss neu setzen
         interfaceController?.setRootTemplate(tpl, animated: true, completion: nil)
 
         // Nach 3 Sekunden zurück zum Dashboard

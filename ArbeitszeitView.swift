@@ -636,7 +636,29 @@ struct TripOnlyArbeitszeitRow: View {
     let onToggle:   () -> Void
 
     private var date:      Date    { trips[0].date }
+    /// Abwesenheit (früheste Abfahrt bis späteste Rückkehr) – Basis für die Verpflegungspauschale,
+    /// NICHT die reine Fahrzeit. Wird nur für die Pauschalen-Berechnung verwendet, nicht angezeigt,
+    /// da sie sonst mit dem 🚗-Symbol als (falsche) Fahrzeit missverstanden wird.
     private var totalH:    Double  { store.totalWorkHoursForTripsOnly(trips) }
+    /// Reine Summe der einzelnen Fahrzeiten (z. B. 2 × 30 min = 1,0 h) – für die "Gesamt"-Zeile.
+    private var tripDurationSum: Double {
+        trips.reduce(0.0) { acc, trip in
+            guard let st = trip.startTime, let et = trip.endTime else { return acc }
+            return acc + max(0, et.timeIntervalSince(st) / 3600.0)
+        }
+    }
+    /// Jede Fahrzeit einzeln formatiert (z. B. "30min + 30min") statt einer zusammengezählten
+    /// Zahl – das, was neben dem 🚗-Symbol in der kompakten Zeile angezeigt wird.
+    private var individualDurationsText: String {
+        trips.compactMap { trip -> String? in
+            guard let st = trip.startTime, let et = trip.endTime else { return nil }
+            let mins = Int(max(0, et.timeIntervalSince(st) / 60))
+            let h = mins / 60, m = mins % 60
+            if h > 0 && m > 0 { return "\(h)h \(m)min" }
+            if h > 0 { return "\(h)h" }
+            return "\(m)min"
+        }.joined(separator: " + ")
+    }
     private var allowance: Double  { store.mealAllowanceForTripsOnly(trips) }
     private var startTime: Date?   { trips.compactMap { $0.startTime }.min() }
     private var endTime:   Date?   { trips.compactMap { $0.endTime   }.max() }
@@ -665,9 +687,8 @@ struct TripOnlyArbeitszeitRow: View {
                         Image(systemName: "car.fill")
                             .font(.system(size: 9))
                             .foregroundColor(.blue)
-                        Text(String(format: "%.1fh", totalH))
-                            .foregroundColor(totalH >= 6 ? .green : totalH >= 3 ? .orange : .secondary)
-                            .fontWeight(totalH >= 6 ? .semibold : .regular)
+                        Text(individualDurationsText)
+                            .foregroundColor(.secondary)
                     }
                     .font(.caption)
                 }
@@ -719,7 +740,7 @@ struct TripOnlyArbeitszeitRow: View {
                         Image(systemName: "clock.badge.checkmark")
                             .font(.system(size: 10))
                             .foregroundColor(.green)
-                        Text(String(format: "Gesamt %.1f h", totalH))
+                        Text(String(format: "Gesamt %.1f h", tripDurationSum))
                             .font(.caption.bold())
                             .foregroundColor(.green)
                         Text("→ \(allowance.euroFormatted)")
