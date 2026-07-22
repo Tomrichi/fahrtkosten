@@ -303,6 +303,7 @@ class DataStore: ObservableObject {
     /// erstattung nach § 9 EStG. Sie darf deshalb nicht in die Verpflegungspauschale/
     /// Gesamterstattung eingerechnet werden, sondern wird separat ausgewiesen.
     func monteurszulage(for meal: MealEntry) -> Double {
+        guard !meal.weekendAwayOnly else { return 0 } // "Wochenende": nicht gearbeitet, keine Zulage
         let h = totalWorkHours(for: meal)
         guard h >= 3 else { return 0 }           // < 3 h: keine Zulage
         let rate: Double
@@ -527,10 +528,15 @@ extension DataStore {
         }()
 
         let raw: Double
-        switch totalH {
-        case ..<3:  raw = rates.rate1to3
-        case ..<6:  raw = rates.rate3to6
-        default:    raw = (returnsHome && !endsLate) ? rates.rate3to6 : rates.rate6plus
+        if meal.weekendAwayOnly {
+            // "Wochenende" (unterwegs/nicht zuhause, nicht gearbeitet): immer volle Tagespauschale
+            raw = rates.rate6plus
+        } else {
+            switch totalH {
+            case ..<3:  raw = rates.rate1to3
+            case ..<6:  raw = rates.rate3to6
+            default:    raw = (returnsHome && !endsLate) ? rates.rate3to6 : rates.rate6plus
+            }
         }
         return max(0, raw - meal.breakfastAmount) + meal.ownBreakfastAmount
     }

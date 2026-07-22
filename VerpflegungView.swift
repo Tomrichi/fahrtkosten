@@ -432,7 +432,9 @@ struct MealFormView: View {
     private var isEdit: Bool { if case .edit = mode { return true }; return false }
     private var editingMeal: MealEntry? { if case .edit(let m) = mode { return m }; return nil }
 
-    private var hours: Double { max(0, endTime.timeIntervalSince(startTime) / 3600) }
+    private var hours: Double {
+        max(0, anchoredToFormDate(endTime).timeIntervalSince(anchoredToFormDate(startTime)) / 3600)
+    }
     private var rates: MealRates { store.mealRates(for: region) }
     /// Betrag aus Einstellungen – wird beim Setzen des Häkchens übernommen
     private var breakfastAmt: Double { breakfastChecked ? store.breakfastFlat : 0 }
@@ -441,7 +443,8 @@ struct MealFormView: View {
 
     private var currentMeal: MealEntry {
         MealEntry(id: editingMeal?.id ?? UUID(), date: date,
-                  startTime: startTime, endTime: endTime, note: note, region: region,
+                  startTime: anchoredToFormDate(startTime), endTime: anchoredToFormDate(endTime),
+                  note: note, region: region,
                   breakfastAmount: breakfastAmt, ownBreakfastAmount: ownBreakfastAmt,
                   pauseMinutes: pauseMinutes,
                   excludeTrips: !includeTodaysTrips,
@@ -562,17 +565,26 @@ struct MealFormView: View {
                 // ── Arbeitszeit ──
                 Section("Arbeitszeit") {
                     DatePicker(lm.t("common.date"),   selection: $date,      displayedComponents: .date)
-                    DatePicker(lm.t("meals.begin"),  selection: $startTime, displayedComponents: .hourAndMinute)
-                    DatePicker(lm.t("meals.end"),    selection: $endTime,   displayedComponents: .hourAndMinute)
-                    HStack {
-                        Label("Pause (Minuten)", systemImage: "pause.circle.fill")
-                            .foregroundColor(.orange)
-                        Spacer()
-                        Stepper("\(pauseMinutes) min", value: $pauseMinutes, in: 0...120, step: 15)
-                            .labelsHidden()
-                        Text("\(pauseMinutes) min")
-                            .foregroundColor(.secondary)
-                            .frame(width: 55, alignment: .trailing)
+                    if weekendReason != .awayOnly {
+                        DatePicker(lm.t("meals.begin"),  selection: $startTime, displayedComponents: .hourAndMinute)
+                        DatePicker(lm.t("meals.end"),    selection: $endTime,   displayedComponents: .hourAndMinute)
+                        HStack {
+                            Label("Pause (Minuten)", systemImage: "pause.circle.fill")
+                                .foregroundColor(.orange)
+                            Spacer()
+                            Stepper("\(pauseMinutes) min", value: $pauseMinutes, in: 0...120, step: 15)
+                                .labelsHidden()
+                            Text("\(pauseMinutes) min")
+                                .foregroundColor(.secondary)
+                                .frame(width: 55, alignment: .trailing)
+                        }
+                    } else {
+                        HStack(spacing: 8) {
+                            Image(systemName: "info.circle.fill").foregroundColor(.blue)
+                            Text("Keine Arbeitszeit – es gilt automatisch die volle Tagespauschale.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
                     }
                     HStack {
                         Label(lm.t("common.note"), systemImage: "note.text")
@@ -585,6 +597,11 @@ struct MealFormView: View {
                 if isWeekend {
                     Section {
                         Button {
+                            if weekendReason == .awayOnly {
+                                // Zurück zu "Gearbeitet": Arbeitszeit auf sinnvollen Default zurücksetzen
+                                startTime = Calendar.current.date(bySettingHour: 8,  minute: 0, second: 0, of: date) ?? startTime
+                                endTime   = Calendar.current.date(bySettingHour: 17, minute: 0, second: 0, of: date) ?? endTime
+                            }
                             weekendReason = .worked
                         } label: {
                             HStack(spacing: 8) {
@@ -595,17 +612,21 @@ struct MealFormView: View {
                             }
                         }
                         Button {
+                            // Keine Arbeitszeit: Start/Ende auf 0 Stunden setzen (Pauschale wird
+                            // unabhängig davon automatisch auf den vollen Tagessatz gesetzt).
+                            endTime = startTime
+                            pauseMinutes = 0
                             weekendReason = .awayOnly
                         } label: {
                             HStack(spacing: 8) {
                                 Image(systemName: weekendReason == .awayOnly ? "largecircle.fill.circle" : "circle")
                                     .foregroundColor(.orange)
-                                Text("Unterwegs / nicht zuhause (nur Pauschale)")
+                                Text("Wochenende")
                                     .foregroundColor(.primary)
                             }
                         }
                     } footer: {
-                        Text("An Samstagen und Sonntagen wird normalerweise keine Arbeitszeit erfasst. Bitte wähle, ob du gearbeitet hast (dann gilt zusätzlich die Wochenendzulage) oder nur unterwegs/nicht zuhause warst (dann gilt nur die normale Verpflegungspauschale, keine Wochenendzulage) – sonst lässt sich der Eintrag nicht speichern.")
+                        Text("An Samstagen und Sonntagen wird normalerweise keine Arbeitszeit erfasst. Bitte wähle, ob du gearbeitet hast (dann gilt zusätzlich die Wochenendzulage und die Arbeitszeit wird erfasst) oder \"Wochenende\" (keine Arbeitszeit, aber die volle Verpflegungspauschale gilt automatisch, keine Wochenendzulage) – sonst lässt sich der Eintrag nicht speichern.")
                     }
                 }
 
@@ -653,7 +674,7 @@ struct MealFormView: View {
                     let earliestTripStart = tripsForResult.compactMap { $0.startTime }.min()
                     let totalHours: Double = {
                         if let start = earliestTripStart {
-                            return max(0, endTime.timeIntervalSince(start) / 3600.0)
+                            return max(0, anchoredToFormDate(endTime).timeIntervalSince(start) / 3600.0)
                         }
                         return hours
                     }()
@@ -702,13 +723,14 @@ struct MealFormView: View {
                     // Pauschale basierend auf Gesamtarbeitszeit (oder nur Arbeitszeit wenn Toggle aus)
                     let effectiveMeal = MealEntry(
                         date: date,
-                        startTime: earliestTripStart ?? startTime,
-                        endTime: endTime, note: note, region: region,
+                        startTime: earliestTripStart ?? anchoredToFormDate(startTime),
+                        endTime: anchoredToFormDate(endTime), note: note, region: region,
                         breakfastAmount: breakfastAmt,
                         ownBreakfastAmount: ownBreakfastAmt,
                         pauseMinutes: pauseMinutes,
                         excludeTrips: !includeTodaysTrips,
-                        workedAtPlant: workedAtPlant
+                        workedAtPlant: workedAtPlant,
+                        weekendAwayOnly: weekendReason == .awayOnly
                     )
                     let effectiveAllowance = effectiveMeal.allowance(rates: rates)
                     LabeledRow(label: lm.t("meals.level"),
@@ -876,9 +898,21 @@ struct MealFormView: View {
         }
     }
 
+    /// Verankert Stunde/Minute von [t] am Kalendertag von [date]. Ohne das kann eine Uhrzeit,
+    /// die einmal über Mitternacht vorausgefüllt wurde (z. B. "Ende = letzte Fahrt + 8h"), beim
+    /// späteren Nachjustieren über den Stunde/Minute-Picker unbemerkt auf dem falschen Tag
+    /// hängen bleiben – die Anzeige zeigt weiterhin nur die Uhrzeit, aber die gespeicherte
+    /// Dauer wäre dann um ~24 Std. zu lang (siehe totalWorkHours bei excludeTrips = true).
+    private func anchoredToFormDate(_ t: Date) -> Date {
+        let cal = Calendar.current
+        let comps = cal.dateComponents([.hour, .minute, .second], from: t)
+        return cal.date(bySettingHour: comps.hour ?? 0, minute: comps.minute ?? 0,
+                         second: comps.second ?? 0, of: date) ?? t
+    }
+
     private func save() {
         let meal = MealEntry(id: editingMeal?.id ?? UUID(), date: date,
-                             startTime: startTime, endTime: endTime,
+                             startTime: anchoredToFormDate(startTime), endTime: anchoredToFormDate(endTime),
                              note: note, region: region,
                              breakfastAmount: breakfastAmt,
                              ownBreakfastAmount: ownBreakfastAmt,

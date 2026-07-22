@@ -1338,13 +1338,55 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.12 – aktuell -->
+<!-- 1.17.14 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.12
+        Version 1.17.14
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">Fix: Arbeitszeit teils über 30 Std. berechnet</div>
+    </div>
+    <span class="build-info">22. Juli 2026 · Build 41</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-fix">FIX</span> <strong>Arbeitszeit teils viel zu hoch berechnet (z. B. 32,8 statt 10,8 Stunden):</strong> Wenn beim Anlegen eines neuen Eintrags die Endzeit über Mitternacht vorausgefüllt und danach nur die Uhrzeit nachjustiert wurde, blieb der Tag der Endzeit unbemerkt auf „morgen" hängen – die Anzeige zeigte weiterhin nur die Uhrzeit, die gespeicherte Dauer war aber rund einen Tag zu lang. Start- und Endzeit werden jetzt beim Speichern immer korrekt auf den gewählten Tag verankert.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.13 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.13
+      </div>
+      <div class="preview-text">Option „Wochenende" blendet Arbeitszeit aus</div>
+    </div>
+    <span class="build-info">21. Juli 2026 · Build 40</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-change">INFO</span> <strong>„Unterwegs/nicht zuhause – nur Pauschale" umbenannt in „Wochenende":</strong> Bei Auswahl werden die Arbeitszeit-Felder (Beginn/Ende/Pause) ausgeblendet, da keine Arbeit stattfand – die Verpflegungspauschale wird trotzdem automatisch mit dem vollen Tagessatz (ab 6 Std.) berechnet.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.12 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.12
       </div>
       <div class="preview-text">Wochenend-Schutz: auch Pauschale ohne Arbeit möglich</div>
     </div>

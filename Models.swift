@@ -227,11 +227,15 @@ struct MealEntry: Identifiable, Codable {
         weekendAwayOnly = try c.decodeIfPresent(Bool.self, forKey: .weekendAwayOnly) ?? false
     }
     var hours: Double { max(0, endTime.timeIntervalSince(startTime) / 3600 - Double(pauseMinutes) / 60) }
+    /// Bei "Wochenende" (unterwegs/nicht zuhause, nicht gearbeitet) gilt immer die volle
+    /// Tagespauschale (ab 6 Std.), unabhängig von der (ausgeblendeten) Arbeitszeit.
     func mealAllowance(rates: MealRates) -> Double {
+        if weekendAwayOnly { return rates.rate6plus }
         switch hours { case ..<3: return rates.rate1to3; case ..<6: return rates.rate3to6; default: return rates.rate6plus }
     }
     func allowance(rates: MealRates) -> Double { max(0, mealAllowance(rates: rates) - breakfastAmount) + ownBreakfastAmount }
     func allowanceLabel(rates: MealRates) -> String {
+        if weekendAwayOnly { return L("meals.level.3") }
         switch hours { case ..<3: return L("meals.level.none"); case ..<6: return L("meals.level.2"); default: return L("meals.level.3") }
     }
 }
