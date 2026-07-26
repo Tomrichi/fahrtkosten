@@ -1802,6 +1802,9 @@ struct TripFormView: View {
             let m = (dur % 3600) / 60
             if h > 0 { fahrzeitText = String(format: "%dh %02dmin", h, m) }
             else if m > 0 { fahrzeitText = String(format: "%dmin", m) }
+            selectedFuelType = defaultFuelTypeFromKey
+            if !defaultConsumptionForCurrentFuel.isEmpty { fuelConsumptionStr = defaultConsumptionForCurrentFuel }
+            if !defaultPriceForCurrentFuel.isEmpty       { fuelPriceStr       = defaultPriceForCurrentFuel }
         case .importFromMaps(let f, let t, let travelTime, let km):
             from = f
             to   = t
