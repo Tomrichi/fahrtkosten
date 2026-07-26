@@ -249,7 +249,7 @@ private struct CarPlayDataAccess {
 
     static func kmRate() -> Double {
         let r = defaults.double(forKey: "kmRate")
-        return r == 0 ? 0.30 : r
+        return r == 0 ? 0.38 : r
     }
 
     static func activeTrip() -> Trip? {

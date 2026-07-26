@@ -11,7 +11,7 @@ final class WatchViewModel: NSObject, ObservableObject {
     @Published var monthKm:    Double = 0
     @Published var monthEuro:  Double = 0
     @Published var tripCount:  Int    = 0
-    @Published var kmRate:     Double = 0.30
+    @Published var kmRate:     Double = 0.38
 
     // Aktive manuelle Fahrt
     @Published var hasActiveTrip: Bool   = false
@@ -174,7 +174,7 @@ final class WatchViewModel: NSObject, ObservableObject {
         monthKm     = context["monthKm"]    as? Double ?? 0
         monthEuro   = context["monthEuro"]  as? Double ?? 0
         tripCount   = context["tripCount"]  as? Int    ?? 0
-        kmRate      = context["kmRate"]     as? Double ?? 0.30
+        kmRate      = context["kmRate"]     as? Double ?? 0.38
         hasActiveTrip = context["hasActive"] as? Bool  ?? false
         activeFrom  = context["activeFrom"] as? String ?? ""
         activeTo    = context["activeTo"]   as? String ?? ""

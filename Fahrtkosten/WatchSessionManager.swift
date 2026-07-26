@@ -25,7 +25,7 @@ final class WatchSessionManager: NSObject, ObservableObject {
               session.isWatchAppInstalled else { return }
 
         let trips = loadTrips()
-        let kmRate = groupDefaults.double(forKey: "kmRate").ifZero(0.30)
+        let kmRate = groupDefaults.double(forKey: "kmRate").ifZero(0.38)
         let cal = Calendar.current
         let now = Date()
 

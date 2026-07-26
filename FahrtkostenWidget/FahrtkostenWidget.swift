@@ -20,7 +20,7 @@ private struct WidgetDataAccess {
 
     static func kmRate() -> Double {
         let rate = defaults.double(forKey: "kmRate")
-        return rate == 0 ? 0.30 : rate
+        return rate == 0 ? 0.38 : rate
     }
 
     static func monthlyData() -> WidgetEntry {

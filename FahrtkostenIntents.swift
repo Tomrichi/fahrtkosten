@@ -21,7 +21,7 @@ private struct IntentDataAccess {
 
     static func kmRate() -> Double {
         let rate = local.double(forKey: "kmRate")
-        return rate == 0 ? 0.30 : rate
+        return rate == 0 ? 0.38 : rate
     }
 
     static func monthlyTotal() -> (total: Double, count: Int, km: Double) {

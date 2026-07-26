@@ -1089,7 +1089,7 @@ private let hilfeHTML = #"""
 <hr>
 
 <h2>Alle Features auf einen Blick</h2>
-<div class="feature">🚗 <strong>Fahrten &amp; Kilometerpauschale</strong> – automatisch berechnet nach § 9 EStG (0,30 €/km, anpassbar)</div>
+<div class="feature">🚗 <strong>Fahrten &amp; Kilometerpauschale</strong> – automatisch berechnet nach § 9 EStG (0,38 €/km, anpassbar)</div>
 <div class="feature">🕐 <strong>Abfahrts- &amp; Ankunftszeit</strong> – pro Fahrt erfassbar, fließt in Verpflegungspauschale ein</div>
 <div class="feature">📍 <strong>GPS-Streckenaufzeichnung</strong> – Hintergrundtracking mit intelligenter Pause- und Stopp-Automatik</div>
 <div class="feature">🗺️ <strong>Apple Maps Integration</strong> – Kilometerzahl per Adresseingabe automatisch berechnen</div>
@@ -1178,7 +1178,7 @@ private let hilfeHTML = #"""
 <div class="tip">💡 Tipp: Suche nach einem Datum ohne Textbegriff – so findest du alle Einträge eines bestimmten Tages kategorienübergreifend.</div>
 
 <h2>Einstellungen</h2>
-<p>Alle Pauschalsätze individuell anpassbar: Kilometerpauschale (Standard: 0,30 €/km), Verpflegungssätze (3 Stufen für Inland, Schweiz, Ausland), Monteurszulage (12 € Inland / 50 € Ausland, Werk-Standort frei einstellbar), Übernachtung/Frühstück, Antriebsart &amp; Kraftstoffpreise. Wischgesten, Backup und Protokoll sind als aufklappbare Menüs zusammengefasst.</p>
+<p>Alle Pauschalsätze individuell anpassbar: Kilometerpauschale (Standard: 0,38 €/km), Verpflegungssätze (3 Stufen für Inland, Schweiz, Ausland), Monteurszulage (12 € Inland / 50 € Ausland, Werk-Standort frei einstellbar), Übernachtung/Frühstück, Antriebsart &amp; Kraftstoffpreise. Wischgesten, Backup und Protokoll sind als aufklappbare Menüs zusammengefasst.</p>
 
 <h2>Backup &amp; Wiederherstellen</h2>
 <p>Alle Daten lassen sich als JSON-Backup sichern. Über <strong>Lokal speichern</strong> wird das Backup in der Dateien-App abgelegt. Über <strong>Teilen</strong> kannst du es per AirDrop, E-Mail oder in Cloud-Dienste exportieren. Es werden maximal 10 lokale Backups aufbewahrt.</p>

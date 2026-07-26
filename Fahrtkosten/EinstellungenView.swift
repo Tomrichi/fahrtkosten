@@ -231,7 +231,7 @@ struct EinstellungenView: View {
                 HStack {
                     Label("Kilometerpauschale", systemImage: "car.fill")
                     Spacer()
-                    TextField("0,30", text: $kmRateStr)
+                    TextField("0,38", text: $kmRateStr)
                         .keyboardType(.decimalPad)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 80)
@@ -242,7 +242,7 @@ struct EinstellungenView: View {
                     .foregroundStyle(.primary)
                     .fontWeight(.regular)
             }
-        } footer: { Text("Gesetzlicher Standardwert: 0,30 € / km (§ 9 Abs. 1 Nr. 4a EStG)") }
+        } footer: { Text("Gesetzlicher Standardwert: 0,38 € / km (§ 9 Abs. 1 Nr. 4a EStG, seit Januar 2026)") }
     }
 
     @ViewBuilder private var collapsibleMeals: some View {

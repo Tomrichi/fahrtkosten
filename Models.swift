@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Constants
 struct Constants {
-    static let kmRate: Double = 0.30
+    static let kmRate: Double = 0.38
     static let inlandMeal1to3:  Double = 0.0
     static let inlandMeal3to6:  Double = 0.0
     static let inlandMeal6plus: Double = 0.0
