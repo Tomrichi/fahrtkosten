@@ -44,6 +44,8 @@ struct ContentView: View {
     @EnvironmentObject var lm: LocalizationManager
 
     @AppStorage("contentView.selectedTab") private var selectedTab: AppTab = .fahrten
+    @AppStorage("kmRateHinweis2026Gezeigt") private var kmRateHinweisGezeigt = false
+    @State private var showKmRateHinweis = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -111,6 +113,17 @@ struct ContentView: View {
             EinstellungenView()
                 .environmentObject(store)
                 .environmentObject(lm)
+        }
+        .onAppear {
+            guard !kmRateHinweisGezeigt else { return }
+            kmRateHinweisGezeigt = true
+            showKmRateHinweis = true
+        }
+        .alert("Kilometerpauschale angehoben", isPresented: $showKmRateHinweis) {
+            Button("Zu den Einstellungen") { settingsController.showSettings = true }
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Der gesetzliche Standardwert für die Kilometerpauschale wurde zum 1. Januar 2026 von 0,30 € auf 0,38 € pro km angehoben (§ 9 Abs. 1 Nr. 4a EStG). Dein hinterlegter Wert (\(store.kmRate.formatted(.number.precision(.fractionLength(2)))) €/km) wurde nicht automatisch geändert – du kannst ihn bei Bedarf in den Einstellungen anpassen.")
         }
     }
 }
