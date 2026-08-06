@@ -155,6 +155,7 @@ struct FahrtenView: View {
         case alle   = "Alle"
     }
     @AppStorage("fahrten.selectedFilter") private var selectedFilter: TripFilter = .alle
+    @AppStorage("defaultFuelType") private var defaultFuelTypeKey: String = "e10"
     @State private var selectedDate: Date = Date()
 
     private var filteredTrips: [Trip] {
@@ -492,6 +493,9 @@ struct FahrtenView: View {
                         endTime: endDate
                     )
                     trip.fahrzeitText = fahrzeitText.isEmpty ? nil : fahrzeitText
+                    if defaultFuelTypeKey != "hybrid" {
+                        trip.fuelTypeRaw = defaultFuelTypeKey
+                    }
                     store.addTrip(trip)
                     AppLogger.shared.log("GPS-Fahrt gespeichert: \(from) → \(to.isEmpty ? from : to), \(String(format: "%.1f", km)) km", level: .gps)
                     showGPSSheet = false
@@ -653,6 +657,19 @@ struct GPSTripSheet: View {
                 .background(Color(.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .shadow(color: .black.opacity(0.07), radius: 6, x: 0, y: 3)
+                .padding(.horizontal, 20)
+
+                // ── Tempo ──
+                HStack {
+                    Image(systemName: "speedometer")
+                        .foregroundColor(.orange)
+                        .font(.system(size: 14))
+                    Text(String(format: "%.0f km/h", tracker.currentSpeedKmh))
+                        .font(.system(size: 14, weight: .regular, design: .monospaced))
+                        .foregroundColor(.secondary)
+                        .contentTransition(.numericText())
+                        .animation(.default, value: tracker.currentSpeedKmh)
+                }
                 .padding(.horizontal, 20)
 
                 // ── Live-Karte ──
