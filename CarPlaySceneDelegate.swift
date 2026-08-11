@@ -20,7 +20,7 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
         self.interfaceController = interfaceController
 
         // Alle 5 Sekunden Dashboard aktualisieren (GPS-Status + Siri-Fahrt + Monatsdaten)
-        refreshTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+        refreshTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             self?.renderDashboard()
         }
         RunLoop.main.add(refreshTimer!, forMode: .common)

@@ -638,7 +638,7 @@ struct GPSTripSheet: View {
                     }
                     Spacer()
                     // Live-km-Anzeige
-                    Text(tracker.totalKm.kmFormatted)
+                    Text(gpsDistanceFormatted(tracker.totalKm))
                         .font(.system(size: 28, weight: .regular, design: .monospaced))
                         .foregroundColor(.primary)
                         .contentTransition(.numericText(countsDown: false))
@@ -660,16 +660,27 @@ struct GPSTripSheet: View {
                 .padding(.horizontal, 20)
 
                 // ── Tempo ──
-                HStack {
-                    Image(systemName: "speedometer")
-                        .foregroundColor(.orange)
-                        .font(.system(size: 14))
-                    Text(String(format: "%.0f km/h", tracker.currentSpeedKmh))
-                        .font(.system(size: 14, weight: .regular, design: .monospaced))
-                        .foregroundColor(.secondary)
-                        .contentTransition(.numericText())
-                        .animation(.default, value: tracker.currentSpeedKmh)
+                HStack(spacing: 0) {
+                    Spacer()
+                    VStack(spacing: 2) {
+                        Text(String(format: "%.0f", tracker.currentSpeedKmh))
+                            .font(.system(size: 64, weight: .thin, design: .monospaced))
+                            .foregroundColor(.primary)
+                            .contentTransition(.numericText())
+                            .animation(.default, value: tracker.currentSpeedKmh)
+                        Text("km/h")
+                            .font(.system(size: 13, weight: .regular))
+                            .foregroundColor(.secondary)
+                            .kerning(1.5)
+                    }
+                    Spacer()
                 }
+                .padding(.vertical, 8)
+                .padding(.horizontal, 20)
+                .frame(maxWidth: .infinity)
+                .background(Color(.secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .shadow(color: .black.opacity(0.07), radius: 6, x: 0, y: 3)
                 .padding(.horizontal, 20)
 
                 // ── Live-Karte ──
@@ -736,7 +747,7 @@ struct GPSTripSheet: View {
 
                 // Kilometer-Anzeige
                 VStack(spacing: 4) {
-                    Text(tracker.totalKm.kmFormatted)
+                    Text(gpsDistanceFormatted(tracker.totalKm))
                         .font(.system(size: 42, weight: .regular, design: .monospaced))
                         .foregroundColor(.primary)
                     Text("aufgezeichnet bisher")
@@ -812,6 +823,21 @@ struct GPSTripSheet: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityElement(children: .combine)
+    }
+
+    // ── GPS-Distanz: Meter unter 1 km, sonst eine Nachkommastelle ──
+    private func gpsDistanceFormatted(_ km: Double) -> String {
+        if km < 1.0 {
+            let m = Int(km * 1000)
+            return "\(m) m"
+        }
+        let truncated = Double(Int(km * 10)) / 10.0
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.minimumFractionDigits = 1
+        f.maximumFractionDigits = 1
+        f.decimalSeparator = ","
+        return (f.string(from: NSNumber(value: truncated)) ?? "0,0") + " km"
     }
 
     // ── Fehler-Banner ──
@@ -2098,7 +2124,7 @@ struct LiveMapCard: View {
                 routeCoordinates: tracker.routeCoordinates,
                 currentLocation: tracker.currentLocation
             )
-            .frame(height: 460)
+            .frame(height: 220)
         }
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
