@@ -564,7 +564,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = 2HE885H8JT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -577,7 +577,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.17.20;
+				MARKETING_VERSION = 1.17.21;
 				PRODUCT_BUNDLE_IDENTIFIER = Thomas.Fahrtkosten.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -599,7 +599,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = 2HE885H8JT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -612,7 +612,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.17.20;
+				MARKETING_VERSION = 1.17.21;
 				PRODUCT_BUNDLE_IDENTIFIER = Thomas.Fahrtkosten.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -633,7 +633,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = FahrtkostenShareExtension/FahrtkostenShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = 2HE885H8JT;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FahrtkostenShareExtension/Info.plist;
@@ -645,7 +645,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.17.20;
+				MARKETING_VERSION = 1.17.21;
 				PRODUCT_BUNDLE_IDENTIFIER = Thomas.Fahrtkosten.FahrtkostenShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -663,7 +663,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = FahrtkostenShareExtension/FahrtkostenShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = 2HE885H8JT;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FahrtkostenShareExtension/Info.plist;
@@ -675,7 +675,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.17.20;
+				MARKETING_VERSION = 1.17.21;
 				PRODUCT_BUNDLE_IDENTIFIER = Thomas.Fahrtkosten.FahrtkostenShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -823,7 +823,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Fahrtkosten/Fahrtkosten.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = 2HE885H8JT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -840,7 +840,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.17.20;
+				MARKETING_VERSION = 1.17.21;
 				PRODUCT_BUNDLE_IDENTIFIER = Thomas.Fahrtkosten;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -862,7 +862,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Fahrtkosten/Fahrtkosten.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = 2HE885H8JT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -879,7 +879,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.17.20;
+				MARKETING_VERSION = 1.17.21;
 				PRODUCT_BUNDLE_IDENTIFIER = Thomas.Fahrtkosten;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -899,7 +899,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = FahrtkostenWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = 2HE885H8JT;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FahrtkostenWidget/Info.plist;
@@ -912,7 +912,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.17.20;
+				MARKETING_VERSION = 1.17.21;
 				PRODUCT_BUNDLE_IDENTIFIER = Thomas.Fahrtkosten.FahrtkostenWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -932,7 +932,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = FahrtkostenWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = 2HE885H8JT;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FahrtkostenWidget/Info.plist;
@@ -945,7 +945,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.17.20;
+				MARKETING_VERSION = 1.17.21;
 				PRODUCT_BUNDLE_IDENTIFIER = Thomas.Fahrtkosten.FahrtkostenWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

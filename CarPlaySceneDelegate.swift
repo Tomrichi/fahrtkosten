@@ -26,6 +26,13 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
         RunLoop.main.add(refreshTimer!, forMode: .common)
 
         renderDashboard()
+
+        // GPS automatisch starten wenn Einstellung aktiv und noch keine Aufzeichnung läuft
+        let autoStart = UserDefaults.standard.bool(forKey: "carPlayAutoStartGPS")
+        let gps = readGPSState()
+        if autoStart && !gps.recording {
+            startGPSFromCarPlay()
+        }
     }
 
     func templateApplicationScene(_ scene: CPTemplateApplicationScene,
@@ -49,14 +56,15 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
     }
 
     // GPS-Status direkt aus App Group UserDefaults lesen (prozessübergreifend zuverlässig)
-    private func readGPSState() -> (recording: Bool, km: Double, elapsed: Int) {
+    private func readGPSState() -> (recording: Bool, km: Double, elapsed: Int, speedKmh: Double) {
         guard let ud = UserDefaults(suiteName: Self.appGroup) else {
-            return (false, 0, 0)
+            return (false, 0, 0, 0)
         }
         return (
             ud.bool(forKey: "gpsIsRecording"),
             ud.double(forKey: "gpsKm"),
-            ud.integer(forKey: "gpsElapsed")
+            ud.integer(forKey: "gpsElapsed"),
+            ud.double(forKey: "gpsSpeedKmh")
         )
     }
 
@@ -99,6 +107,7 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
 
             items.append(CPInformationItem(title: "🔴 GPS läuft", detail: "\(String(format: "%.1f", gps.km)) km"))
             items.append(CPInformationItem(title: "Fahrzeit", detail: timeStr))
+            items.append(CPInformationItem(title: "Tempo", detail: "\(Int(gps.speedKmh)) km/h"))
             items.append(CPInformationItem(title: "Erstattung ca.", detail: carPlayEuro(gps.km * CarPlayDataAccess.kmRate())))
 
             let stopGPSBtn = CPTextButton(title: "GPS stoppen",

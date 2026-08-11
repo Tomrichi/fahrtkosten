@@ -248,6 +248,7 @@ final class LocationTracker: NSObject, ObservableObject {
         ud.set(recording,      forKey: "gpsIsRecording")
         ud.set(totalKm,        forKey: "gpsKm")
         ud.set(elapsedSeconds, forKey: "gpsElapsed")
+        ud.set(currentSpeedKmh, forKey: "gpsSpeedKmh")
         // Live Activity aktualisieren
         if recording {
             Task { @MainActor in LiveActivityManager.shared.update(

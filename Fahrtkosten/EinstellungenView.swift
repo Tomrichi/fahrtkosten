@@ -56,6 +56,7 @@ struct EinstellungenView: View {
     @AppStorage("swipeTrailing1Color") private var swipeTrailing1Color: String = "orange"
     @AppStorage("swipeTrailing2Color") private var swipeTrailing2Color: String = "blue"
     @AppStorage("homeAddress")             private var homeAddress: String = ""
+    @AppStorage("carPlayAutoStartGPS")     private var carPlayAutoStartGPS: Bool = false
     @AppStorage("defaultFuelType")         private var defaultFuelType: String = "e10"
     // Preis pro Kraftstoffart
     @AppStorage("defaultFuelPrice.e5")     private var priceE5: String = ""
@@ -115,6 +116,7 @@ struct EinstellungenView: View {
             Form {
                 collapsibleRates
                 homeAddressSection
+                gpsSection
                 collapsibleFuel
                 collapsibleMeals
                 collapsibleMonteurszulage
@@ -205,6 +207,19 @@ struct EinstellungenView: View {
             .padding(.horizontal, 16)
             .padding(.top, 4)
             .transition(.move(edge: .top).combined(with: .opacity))
+        }
+    }
+
+    // MARK: - GPS / CarPlay
+    @ViewBuilder private var gpsSection: some View {
+        Section {
+            Toggle(isOn: $carPlayAutoStartGPS) {
+                Label("GPS bei CarPlay-Verbindung starten", systemImage: "car.fill")
+            }
+        } header: {
+            Text("GPS / CarPlay")
+        } footer: {
+            Text("Startet die GPS-Aufzeichnung automatisch, sobald dein iPhone mit CarPlay verbunden wird.")
         }
     }
 
