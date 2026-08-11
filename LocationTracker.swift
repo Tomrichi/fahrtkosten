@@ -246,6 +246,7 @@ final class LocationTracker: NSObject, ObservableObject {
     private func writeGPSStateToAppGroup(recording: Bool) {
         guard let ud = UserDefaults(suiteName: Self.appGroup) else { return }
         ud.set(recording,      forKey: "gpsIsRecording")
+        ud.set(isPaused,       forKey: "gpsIsPaused")
         ud.set(totalKm,        forKey: "gpsKm")
         ud.set(elapsedSeconds, forKey: "gpsElapsed")
         ud.set(currentSpeedKmh, forKey: "gpsSpeedKmh")
@@ -320,7 +321,7 @@ extension LocationTracker: CLLocationManagerDelegate {
 
     // MARK: - Pause / Resume
 
-    private func pauseTracking() {
+    func pauseTracking() {
         guard isTracking else { return }
         phase    = .paused
         pausedAt = Date()

@@ -56,16 +56,25 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
     }
 
     // GPS-Status direkt aus App Group UserDefaults lesen (prozessübergreifend zuverlässig)
-    private func readGPSState() -> (recording: Bool, km: Double, elapsed: Int, speedKmh: Double) {
+    private func readGPSState() -> (recording: Bool, paused: Bool, km: Double, elapsed: Int, speedKmh: Double) {
         guard let ud = UserDefaults(suiteName: Self.appGroup) else {
-            return (false, 0, 0, 0)
+            return (false, false, 0, 0, 0)
         }
         return (
             ud.bool(forKey: "gpsIsRecording"),
+            ud.bool(forKey: "gpsIsPaused"),
             ud.double(forKey: "gpsKm"),
             ud.integer(forKey: "gpsElapsed"),
             ud.double(forKey: "gpsSpeedKmh")
         )
+    }
+
+    private func gpsDistanceFormatted(_ km: Double) -> String {
+        if km < 1.0 {
+            return "\(Int(km * 1000)) m"
+        }
+        let truncated = Double(Int(km * 10)) / 10.0
+        return String(format: "%.1f km", truncated).replacingOccurrences(of: ".", with: ",")
     }
 
     // MARK: - Dashboard rendern
@@ -105,13 +114,30 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
                 ? String(format: "%d:%02d:%02d", h, m, s)
                 : String(format: "%02d:%02d", m, s)
 
-            items.append(CPInformationItem(title: "🔴 GPS läuft", detail: "\(String(format: "%.1f", gps.km)) km"))
-            items.append(CPInformationItem(title: "Fahrzeit", detail: timeStr))
-            items.append(CPInformationItem(title: "Tempo", detail: "\(Int(gps.speedKmh)) km/h"))
-            items.append(CPInformationItem(title: "Erstattung ca.", detail: carPlayEuro(gps.km * CarPlayDataAccess.kmRate())))
+            let statusIcon = gps.paused ? "⏸" : "🔴"
+            let statusText = gps.paused ? "Pausiert" : "Aufzeichnung läuft"
 
-            let stopGPSBtn = CPTextButton(title: "GPS stoppen",
-                                          textStyle: .cancel) { [weak self] _ in
+            // Tempo an erster Stelle — wichtigste Info beim Fahren
+            items.append(CPInformationItem(title: "⚡ Tempo",   detail: "\(Int(gps.speedKmh)) km/h"))
+            items.append(CPInformationItem(title: "📍 Strecke", detail: gpsDistanceFormatted(gps.km)))
+            items.append(CPInformationItem(title: "⏱ Fahrzeit", detail: timeStr))
+            items.append(CPInformationItem(title: "💶 Erstattung ca.", detail: carPlayEuro(gps.km * CarPlayDataAccess.kmRate())))
+            items.append(CPInformationItem(title: statusIcon + " Status", detail: statusText))
+
+            // Pause / Weiter Button
+            let pauseResumeBtn: CPTextButton
+            if gps.paused {
+                pauseResumeBtn = CPTextButton(title: "▶ Weiter", textStyle: .confirm) { _ in
+                    LocationTracker.shared.resumeTracking()
+                }
+            } else {
+                pauseResumeBtn = CPTextButton(title: "⏸ Pause", textStyle: .normal) { _ in
+                    LocationTracker.shared.pauseTracking()
+                }
+            }
+            actions.append(pauseResumeBtn)
+
+            let stopGPSBtn = CPTextButton(title: "⏹ Stoppen", textStyle: .cancel) { [weak self] _ in
                 self?.stopGPSFromCarPlay()
             }
             actions.append(stopGPSBtn)
