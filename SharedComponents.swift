@@ -260,7 +260,7 @@ struct AusgabenCard: View {
             Divider()
 
             if kfzTotal > 0 {
-                ausgabenZeile("car.fill", .iosIndigo, "KFZ-Kosten", kfzTotal)
+                ausgabenZeile("car.fill", .blue, "KFZ-Kosten", kfzTotal)
             }
             if privateTotal > 0 {
                 ausgabenZeile("person.fill", Color.pink, "Private Ausgaben", privateTotal)

@@ -428,7 +428,7 @@ struct SearchView: View {
     private func colorForVehicle(_ cat: VehicleCostCategory) -> Color {
         switch cat {
         case .werkstatt:       return .orange
-        case .leasing:         return .indigo
+        case .leasing:         return .blue
         case .versicherung:    return .blue
         case .tuvHu:           return .iosGreen
         case .steuer:          return .purple
@@ -442,7 +442,7 @@ struct SearchView: View {
     private func colorForSpese(_ kat: ReisespesenKategorie) -> Color {
         switch kat {
         case .werkstatt:       return .orange
-        case .leasing:         return .indigo
+        case .leasing:         return .blue
         case .vignetteMaut:    return .blue
         case .benzin:          return .red
         case .strom:           return .iosGreen

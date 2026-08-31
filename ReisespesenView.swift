@@ -181,11 +181,11 @@ struct KFZKostenView: View {
     private func kfzColor(_ kat: ReisespesenKategorie) -> Color {
         switch kat {
         case .werkstatt:       return .iosOrange
-        case .leasing:         return .iosIndigo
+        case .leasing:         return .blue
         case .vignetteMaut:    return .blue
         case .benzin:          return Color(.systemRed)
         case .strom:           return .iosGreen
-        case .kfzSteuer:       return .iosPurple
+        case .kfzSteuer:       return .blue
         case .kfzVersicherung: return .iosTeal
         case .verpflegung:     return .brown
         case .sonstiges:       return Color(.systemGray)
@@ -397,11 +397,11 @@ struct KFZKostenRow: View {
     private var rowColor: Color {
         switch spese.kategorie {
         case .werkstatt:       return .iosOrange
-        case .leasing:         return .iosIndigo
+        case .leasing:         return .blue
         case .vignetteMaut:    return .blue
         case .benzin:          return Color(.systemRed)
         case .strom:           return .iosGreen
-        case .kfzSteuer:       return .iosPurple
+        case .kfzSteuer:       return .blue
         case .kfzVersicherung: return .iosTeal
         case .verpflegung:     return .brown
         case .sonstiges:       return Color(.systemGray)
@@ -443,16 +443,16 @@ struct KFZKostenFormView: View {
                         HStack(spacing: 10) {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                    .fill(Color.iosIndigo.opacity(0.12))
+                                    .fill(Color.blue.opacity(0.12))
                                     .frame(width: 32, height: 32)
                                 Image(systemName: "doc.viewfinder.fill")
                                     .font(.system(size: 14, weight: .regular))
-                                    .foregroundColor(.iosIndigo)
+                                    .foregroundColor(.blue)
                             }
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("Beleg scannen")
                                     .font(.system(size: 15, weight: .regular))
-                                    .foregroundColor(.iosIndigo)
+                                    .foregroundColor(.blue)
                                 Text("Kamera oder Foto – Daten werden automatisch erkannt")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
@@ -529,7 +529,7 @@ struct KFZKostenFormView: View {
                             Spacer()
                             Text(amount.euroFormatted)
                                 .font(.system(size: 18, weight: .regular, design: .monospaced))
-                                .foregroundColor(.iosIndigo)
+                                .foregroundColor(.blue)
                         }
                     }
                 }

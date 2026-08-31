@@ -285,7 +285,13 @@ struct MealRow: View {
 
     private var monteurszulage: Double { store.monteurszulage(for: meal) }
     private var wochenendzulage: Double { store.wochenendzulage(for: meal) }
-    private var allowance: Double { meal.allowance(rates: rates) }
+    private var allowance: Double { store.effectiveMealAllowance(for: meal) }
+    private var hotelBreakfastDeduction: Double {
+        let base = meal.mealAllowance(rates: rates)
+        let eff  = store.effectiveMealAllowance(for: meal)
+        let raw  = meal.allowance(rates: rates)
+        return eff < raw ? base * 0.2 : 0
+    }
 
     var body: some View {
         HStack(spacing: 14) {
@@ -325,6 +331,15 @@ struct MealRow: View {
                 HStack(spacing: 4) {
                     if meal.breakfastAmount > 0 {
                         Text("Verpfl. Dritte −\(meal.breakfastAmount.euroFormatted)")
+                            .font(.system(size: 9, weight: .regular))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
+                            .background(Color.red.opacity(0.75))
+                            .clipShape(Capsule())
+                    }
+                    if hotelBreakfastDeduction > 0 {
+                        Text("☕ Hotel −\(hotelBreakfastDeduction.euroFormatted)")
                             .font(.system(size: 9, weight: .regular))
                             .foregroundColor(.white)
                             .padding(.horizontal, 5)

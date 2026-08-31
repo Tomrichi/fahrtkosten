@@ -205,7 +205,7 @@ struct UebersichtView: View {
 
     private var filteredTotal: Double {
         let tripTotal   = filteredTrips.reduce(0)  { $0 + ($1.km * store.kmRate) }
-        let mealTotal   = filteredMeals.reduce(0)  { acc, m in acc + m.allowance(rates: store.mealRates(for: m.region)) }
+        let mealTotal   = filteredMeals.reduce(0)  { acc, m in acc + store.effectiveMealAllowance(for: m) }
         let hotelTotal  = filteredHotels.reduce(0) { $0 + $1.amount(flat: store.hotelFlat) }
         return tripTotal + mealTotal + hotelTotal
     }
@@ -278,14 +278,14 @@ struct UebersichtView: View {
 
                 // ── Aufklappbare Kacheln ──
                 let tripAmount     = filteredTrips.reduce(0.0)          { $0 + ($1.km * store.kmRate) }
-                let mealAmount     = filteredMeals.reduce(0.0)          { acc, m in acc + m.allowance(rates: store.mealRates(for: m.region)) }
+                let mealAmount     = filteredMeals.reduce(0.0)          { acc, m in acc + store.effectiveMealAllowance(for: m) }
                 let hotelAmount    = filteredHotels.reduce(0.0)         { $0 + $1.amount(flat: store.hotelFlat) }
                 let vehicleAmount  = filteredVehicleCosts.reduce(0.0)    { $0 + $1.amount }
                 let privateAmount  = filteredPrivateExpenses.reduce(0.0) { $0 + $1.amount }
 
                 // Fahrten
                 expandableCard(
-                    icon: "car.fill", color: Color(.systemGray3),
+                    icon: "car.fill", color: .blue,
                     label: lm.t("tab.trips"),
                     amount: tripAmount,
                     detail: filteredTrips.count == 1 ? "1 Eintrag" : "\(filteredTrips.count) Einträge",
@@ -293,7 +293,7 @@ struct UebersichtView: View {
                 ) {
                     ForEach(filteredTrips.sorted(by: { $0.date > $1.date })) { trip in
                         expandRow(
-                            icon: "car.fill", color: Color(.systemGray3),
+                            icon: "car.fill", color: .blue,
                             title: "\(trip.from) → \(trip.to)",
                             subtitle: "\(trip.date.shortDateShort)  ·  \(trip.km.kmFormatted)",
                             amount: (trip.km * store.kmRate).euroFormatted,
@@ -311,7 +311,7 @@ struct UebersichtView: View {
                     isExpanded: $expandMeals
                 ) {
                     ForEach(filteredMeals.sorted(by: { $0.date > $1.date })) { meal in
-                        let a = meal.allowance(rates: store.mealRates(for: meal.region))
+                        let a = store.effectiveMealAllowance(for: meal)
                         expandRow(
                             icon: "fork.knife", color: .green,
                             title: meal.date.weekdayShortDate,
@@ -359,7 +359,7 @@ struct UebersichtView: View {
 
                 // Übernachtungen
                 expandableCard(
-                    icon: "bed.double.fill", color: .iosPurple,
+                    icon: "bed.double.fill", color: .blue,
                     label: lm.t("overview.accommodation.short"),
                     amount: hotelAmount,
                     detail: filteredHotels.count == 1 ? "1 Eintrag" : "\(filteredHotels.count) Einträge",
@@ -371,11 +371,11 @@ struct UebersichtView: View {
                         let subtitle = [desc.isEmpty ? nil : desc, nightsStr]
                             .compactMap { $0 }.joined(separator: "  ·  ")
                         expandRow(
-                            icon: "bed.double.fill", color: .iosPurple,
+                            icon: "bed.double.fill", color: .blue,
                             title: hotel.date.shortDate,
                             subtitle: subtitle,
                             amount: hotel.amount(flat: store.hotelFlat).euroFormatted,
-                            amountColor: .iosPurple
+                            amountColor: .blue
                         )
                     }
                 }

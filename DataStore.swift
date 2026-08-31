@@ -349,7 +349,19 @@ class DataStore: ObservableObject {
     // MARK: - Totals
     var totalKmAmount:    Double { trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km * kmRate } }
     var totalKm:          Double { trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km } }
-    var totalMeal:        Double { meals.reduce(0)           { $0 + $1.allowance(rates: mealRates(for: $1.region)) } }
+    /// Verpflegungspauschale für einen Eintrag unter Berücksichtigung des Hotel-Frühstücks (20 % Abzug)
+    func effectiveMealAllowance(for meal: MealEntry) -> Double {
+        let base = meal.allowance(rates: mealRates(for: meal.region))
+        let cal = Calendar.current
+        let hasHotelBreakfast = hotels.contains { h in
+            h.breakfastIncluded && cal.isDate(h.date, inSameDayAs: meal.date)
+        }
+        guard hasHotelBreakfast else { return base }
+        let deduction = meal.mealAllowance(rates: mealRates(for: meal.region)) * 0.2
+        return max(0, base - deduction)
+    }
+
+    var totalMeal:        Double { meals.reduce(0)           { $0 + effectiveMealAllowance(for: $1) } }
     var totalHotel:       Double { hotels.reduce(0)          { $0 + $1.amount(flat: hotelFlat) } }
     var totalVehicle:     Double { vehicleCosts.reduce(0)    { $0 + $1.amount } }
     var totalReiseSpesen: Double { reiseSpesen.reduce(0)     { $0 + $1.amount } }

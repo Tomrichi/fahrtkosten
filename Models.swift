@@ -257,17 +257,20 @@ struct HotelEntry: Identifiable, Codable {
     var hotelName      : String
     var mode           : HotelMode
     var actualCost     : Double  // Gesamtbetrag inkl. MwSt (NEU: immer Gesamtbetrag)
-    var numberOfNights : Int     // Anzahl Nächte (NEU)
+    var numberOfNights       : Int     // Anzahl Nächte (NEU)
+    /// Frühstück im Hotelpreis inbegriffen → 20 % der Tagespauschale werden abgezogen
+    var breakfastIncluded    : Bool = false
 
     enum CodingKeys: String, CodingKey {
-        case id, date, checkOutDate, city, hotelName, mode, actualCost, numberOfNights
+        case id, date, checkOutDate, city, hotelName, mode, actualCost, numberOfNights, breakfastIncluded
     }
     init(id: UUID = UUID(), date: Date, checkOutDate: Date? = nil,
          city: String, hotelName: String, mode: HotelMode,
-         actualCost: Double, numberOfNights: Int = 1) {
+         actualCost: Double, numberOfNights: Int = 1, breakfastIncluded: Bool = false) {
         self.id = id; self.date = date; self.checkOutDate = checkOutDate
         self.city = city; self.hotelName = hotelName; self.mode = mode
         self.actualCost = actualCost; self.numberOfNights = max(1, numberOfNights)
+        self.breakfastIncluded = breakfastIncluded
     }
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -279,6 +282,7 @@ struct HotelEntry: Identifiable, Codable {
         mode = try c.decode(HotelMode.self, forKey: .mode)
         actualCost = try c.decode(Double.self, forKey: .actualCost)
         numberOfNights = try c.decodeIfPresent(Int.self, forKey: .numberOfNights) ?? 1
+        breakfastIncluded = try c.decodeIfPresent(Bool.self, forKey: .breakfastIncluded) ?? false
     }
     func amount(flat: Double) -> Double {
         switch mode { case .flat: return flat * Double(numberOfNights); case .actual: return actualCost }

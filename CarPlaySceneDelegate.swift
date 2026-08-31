@@ -71,7 +71,8 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
 
     private func gpsDistanceFormatted(_ km: Double) -> String {
         if km < 1.0 {
-            return "\(Int(km * 1000)) m"
+            let m = (Int(km * 1000) / 100) * 100
+            return "\(m) m"
         }
         let truncated = Double(Int(km * 10)) / 10.0
         return String(format: "%.1f km", truncated).replacingOccurrences(of: ".", with: ",")

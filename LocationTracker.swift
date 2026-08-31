@@ -188,6 +188,7 @@ final class LocationTracker: NSObject, ObservableObject {
                 // Pausierte Zeit nicht mitzählen
                 guard !self.isPaused else { return }
                 self.elapsedSeconds = Int(Date().timeIntervalSince(start)) - self.pausedSeconds
+                self.writeGPSStateToAppGroup(recording: true)
             }
         }
         RunLoop.main.add(timer!, forMode: .common)

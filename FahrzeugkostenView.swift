@@ -192,10 +192,10 @@ struct VehicleCostRow: View {
     private var categoryColor: Color {
         switch cost.category {
         case .werkstatt:       return .iosOrange
-        case .leasing:         return .iosIndigo
+        case .leasing:         return .blue
         case .versicherung:    return .blue
         case .tuvHu:           return .iosGreen
-        case .steuer:          return .iosPurple
+        case .steuer:          return .blue
         case .reifen:          return .iosTeal
         case .strom:           return .yellow
         case .fahrzeugwaesche: return Color(red: 0.0, green: 0.8, blue: 0.9)

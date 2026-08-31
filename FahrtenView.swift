@@ -155,7 +155,15 @@ struct FahrtenView: View {
         case alle   = "Alle"
     }
     @AppStorage("fahrten.selectedFilter") private var selectedFilter: TripFilter = .alle
-    @AppStorage("defaultFuelType") private var defaultFuelTypeKey: String = "e10"
+    @AppStorage("defaultFuelType")              private var defaultFuelTypeKey: String = "e10"
+    @AppStorage("defaultFuelPrice.e5")          private var defaultPriceE5: String = ""
+    @AppStorage("defaultFuelPrice.e10")         private var defaultPriceE10: String = ""
+    @AppStorage("defaultFuelPrice.diesel")      private var defaultPriceDiesel: String = ""
+    @AppStorage("defaultFuelPrice.elektro")     private var defaultPriceElektro: String = ""
+    @AppStorage("defaultConsumption.e5")        private var defaultConsE5: String = ""
+    @AppStorage("defaultConsumption.e10")       private var defaultConsE10: String = ""
+    @AppStorage("defaultConsumption.diesel")    private var defaultConsDiesel: String = ""
+    @AppStorage("defaultConsumption.elektro")   private var defaultConsElektro: String = ""
     @State private var selectedDate: Date = Date()
 
     private var filteredTrips: [Trip] {
@@ -495,6 +503,20 @@ struct FahrtenView: View {
                     trip.fahrzeitText = fahrzeitText.isEmpty ? nil : fahrzeitText
                     if defaultFuelTypeKey != "hybrid" {
                         trip.fuelTypeRaw = defaultFuelTypeKey
+                        let priceStr = switch defaultFuelTypeKey {
+                            case "e5":      defaultPriceE5
+                            case "diesel":  defaultPriceDiesel
+                            case "elektro": defaultPriceElektro
+                            default:        defaultPriceE10
+                        }
+                        let consStr = switch defaultFuelTypeKey {
+                            case "e5":      defaultConsE5
+                            case "diesel":  defaultConsDiesel
+                            case "elektro": defaultConsElektro
+                            default:        defaultConsE10
+                        }
+                        if let price = Double(priceStr.replacingOccurrences(of: ",", with: ".")) { trip.fuelPricePerLiter = price }
+                        if let cons  = Double(consStr.replacingOccurrences(of: ",", with: "."))  { trip.fuelConsumption   = cons  }
                     }
                     store.addTrip(trip)
                     AppLogger.shared.log("GPS-Fahrt gespeichert: \(from) → \(to.isEmpty ? from : to), \(String(format: "%.1f", km)) km", level: .gps)
@@ -623,100 +645,96 @@ struct GPSTripSheet: View {
 
     // ── Live-Aufzeichnung ──
     private var trackingView: some View {
-        ScrollView {
-            VStack(spacing: 16) {
+        VStack(spacing: 0) {
 
-                // ── Anzeige-Panel: Status + km + Zeit (kompakt) ──
-                HStack(spacing: 16) {
-                    // Aufnahme-Indikator
-                    HStack(spacing: 5) {
-                        PulsingDot(color: .blue)
-                        Text("REC")
-                            .font(.system(size: 11, weight: .regular))
-                            .foregroundColor(.secondary)
-                            .kerning(1.0)
-                    }
-                    Spacer()
-                    // Live-km-Anzeige
-                    Text(gpsDistanceFormatted(tracker.totalKm))
-                        .font(.system(size: 28, weight: .regular, design: .monospaced))
-                        .foregroundColor(.primary)
-                        .contentTransition(.numericText(countsDown: false))
-                        .animation(.spring(response: 0.35), value: tracker.totalKm)
-                    Spacer()
-                    // Vergangene Zeit
-                    Text(formatElapsed(tracker.elapsedSeconds))
-                        .font(.system(size: 14, weight: .regular, design: .monospaced))
+            // ── Anzeige-Panel: Status + km + Zeit ──
+            HStack(spacing: 16) {
+                HStack(spacing: 5) {
+                    PulsingDot(color: .blue)
+                    Text("REC")
+                        .font(.system(size: 11, weight: .regular))
                         .foregroundColor(.secondary)
-                        .contentTransition(.numericText())
-                        .animation(.default, value: tracker.elapsedSeconds)
+                        .kerning(1.0)
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 10)
-                .frame(maxWidth: .infinity)
-                .background(Color(.secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .shadow(color: .black.opacity(0.07), radius: 6, x: 0, y: 3)
-                .padding(.horizontal, 20)
-
-                // ── Tempo ──
-                HStack(spacing: 0) {
-                    Spacer()
-                    VStack(spacing: 2) {
-                        Text(String(format: "%.0f", tracker.currentSpeedKmh))
-                            .font(.system(size: 64, weight: .thin, design: .monospaced))
-                            .foregroundColor(.primary)
-                            .contentTransition(.numericText())
-                            .animation(.default, value: tracker.currentSpeedKmh)
-                        Text("km/h")
-                            .font(.system(size: 13, weight: .regular))
-                            .foregroundColor(.secondary)
-                            .kerning(1.5)
-                    }
-                    Spacer()
-                }
-                .padding(.vertical, 8)
-                .padding(.horizontal, 20)
-                .frame(maxWidth: .infinity)
-                .background(Color(.secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .shadow(color: .black.opacity(0.07), radius: 6, x: 0, y: 3)
-                .padding(.horizontal, 20)
-
-                // ── Live-Karte ──
-                LiveMapCard(tracker: tracker)
-
-                if let err = tracker.errorMessage {
-                    errorBanner(err)
-                        .padding(.horizontal, 20)
-                }
-
-                // ── Stop-Button ──
-                Button {
-                    let elapsed = tracker.elapsedSeconds
-                    let startDate = tracker.tripStartDate
-                    let endDate = Date()
-                    tracker.stopAndGeocode { from, to, km in
-                        onResult(from, to, km, elapsed, startDate, endDate)
-                    }
-                } label: {
-                    HStack(spacing: 12) {
-                        Image(systemName: "stop.circle.fill")
-                            .font(.system(size: 22))
-                        Text(lm.t("trips.gps.stop"))
-                            .fontWeight(.regular)
-                    }
-                    .font(.subheadline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(Color.blue)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 24)
+                Spacer()
+                Text(gpsDistanceFormatted(tracker.totalKm))
+                    .font(.system(size: 28, weight: .regular, design: .monospaced))
+                    .foregroundColor(.primary)
+                    .contentTransition(.numericText(countsDown: false))
+                    .animation(.spring(response: 0.35), value: tracker.totalKm)
+                Spacer()
+                Text(formatElapsed(tracker.elapsedSeconds))
+                    .font(.system(size: 14, weight: .regular, design: .monospaced))
+                    .foregroundColor(.secondary)
+                    .contentTransition(.numericText())
+                    .animation(.default, value: tracker.elapsedSeconds)
             }
-            .padding(.top, 16)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity)
+            .background(Color(.secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .shadow(color: .black.opacity(0.07), radius: 6, x: 0, y: 3)
+            .padding(.horizontal, 20)
+
+            Spacer(minLength: 8).fixedSize()
+
+            // ── Tempo ──
+            VStack(spacing: 4) {
+                Text(String(format: "%.0f", tracker.currentSpeedKmh))
+                    .font(.system(size: 43, weight: .thin, design: .monospaced))
+                    .foregroundColor(.primary)
+                    .contentTransition(.numericText())
+                    .animation(.default, value: tracker.currentSpeedKmh)
+                Text("km/h")
+                    .font(.system(size: 13, weight: .regular))
+                    .foregroundColor(.secondary)
+                    .kerning(1.5)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 20)
+            .background(Color(.secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .shadow(color: .black.opacity(0.07), radius: 6, x: 0, y: 3)
+            .padding(.horizontal, 20)
+
+            Spacer(minLength: 8).fixedSize()
+
+            // ── Live-Karte ──
+            LiveMapCard(tracker: tracker)
+
+            if let err = tracker.errorMessage {
+                errorBanner(err)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 8)
+            }
+
+            Spacer(minLength: 8).fixedSize()
+
+            // ── Stop-Button ──
+            Button {
+                let elapsed = tracker.elapsedSeconds
+                let startDate = tracker.tripStartDate
+                let endDate = Date()
+                tracker.stopAndGeocode { from, to, km in
+                    onResult(from, to, km, elapsed, startDate, endDate)
+                }
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "stop.circle.fill")
+                        .font(.system(size: 22))
+                    Text(lm.t("trips.gps.stop"))
+                        .fontWeight(.regular)
+                }
+                .font(.subheadline)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(Color.blue)
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 28)
         }
         .background(Color(.systemGroupedBackground))
     }
@@ -828,7 +846,7 @@ struct GPSTripSheet: View {
     // ── GPS-Distanz: Meter unter 1 km, sonst eine Nachkommastelle ──
     private func gpsDistanceFormatted(_ km: Double) -> String {
         if km < 1.0 {
-            let m = Int(km * 1000)
+            let m = (Int(km * 1000) / 100) * 100
             return "\(m) m"
         }
         let truncated = Double(Int(km * 10)) / 10.0
@@ -2124,7 +2142,7 @@ struct LiveMapCard: View {
                 routeCoordinates: tracker.routeCoordinates,
                 currentLocation: tracker.currentLocation
             )
-            .frame(height: 220)
+            .frame(height: 400)
         }
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))

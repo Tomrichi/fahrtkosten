@@ -80,7 +80,7 @@ struct UebernachtungView: View {
                             if selectedFilter != .alle {
                                 HStack(spacing: 8) {
                                     Image(systemName: "calendar")
-                                        .foregroundColor(.iosPurple)
+                                        .foregroundColor(.blue)
                                         .font(.system(size: 15, weight: .regular))
                                     DatePicker("", selection: $selectedDate, displayedComponents: .date)
                                         .labelsHidden()
@@ -91,10 +91,10 @@ struct UebernachtungView: View {
                                     } label: {
                                         Text("Heute")
                                             .font(.caption)
-                                            .foregroundColor(.iosPurple)
+                                            .foregroundColor(.blue)
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 5)
-                                            .background(Color.iosPurple.opacity(0.1))
+                                            .background(Color.blue.opacity(0.1))
                                             .clipShape(Capsule())
                                     }
                                     .buttonStyle(.plain)
@@ -110,7 +110,7 @@ struct UebernachtungView: View {
                     Section {
                         ListHeaderCard(
                             icon: "bed.double.fill",
-                            color: .iosPurple,
+                            color: .blue,
                             title: filterLabel,
                             countLabel: "\(filteredHotels.count) \(lm.t("hotel.unit"))",
                             total: filteredTotal
@@ -199,9 +199,9 @@ struct UebernachtungView: View {
         VStack(spacing: 16) {
             ZStack {
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(Color.iosPurple.opacity(0.1)).frame(width: 64, height: 64)
+                    .fill(Color.blue.opacity(0.1)).frame(width: 64, height: 64)
                 Image(systemName: "bed.double.fill")
-                    .font(.system(size: 26, weight: .regular)).foregroundColor(.iosPurple)
+                    .font(.system(size: 26, weight: .regular)).foregroundColor(.blue)
             }
             VStack(spacing: 6) {
                 Text(lm.t("hotel.add")).font(.subheadline).foregroundColor(.primary)
@@ -239,9 +239,9 @@ struct HotelRow: View {
         HStack(spacing: 12) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(Color.iosPurple.opacity(0.11)).frame(width: 36, height: 36)
+                    .fill(Color.blue.opacity(0.11)).frame(width: 36, height: 36)
                 Image(systemName: "bed.double.fill")
-                    .foregroundColor(.iosPurple).font(.system(size: 15, weight: .regular))
+                    .foregroundColor(.blue).font(.system(size: 15, weight: .regular))
             }
             VStack(alignment: .leading, spacing: 3) {
                 Text(hotel.date.shortDate).font(.system(size: 15, weight: .regular))
@@ -262,8 +262,8 @@ struct HotelRow: View {
             Spacer()
             VStack(alignment: .trailing, spacing: 3) {
                 Text(hotel.amount(flat: hotelFlat).euroFormatted)
-                    .font(.system(size: 15, weight: .regular, design: .monospaced)).foregroundColor(.iosPurple)
-                HStack(spacing: 3) {
+                    .font(.system(size: 15, weight: .regular, design: .monospaced)).foregroundColor(.blue)
+                HStack(spacing: 4) {
                     Text(hotel.mode == .flat ? lm.t("hotel.flat.badge") : lm.t("hotel.actual.badge"))
                         .font(.system(size: 10, weight: .regular))
                     if hotel.numberOfNights > 1 {
@@ -273,7 +273,14 @@ struct HotelRow: View {
                 }
                 .foregroundColor(.white)
                 .padding(.horizontal, 6).padding(.vertical, 2)
-                .background(Color.iosPurple.opacity(0.7)).clipShape(Capsule())
+                .background(Color.blue.opacity(0.7)).clipShape(Capsule())
+                if hotel.breakfastIncluded {
+                    Text("☕ Frühstück")
+                        .font(.system(size: 10, weight: .regular))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 6).padding(.vertical, 2)
+                        .background(Color.red.opacity(0.7)).clipShape(Capsule())
+                }
             }
         }
         .padding(.vertical, 5)
@@ -296,8 +303,9 @@ struct HotelFormView: View {
     @State private var hotelName     = ""
     @State private var hotelMode     = HotelMode.flat
     @State private var costString    = ""
-    @State private var showScanner   = false
-    @State private var showDateRange = false
+    @State private var showScanner       = false
+    @State private var showDateRange     = false
+    @State private var breakfastIncluded = false
 
     private var isEdit: Bool { if case .edit = mode { return true }; return false }
     private var editingHotel: HotelEntry? { if case .edit(let h) = mode { return h }; return nil }
@@ -322,13 +330,13 @@ struct HotelFormView: View {
                         HStack(spacing: 10) {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                    .fill(Color.iosPurple.opacity(0.12)).frame(width: 32, height: 32)
+                                    .fill(Color.blue.opacity(0.12)).frame(width: 32, height: 32)
                                 Image(systemName: "doc.viewfinder.fill")
-                                    .font(.system(size: 14, weight: .regular)).foregroundColor(.iosPurple)
+                                    .font(.system(size: 14, weight: .regular)).foregroundColor(.blue)
                             }
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("Rechnung scannen")
-                                    .font(.system(size: 15, weight: .regular)).foregroundColor(.iosPurple)
+                                    .font(.system(size: 15, weight: .regular)).foregroundColor(.blue)
                                 Text("Datum, Hotelname, Betrag & Nächte automatisch erkennen")
                                     .font(.caption).foregroundColor(.secondary)
                             }
@@ -360,11 +368,11 @@ struct HotelFormView: View {
                     // Nächteanzahl als Info-Zeile
                     HStack {
                         Label("Anzahl Nächte", systemImage: "moon.fill")
-                            .foregroundColor(.iosPurple)
+                            .foregroundColor(.blue)
                         Spacer()
                         Text("\(numberOfNights) \(numberOfNights == 1 ? "Nacht" : "Nächte")")
                             .font(.system(size: 15, weight: .regular))
-                            .foregroundColor(.iosPurple)
+                            .foregroundColor(.blue)
                     }
                 }
 
@@ -445,6 +453,29 @@ struct HotelFormView: View {
                     }
                 }
 
+                // ── Frühstück ──
+                Section {
+                    Toggle(isOn: $breakfastIncluded) {
+                        HStack(spacing: 8) {
+                            Label("Frühstück inbegriffen", systemImage: "cup.and.saucer.fill")
+                            if breakfastIncluded {
+                                Text("−20 % Verpfl.")
+                                    .font(.caption)
+                                    .foregroundColor(.red)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.red.opacity(0.12))
+                                    .clipShape(Capsule())
+                            }
+                        }
+                    }
+                    .tint(.red)
+                } header: {
+                    Text("Verpflegung")
+                } footer: {
+                    Text("Gilt für in Deutschland angestellte Techniker: Ist das Frühstück im Hotelpreis enthalten und auf der Rechnung nicht separat ausgewiesen, werden 20 % der Verpflegungspauschale für diesen Tag abgezogen (§ 9 Abs. 4a EStG).")
+                }
+
                 Section {
                     InfoBox(text: String(format: lm.t("hotel.info"), store.hotelFlat.euroFormatted))
                 }
@@ -495,6 +526,7 @@ struct HotelFormView: View {
         if h.mode == .actual {
             costString = String(format: "%.2f", h.actualCost).replacingOccurrences(of: ".", with: ",")
         }
+        breakfastIncluded = h.breakfastIncluded
     }
 
     private func save() {
@@ -505,7 +537,8 @@ struct HotelFormView: View {
             city: city, hotelName: hotelName,
             mode: hotelMode,
             actualCost: actualCost,
-            numberOfNights: numberOfNights
+            numberOfNights: numberOfNights,
+            breakfastIncluded: breakfastIncluded
         )
         if isEdit { store.updateHotel(entry) } else { store.addHotel(entry) }
         dismiss()
