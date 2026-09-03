@@ -140,10 +140,12 @@ struct FahrtenView: View {
     @EnvironmentObject var store: DataStore
     @EnvironmentObject var lm: LocalizationManager
     @EnvironmentObject var settingsCtrl: SettingsController
+    @EnvironmentObject var proMgr: ProManager
 
     @State private var showAdd           = false
     @State private var editTrip: Trip?
     @State private var showGPSSheet      = false
+    @State private var showProUpgrade    = false
     @State private var importMode: TripFormMode? = nil
     
 
@@ -222,7 +224,7 @@ struct FahrtenView: View {
         ud?.removeObject(forKey: "carPlayAutoStopped")
         if autoStopped {
             // CarPlay getrennt → Sheet öffnen, User prüft Daten selbst
-            showGPSSheet = true
+            if proMgr.isPro { showGPSSheet = true } else { showProUpgrade = true }
         }
         // Manueller Stop per CarPlay-Button: CarPlaySceneDelegate stoppt und speichert
         // die Fahrt bereits direkt über LocationTracker.shared/CarPlayDataAccess –
@@ -239,7 +241,7 @@ struct FahrtenView: View {
                         // Kachel 1: GPS-Aufzeichnung
                         Button {
                             AppLogger.shared.logTap("GPS-Aufzeichnung starten")
-                            showGPSSheet = true
+                            if proMgr.isPro { showGPSSheet = true } else { showProUpgrade = true }
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: "location.circle.fill")
@@ -451,7 +453,7 @@ struct FahrtenView: View {
                         }
                         Button {
                             AppLogger.shared.logTap("GPS-Aufzeichnung (Menü)")
-                            showGPSSheet = true
+                            if proMgr.isPro { showGPSSheet = true } else { showProUpgrade = true }
                         } label: {
                             Label("GPS-Aufzeichnung", systemImage: "location.circle.fill")
                         }
@@ -476,6 +478,10 @@ struct FahrtenView: View {
             // Bearbeiten
             .sheet(item: $editTrip) { trip in
                 TripFormView(mode: .edit(trip))
+            }
+            // Pro-Upgrade Sheet
+            .sheet(isPresented: $showProUpgrade) {
+                ProUpgradeView().environmentObject(proMgr)
             }
             // GPS-Aufzeichnungs-Sheet
             // Nach Stop: Fahrt wird DIREKT gespeichert – kein extra Formular nötig

@@ -1338,13 +1338,56 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.24 – aktuell -->
+<!-- 1.17.26 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.24
+        Version 1.17.26
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">Bugfix · CarPlay Pause/Weiter</div>
+    </div>
+    <span class="build-info">1. September 2026 · Build 48</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-fix">FIX</span> <strong>CarPlay – Pause/Weiter:</strong> Nach dem Pausieren einer GPS-Fahrt wird der Button in CarPlay jetzt korrekt auf „Weiter" umgeschaltet und die Aufzeichnung lässt sich wieder fortsetzen.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.25 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.25
+      </div>
+      <div class="preview-text">Freemium · GPS & Export & Backup als Pro-Feature</div>
+    </div>
+    <span class="build-info">1. September 2026 · Build 47</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEU</span> <strong>Freemium-Modell:</strong> Fahrtkosten ist jetzt kostenlos. GPS-Aufzeichnung, Export (PDF & CSV), Backup und CarPlay werden als einmalige Pro-Version (6,99 €) freigeschaltet.</li>
+      <li><span class="badge-new">NEU</span> <strong>GPS-Ansicht überarbeitet:</strong> Größere Karte, Geschwindigkeit kompakt darüber – alles auf einen Blick, kein Scrollen nötig.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.24 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.24
       </div>
       <div class="preview-text">Frühstück im Hotel · GPS-Bugfixes · Neues Farbdesign</div>
     </div>

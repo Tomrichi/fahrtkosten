@@ -4,6 +4,7 @@ import AppIntents
 @main
 struct FahrtkostenApp: App {
     private let lm = LocalizationManager.shared
+    @StateObject private var proMgr = ProManager()
     @AppStorage("preferredColorScheme") private var colorSchemePref: String = "system"
     @State private var showSplash = true
     @State private var pendingImportFrom: String? = nil
@@ -37,6 +38,7 @@ struct FahrtkostenApp: App {
                 if !showSplash {
                     ContentView()
                         .environmentObject(lm)
+                        .environmentObject(proMgr)
                         .preferredColorScheme(resolvedColorScheme)
                         .transition(.opacity)
                         .onAppear {

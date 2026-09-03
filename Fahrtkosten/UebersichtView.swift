@@ -32,10 +32,12 @@ enum ZeitFilter: String, CaseIterable {
 struct UebersichtView: View {
     @EnvironmentObject var store: DataStore
     @EnvironmentObject var lm: LocalizationManager
+    @EnvironmentObject var proMgr: ProManager
     @State private var showSettings    = false
     @AppStorage("uebersicht.tab") private var uebersichtTab: UebersichtTab = .dashboard
     @AppStorage("uebersicht.zeitFilter") private var zeitFilter: ZeitFilter = .monat
     @State private var showExport         = false
+    @State private var showProUpgrade     = false
     @State private var pdfPreviewItem    : PDFPreviewItem? = nil
     @State private var showPDFDatePicker = false
     @State private var pdfExportDate     = Date()
@@ -80,6 +82,7 @@ struct UebersichtView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         Button {
+                            guard proMgr.isPro else { showProUpgrade = true; return }
                             let content = CSVExportService.generate(
                                 store: store,
                                 trips: filteredTrips,
@@ -92,13 +95,14 @@ struct UebersichtView: View {
                             let url = CSVExportService.fileURL(content: content, zeitraum: zeitFilter.rawValue)
                             shareFile(url)
                         } label: {
-                            Label("CSV exportieren", systemImage: "tablecells")
+                            Label(proMgr.isPro ? "CSV exportieren" : "CSV exportieren 🔒", systemImage: "tablecells")
                         }
                         Button {
+                            guard proMgr.isPro else { showProUpgrade = true; return }
                             pdfExportDate = Date()
                             showPDFDatePicker = true
                         } label: {
-                            Label("PDF Vorschau & Export", systemImage: "doc.richtext.fill")
+                            Label(proMgr.isPro ? "PDF Vorschau & Export" : "PDF Vorschau & Export 🔒", systemImage: "doc.richtext.fill")
                         }
                     } label: {
                         Image(systemName: "square.and.arrow.up")
@@ -112,6 +116,9 @@ struct UebersichtView: View {
             }
             .sheet(isPresented: $showSettings) {
                 EinstellungenView()
+            }
+            .sheet(isPresented: $showProUpgrade) {
+                ProUpgradeView().environmentObject(proMgr)
             }
             .sheet(isPresented: $showAddVerpflegungSpese) {
                 KFZKostenFormView(mode: .add, defaultKategorie: .verpflegung)

@@ -5,6 +5,7 @@ import WebKit
 struct EinstellungenView: View {
     @EnvironmentObject var store: DataStore
     @EnvironmentObject var lm: LocalizationManager
+    @EnvironmentObject var proMgr: ProManager
     @Environment(\.dismiss) private var dismiss
 
     @State private var kmRateStr          = ""
@@ -38,6 +39,7 @@ struct EinstellungenView: View {
     @State private var showBedienungshilfen     = false
     @State private var showBackupPicker     = false
     @State private var showBackupShareSheet = false
+    @State private var showProUpgrade       = false
     @State private var showFeedback         = false
     @State private var showLogViewer        = false
     @State private var logClearConfirm      = false
@@ -169,6 +171,9 @@ struct EinstellungenView: View {
             }
             .sheet(isPresented: $showBackupShareSheet) {
                 if let url = backupFileURL { ShareSheet(items: [url]) }
+            }
+            .sheet(isPresented: $showProUpgrade) {
+                ProUpgradeView().environmentObject(proMgr)
             }
             .sheet(isPresented: $showBackupPicker) {
                 BackupImportPicker { url in
@@ -590,6 +595,7 @@ struct EinstellungenView: View {
             if expandBackup {
                 // Lokal speichern
                 Button {
+                    guard proMgr.isPro else { showProUpgrade = true; return }
                     saveAndApply()
                     AppLogger.shared.logTap("Backup: Lokal speichern")
                     backupMgr.saveLocally(from: store)
@@ -604,6 +610,7 @@ struct EinstellungenView: View {
 
                 // Teilen / Cloud
                 Button {
+                    guard proMgr.isPro else { showProUpgrade = true; return }
                     saveAndApply()
                     AppLogger.shared.logTap("Backup: Teilen / Cloud-Export")
                     if let url = backupMgr.backupFileURL(from: store) {

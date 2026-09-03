@@ -333,11 +333,9 @@ extension LocationTracker: CLLocationManagerDelegate {
         }
         stationaryTimer?.invalidate()
         stationaryTimer = nil
-
-        // UI informieren
+        writeGPSStateToAppGroup(recording: true)
         NotificationCenter.default.post(name: .gpsTrackingPaused, object: nil)
         AppLogger.shared.log("GPS-Aufzeichnung pausiert (Stillstand > \(pauseAfterSeconds / 60) Min)")
-
     }
 
     func resumeTracking() {
@@ -349,7 +347,7 @@ extension LocationTracker: CLLocationManagerDelegate {
         pausedAt = nil
         phase = .tracking
         lastMovedAt = Date()
-
+        writeGPSStateToAppGroup(recording: true)
         NotificationCenter.default.post(name: .gpsTrackingResumed, object: nil)
         AppLogger.shared.log("GPS-Aufzeichnung fortgesetzt")
     }

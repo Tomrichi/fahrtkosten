@@ -1,30 +1,30 @@
 import SwiftUI
+import StoreKit
 
 struct ProUpgradeView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var proMgr: ProManager
-    @State private var selectedPlan = "yearly"
 
     let features: [(String, String, Color, String)] = [
-        ("map.fill",         "Google/Apple Maps Integration", .blue,   "Routenvorschau & automatischer km-Import"),
-        ("arrow.down.circle.fill", "Automatischer km-Import", .green,  "Strecke direkt in die Abrechnung übernehmen"),
-        ("infinity",         "Unbegrenzte Einträge",          .orange, "Fahrten, Verpflegung & Übernachtungen"),
-        ("doc.fill",         "PDF-Export",                    .purple, "Fertige Abrechnung als Dokument"),
+        ("location.fill",          "GPS-Aufzeichnung",       .blue,   "Strecke automatisch per GPS erfassen"),
+        ("doc.richtext.fill",      "Export PDF & Excel",     .green,  "Fertige Abrechnung als Dokument"),
+        ("arrow.clockwise.icloud", "Backup & Restore",       .cyan,   "Daten sichern und wiederherstellen"),
+        ("car.fill",               "CarPlay",                .indigo, "GPS-Aufzeichnung am Fahrzeugdisplay"),
     ]
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    // Hero
+
+                    // ── Hero ─────────────────────────────────────────────────
                     VStack(spacing: 8) {
                         Image(systemName: "star.circle.fill")
                             .font(.system(size: 64))
                             .foregroundStyle(.yellow, .orange)
-                            .accessibilityHidden(true)
                         Text("Fahrtkosten Pro")
                             .font(.title.bold())
-                        Text("Alles was du für die perfekte Abrechnung brauchst")
+                        Text("Einmalig kaufen – dauerhaft alle Features")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
@@ -32,7 +32,7 @@ struct ProUpgradeView: View {
                     }
                     .padding(.top, 8)
 
-                    // Features
+                    // ── Feature-Liste ─────────────────────────────────────────
                     VStack(spacing: 0) {
                         ForEach(features, id: \.1) { icon, title, color, desc in
                             HStack(spacing: 14) {
@@ -44,7 +44,6 @@ struct ProUpgradeView: View {
                                         .foregroundColor(color)
                                         .font(.system(size: 17))
                                 }
-                                .accessibilityHidden(true)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(title).font(.system(size: 15, weight: .semibold))
                                     Text(desc).font(.caption).foregroundColor(.secondary)
@@ -52,12 +51,9 @@ struct ProUpgradeView: View {
                                 Spacer()
                                 Image(systemName: "checkmark.circle.fill")
                                     .foregroundColor(.iosGreen)
-                                    .accessibilityHidden(true)
                             }
                             .padding(.horizontal, 20)
                             .padding(.vertical, 12)
-                            .accessibilityElement(children: .combine)
-                            .accessibilityLabel("\(title). \(desc)")
                             if features.last?.1 != title {
                                 Divider().padding(.leading, 74)
                             }
@@ -67,39 +63,66 @@ struct ProUpgradeView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 13))
                     .padding(.horizontal)
 
-                    // Plan picker
-                    VStack(spacing: 10) {
-                        ForEach([
-                            ("monthly", "Monatlich",  "4,99 €",  "/ Monat",   "Flexibel · jederzeit kündbar", false),
-                            ("yearly",  "Jährlich",   "39,99 €", "/ Jahr",    "= 3,33 € / Monat · 33 % günstiger", true),
-                        ], id: \.0) { id, name, price, unit, desc, isBest in
-                            PlanCard(
-                                id: id, name: name, price: price,
-                                unit: unit, desc: desc, isBest: isBest,
-                                isSelected: selectedPlan == id
-                            )
-                            .onTapGesture { selectedPlan = id }
+                    // ── Preis-Card ────────────────────────────────────────────
+                    VStack(spacing: 6) {
+                        HStack(alignment: .firstTextBaseline, spacing: 4) {
+                            Text("6,99 €")
+                                .font(.system(size: 36, weight: .bold, design: .monospaced))
+                            Text("einmalig")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
                         }
+                        Text("Kein Abo · kein Ablaufdatum · alle zukünftigen Updates inklusive")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
                     }
+                    .padding(.vertical, 16)
+                    .frame(maxWidth: .infinity)
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 13))
                     .padding(.horizontal)
 
-                    // CTA
+                    // ── Fehlermeldung ─────────────────────────────────────────
+                    if let err = proMgr.errorMessage {
+                        Text(err)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+
+                    // ── Kaufen ────────────────────────────────────────────────
                     Button {
-                        proMgr.isPro = true
-                        dismiss()
+                        Task { await proMgr.purchase() }
                     } label: {
-                        Text("Jetzt upgraden – \(selectedPlan == "monthly" ? "4,99 € / Monat" : "39,99 € / Jahr")")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 52)
+                        Group {
+                            if proMgr.isLoading {
+                                ProgressView().tint(.white)
+                            } else {
+                                Text("Jetzt kaufen – 6,99 €")
+                                    .font(.headline)
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 52)
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.blue)
+                    .disabled(proMgr.isLoading)
                     .padding(.horizontal)
-                    .accessibilityLabel("Fahrtkosten Pro kaufen, \(selectedPlan == "monthly" ? "4,99 Euro pro Monat" : "39,99 Euro pro Jahr")")
-                    .accessibilityHint("Startet den In-App-Kauf")
 
-                    Text("Abonnement über Apple In-App-Käufe.\nJederzeit in den Einstellungen kündbar.")
+                    // ── Wiederherstellen ──────────────────────────────────────
+                    Button {
+                        Task { await proMgr.restore() }
+                    } label: {
+                        Text("Kauf wiederherstellen")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    .disabled(proMgr.isLoading)
+
+                    Text("Einmalkauf über Apple In-App-Käufe.\nNach dem Kauf auf allen deinen Geräten verfügbar.")
                         .font(.caption2)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -114,48 +137,9 @@ struct ProUpgradeView: View {
                     Button("Schließen") { dismiss() }
                 }
             }
-        }
-    }
-}
-
-struct PlanCard: View {
-    let id: String, name: String, price: String, unit: String, desc: String, isBest: Bool, isSelected: Bool
-
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 8) {
-                    Text(name).font(.headline)
-                    if isBest {
-                        Text("BEST VALUE")
-                            .font(.system(size: 10, weight: .bold))
-                            .padding(.horizontal, 7).padding(.vertical, 2)
-                            .background(Color.iosGreen)
-                            .foregroundColor(.white)
-                            .clipShape(Capsule())
-                    }
-                }
-                HStack(alignment: .firstTextBaseline, spacing: 3) {
-                    Text(price).font(.system(size: 22, weight: .bold, design: .monospaced))
-                    Text(unit).font(.subheadline).foregroundColor(.secondary)
-                }
-                Text(desc).font(.caption).foregroundColor(.secondary)
+            .onChange(of: proMgr.isPro) { _, isPro in
+                if isPro { dismiss() }
             }
-            Spacer()
-            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                .font(.title2)
-                .foregroundColor(isSelected ? .blue : .secondary)
-                .accessibilityHidden(true)
         }
-        .padding(16)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 13))
-        .overlay(
-            RoundedRectangle(cornerRadius: 13)
-                .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)
-        )
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(name), \(price) \(unit). \(desc)\(isBest ? ". Bestes Angebot." : "")")
-        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 }
