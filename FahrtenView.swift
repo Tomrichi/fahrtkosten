@@ -508,7 +508,14 @@ struct FahrtenView: View {
                     )
                     trip.fahrzeitText = fahrzeitText.isEmpty ? nil : fahrzeitText
                     if defaultFuelTypeKey != "hybrid" {
-                        trip.fuelTypeRaw = defaultFuelTypeKey
+                        let fuelType: FuelType = {
+                            switch defaultFuelTypeKey {
+                            case "e5":      return .e5
+                            case "diesel":  return .diesel
+                            case "elektro": return .elektro
+                            default:        return .e10
+                            }
+                        }()
                         let priceStr = switch defaultFuelTypeKey {
                             case "e5":      defaultPriceE5
                             case "diesel":  defaultPriceDiesel
@@ -521,8 +528,12 @@ struct FahrtenView: View {
                             case "elektro": defaultConsElektro
                             default:        defaultConsE10
                         }
-                        if let price = Double(priceStr.replacingOccurrences(of: ",", with: ".")) { trip.fuelPricePerLiter = price }
-                        if let cons  = Double(consStr.replacingOccurrences(of: ",", with: "."))  { trip.fuelConsumption   = cons  }
+                        let price = Double(priceStr.replacingOccurrences(of: ",", with: "."))
+                        let cons  = Double(consStr.replacingOccurrences(of: ",", with: "."))
+                        if let price { trip.fuelPricePerLiter = price }
+                        if let cons  { trip.fuelConsumption   = cons  }
+                        // storageKey verwenden damit Edit-Modus Kraftstoffart immer korrekt dekodiert
+                        trip.fuelTypeRaw = fuelType.storageKey
                     }
                     store.addTrip(trip)
                     AppLogger.shared.log("GPS-Fahrt gespeichert: \(from) → \(to.isEmpty ? from : to), \(String(format: "%.1f", km)) km", level: .gps)
@@ -1856,7 +1867,7 @@ struct TripFormView: View {
                         hybridFuelPriceStr      = parts[1]
                         hybridFuelConsumptionStr = parts[2]
                     }
-                } else if let saved = FuelType.allCases.first(where: { $0.tankerkoenigKey == raw }) {
+                } else if let saved = FuelType.allCases.first(where: { $0.tankerkoenigKey == raw || $0.storageKey == raw }) {
                     selectedFuelType = saved
                 }
             }

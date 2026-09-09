@@ -205,7 +205,7 @@ struct StopTripSheet: View {
                     default:        return .e10
                     }
                 }()
-                finished.fuelTypeRaw = fuelType.tankerkoenigKey
+                finished.fuelTypeRaw = fuelType.storageKey
             }
         }
 

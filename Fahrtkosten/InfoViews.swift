@@ -1338,22 +1338,26 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.26 – aktuell -->
+<!-- 1.17.29 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.26
+        Version 1.17.29
         <span class="current-badge">● Aktuell</span>
       </div>
       <div class="preview-text">Bugfix · CarPlay Pause/Weiter</div>
     </div>
-    <span class="build-info">1. September 2026 · Build 48</span>
+    <span class="build-info">9. September 2026 · Build 53</span>
     <span class="chevron">›</span>
   </summary>
   <div class="detail-content">
     <ul>
-      <li><span class="badge-fix">FIX</span> <strong>CarPlay – Pause/Weiter:</strong> Nach dem Pausieren einer GPS-Fahrt wird der Button in CarPlay jetzt korrekt auf „Weiter" umgeschaltet und die Aufzeichnung lässt sich wieder fortsetzen.</li>
+      <li><span class="badge-fix">FIX</span> <strong>CarPlay – Pause/Weiter:</strong> Nach dem Pausieren einer GPS-Fahrt wird der Button in CarPlay jetzt korrekt auf „Weiter" umgeschaltet und die Aufzeichnung lässt sich wieder fortsetzen
+          Fahrtkosten gibt es jetzt zum kostelosen Download - erfasse Fahrten, Spesen, Übernachtungen
+          und KFZ-Kosten und behalte deine Erstattung im Blick.</li>
+      <li><span class="badge-new">NEU</span> <strong>Mit Pro schaltest Du optional die automatische GPS- und CarPlay-Aufzeichnung, den PDF-/Excel-Export und das iCloud-Backup freo - einmalig, ohne Abo.</li>
+      <li><span class="badge-new">NEU</span> <strong>Dazu kleine Verbesserungen und Fehlerbehebungen. Dir gefällt die App? Über eine kurze Bewertung freuen wir uns sehr - das hilft anderen, sie zu finden.</li>
     </ul>
   </div>
 </details>

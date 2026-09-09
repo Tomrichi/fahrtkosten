@@ -28,6 +28,17 @@ enum FuelType: String, CaseIterable, Identifiable {
         }
     }
 
+    /// AppStorage-Key (identisch mit dem in EinstellungenView / UserDefaults gespeicherten Wert)
+    var storageKey: String {
+        switch self {
+        case .e5:      return "e5"
+        case .e10:     return "e10"
+        case .diesel:  return "diesel"
+        case .elektro: return "elektro"
+        case .hybrid:  return "hybrid"
+        }
+    }
+
     /// true wenn kein Tankerkönig-Abruf sinnvoll ist
     var isElectric: Bool { self == .elektro }
 
