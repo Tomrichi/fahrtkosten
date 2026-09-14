@@ -42,6 +42,7 @@ struct ContentView: View {
     @StateObject private var store              = DataStore()
     @StateObject private var settingsController = SettingsController()
     @EnvironmentObject var lm: LocalizationManager
+    @EnvironmentObject var proMgr: ProManager
 
     @AppStorage("contentView.selectedTab") private var selectedTab: AppTab = .fahrten
     @AppStorage("kmRateHinweis2026Gezeigt") private var kmRateHinweisGezeigt = false
@@ -115,9 +116,13 @@ struct ContentView: View {
                 .environmentObject(lm)
         }
         .onAppear {
+            if proMgr.isPro { store.enableSync() }
             guard !kmRateHinweisGezeigt else { return }
             kmRateHinweisGezeigt = true
             showKmRateHinweis = true
+        }
+        .onChange(of: proMgr.isPro) { _, isPro in
+            if isPro { store.enableSync() }
         }
         .alert("Kilometerpauschale angehoben", isPresented: $showKmRateHinweis) {
             Button("Zu den Einstellungen") { settingsController.showSettings = true }

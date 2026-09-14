@@ -15,6 +15,8 @@ class DataStore: ObservableObject {
     private let local: UserDefaults = {
         UserDefaults(suiteName: "group.de.tommwagner.fahrtkosten") ?? .standard
     }()
+    /// Nur true wenn der Nutzer Pro ist – dann wird iCloud KV Store aktiv genutzt
+    private(set) var isSyncEnabled = false
 
     // MARK: - Data (gespeichert in iCloud + lokalem UserDefaults als Backup)
     @Published var trips:           [Trip]           = [] { didSet { save(trips,           key: "trips") } }
@@ -215,8 +217,9 @@ class DataStore: ObservableObject {
         AppLogger.shared.logData("Lokale Daten geladen: \(trips.count) Fahrten")
     }
 
-    // MARK: - iCloud-Daten zusammenführen (nach 2 Sek. beim Start)
+    // MARK: - iCloud-Daten zusammenführen (nach 2 Sek. beim Start, nur wenn Pro)
     private func mergeFromiCloud() {
+        guard isSyncEnabled else { return }
         // Lokale Daten zu iCloud hochladen falls iCloud leer
         let keys = ["trips", "meals", "hotels", "vehicleCosts", "reiseSpesen", "privateExpenses"]
         for key in keys {
@@ -252,6 +255,7 @@ class DataStore: ObservableObject {
 
     // MARK: - iCloud Observer (andere Geräte haben etwas geändert)
     @objc private func icloudDidChange(_ notification: Notification) {
+        guard isSyncEnabled else { return }
         guard let keys = notification.userInfo?[NSUbiquitousKeyValueStoreChangedKeysKey] as? [String] else { return }
         DispatchQueue.main.async {
             if keys.contains("trips"),           let r: [Trip]           = self.loadiCloud(key: "trips")           { self.trips           = self.merge(local: self.trips,           remote: r) }
@@ -263,11 +267,12 @@ class DataStore: ObservableObject {
         }
     }
 
-    // MARK: - Speichern (iCloud + lokales UserDefaults als Backup)
+    // MARK: - Speichern (lokal immer, iCloud nur wenn Pro)
     private func save<T: Codable>(_ value: T, key: String) {
         guard let data = try? JSONEncoder().encode(value) else { return }
-        local.set(data, forKey: key)          // lokales Backup immer aktuell
-        icloud.set(data, forKey: key)         // iCloud sync
+        local.set(data, forKey: key)
+        guard isSyncEnabled else { return }
+        icloud.set(data, forKey: key)
         icloud.synchronize()
     }
 
@@ -460,6 +465,27 @@ class DataStore: ObservableObject {
         abroadMeal1to3  = Constants.abroadMeal1to3;  abroadMeal3to6  = Constants.abroadMeal3to6;  abroadMeal6plus = Constants.abroadMeal6plus
         breakfastFlat   = Constants.breakfastFlat
         AppLogger.shared.logData("Pauschalsätze auf Standardwerte zurückgesetzt")
+    }
+
+    // MARK: - iCloud-Sync aktivieren (Pro-Feature)
+    /// Wird aufgerufen sobald isPro = true wird. Aktiviert iCloud-Sync und führt
+    /// einen initialen Merge durch, damit alle Geräte den gleichen Datenstand haben.
+    func enableSync() {
+        guard !isSyncEnabled else { return }
+        isSyncEnabled = true
+        AppLogger.shared.logData("iCloud-Sync aktiviert (Pro)")
+        // Aktuell lokale Daten zu iCloud hochladen (andere Geräte bekommen sie so)
+        let syncKeys = ["trips", "meals", "hotels", "vehicleCosts", "reiseSpesen", "privateExpenses", "recurringTrips", "favorites"]
+        for key in syncKeys {
+            if let data = local.data(forKey: key) {
+                icloud.set(data, forKey: key)
+            }
+        }
+        icloud.synchronize()
+        // Nach kurzer Verzögerung iCloud-Daten zusammenführen
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            self.mergeFromiCloud()
+        }
     }
 }
 
