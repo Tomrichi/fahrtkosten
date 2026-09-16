@@ -1338,13 +1338,37 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.29 – aktuell -->
+<!-- 1.17.32 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.29
+        Version 1.17.32
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">iCloud-Sync · GPS-Spritdaten · Bugfixes</div>
+    </div>
+    <span class="build-info">16. September 2026 · Build 55</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEU</span> <strong>iCloud-Sync (Pro):</strong> Fahrten, Spesen, Übernachtungen und KFZ-Kosten werden automatisch zwischen iPhone, iPad und Mac synchronisiert – exklusiv für Pro-Nutzer.</li>
+      <li><span class="badge-fix">FIX</span> <strong>GPS – Kraftstofftyp:</strong> Der in den Einstellungen hinterlegte Kraftstoff (z. B. Diesel oder Elektro) wird jetzt zuverlässig in jede GPS-Fahrt übernommen.</li>
+      <li><span class="badge-fix">FIX</span> <strong>CarPlay – Spritdaten:</strong> Beim Beenden einer GPS-Fahrt über CarPlay werden Kraftstoffart, Preis und Verbrauch aus den Einstellungen korrekt gespeichert.</li>
+      <li><span class="badge-fix">FIX</span> <strong>GPS – Pause:</strong> Das GPS-Sheet kann während einer Pause nicht mehr versehentlich weggewischt werden. Auch der Abbrechen-Button stoppt die Aufzeichnung jetzt korrekt.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.29 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.29
       </div>
       <div class="preview-text">Bugfix · CarPlay Pause/Weiter</div>
     </div>
@@ -1353,11 +1377,7 @@ private let versionHistoryHTML = #"""
   </summary>
   <div class="detail-content">
     <ul>
-      <li><span class="badge-fix">FIX</span> <strong>CarPlay – Pause/Weiter:</strong> Nach dem Pausieren einer GPS-Fahrt wird der Button in CarPlay jetzt korrekt auf „Weiter" umgeschaltet und die Aufzeichnung lässt sich wieder fortsetzen
-          Fahrtkosten gibt es jetzt zum kostelosen Download - erfasse Fahrten, Spesen, Übernachtungen
-          und KFZ-Kosten und behalte deine Erstattung im Blick.</li>
-      <li><span class="badge-new">NEU</span> <strong>Mit Pro schaltest Du optional die automatische GPS- und CarPlay-Aufzeichnung, den PDF-/Excel-Export und das iCloud-Backup freo - einmalig, ohne Abo.</li>
-      <li><span class="badge-new">NEU</span> <strong>Dazu kleine Verbesserungen und Fehlerbehebungen. Dir gefällt die App? Über eine kurze Bewertung freuen wir uns sehr - das hilft anderen, sie zu finden.</li>
+      <li><span class="badge-fix">FIX</span> <strong>CarPlay – Pause/Weiter:</strong> Nach dem Pausieren einer GPS-Fahrt wird der Button in CarPlay jetzt korrekt auf „Weiter" umgeschaltet und die Aufzeichnung lässt sich wieder fortsetzen.</li>
     </ul>
   </div>
 </details>

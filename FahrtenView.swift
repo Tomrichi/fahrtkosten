@@ -595,7 +595,7 @@ struct GPSTripSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(lm.t("action.cancel")) {
-                        if tracker.isTracking {
+                        if tracker.isTracking || tracker.isPaused {
                             tracker.stopAndGeocode { _, _, _ in }
                         }
                         dismiss()
@@ -604,8 +604,8 @@ struct GPSTripSheet: View {
                 }
             }
         }
-        // Kein versehentliches Wischen während Aufzeichnung
-        .interactiveDismissDisabled(tracker.isTracking || tracker.isGeocoding)
+        // Kein versehentliches Wischen während Aufzeichnung oder Pause
+        .interactiveDismissDisabled(tracker.isTracking || tracker.isPaused || tracker.isGeocoding)
     }
 
     // ── Startbildschirm (wird beim Erscheinen sofort übersprungen, da onAppear startet) ──

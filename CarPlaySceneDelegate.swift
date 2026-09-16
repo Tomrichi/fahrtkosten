@@ -213,15 +213,36 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
         NotificationCenter.default.post(name: NSNotification.Name("carPlayStopGPS"), object: nil)
 
         let startDate = LocationTracker.shared.tripStartDate
+        // Spritdaten aus App Group lesen (gleiche Quelle wie @AppStorage in der App)
+        let fuelTypeKey  = ud.string(forKey: "defaultFuelType") ?? "e10"
+        let fuelPriceStr = ud.string(forKey: "defaultFuelPrice.\(fuelTypeKey)") ?? ""
+        let fuelConsStr  = ud.string(forKey: "defaultConsumption.\(fuelTypeKey)") ?? ""
+        let fuelPrice    = Double(fuelPriceStr.replacingOccurrences(of: ",", with: "."))
+        let fuelCons     = Double(fuelConsStr.replacingOccurrences(of: ",", with: "."))
+
         LocationTracker.shared.stopAndGeocode { [weak self] from, to, km in
             let start = startDate ?? Date()
-            let trip = Trip(
+            var trip = Trip(
                 from: from.isEmpty ? "Startort" : from,
                 to:   to.isEmpty   ? "Zielort"  : to,
                 date: start, km: km,
                 note: "GPS via CarPlay",
                 startTime: start, endTime: Date()
             )
+            // Spritdaten übernehmen (außer Hybrid)
+            if fuelTypeKey != "hybrid" {
+                let fuelType: FuelType = {
+                    switch fuelTypeKey {
+                    case "e5":      return .e5
+                    case "diesel":  return .diesel
+                    case "elektro": return .elektro
+                    default:        return .e10
+                    }
+                }()
+                trip.fuelTypeRaw = fuelType.storageKey
+                if let p = fuelPrice, p > 0 { trip.fuelPricePerLiter = p }
+                if let c = fuelCons,  c > 0 { trip.fuelConsumption   = c }
+            }
             CarPlayDataAccess.saveTrip(trip)
             self?.renderDashboard()
         }
