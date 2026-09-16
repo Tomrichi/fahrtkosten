@@ -146,6 +146,8 @@ struct FahrtenView: View {
     @State private var editTrip: Trip?
     @State private var showGPSSheet      = false
     @State private var showProUpgrade    = false
+    @State private var showGPSMacAlert   = false
+    private var isRunningOnMac: Bool { ProcessInfo.processInfo.isiOSAppOnMac || ProcessInfo.processInfo.isMacCatalystApp }
     @State private var importMode: TripFormMode? = nil
     
 
@@ -224,7 +226,8 @@ struct FahrtenView: View {
         ud?.removeObject(forKey: "carPlayAutoStopped")
         if autoStopped {
             // CarPlay getrennt → Sheet öffnen, User prüft Daten selbst
-            if proMgr.isPro { showGPSSheet = true } else { showProUpgrade = true }
+            if isRunningOnMac { showGPSMacAlert = true }
+            else if proMgr.isPro { showGPSSheet = true } else { showProUpgrade = true }
         }
         // Manueller Stop per CarPlay-Button: CarPlaySceneDelegate stoppt und speichert
         // die Fahrt bereits direkt über LocationTracker.shared/CarPlayDataAccess –
@@ -241,7 +244,8 @@ struct FahrtenView: View {
                         // Kachel 1: GPS-Aufzeichnung
                         Button {
                             AppLogger.shared.logTap("GPS-Aufzeichnung starten")
-                            if proMgr.isPro { showGPSSheet = true } else { showProUpgrade = true }
+                            if isRunningOnMac { showGPSMacAlert = true }
+            else if proMgr.isPro { showGPSSheet = true } else { showProUpgrade = true }
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: "location.circle.fill")
@@ -453,7 +457,8 @@ struct FahrtenView: View {
                         }
                         Button {
                             AppLogger.shared.logTap("GPS-Aufzeichnung (Menü)")
-                            if proMgr.isPro { showGPSSheet = true } else { showProUpgrade = true }
+                            if isRunningOnMac { showGPSMacAlert = true }
+            else if proMgr.isPro { showGPSSheet = true } else { showProUpgrade = true }
                         } label: {
                             Label("GPS-Aufzeichnung", systemImage: "location.circle.fill")
                         }
@@ -482,6 +487,11 @@ struct FahrtenView: View {
             // Pro-Upgrade Sheet
             .sheet(isPresented: $showProUpgrade) {
                 ProUpgradeView().environmentObject(proMgr)
+            }
+            .alert("GPS nicht verfügbar", isPresented: $showGPSMacAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Die GPS-Aufzeichnung ist nur auf iPhone und iPad verfügbar. Starte die Fahrt auf deinem iPhone – die Daten werden automatisch per iCloud synchronisiert.")
             }
             // GPS-Aufzeichnungs-Sheet
             // Nach Stop: Fahrt wird DIREKT gespeichert – kein extra Formular nötig
