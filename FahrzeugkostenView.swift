@@ -126,7 +126,7 @@ struct FahrzeugkostenView: View {
                 AppLogger.shared.logTap("KFZ-Kosten: Erster Eintrag hinzufügen")
                 showAdd = true
             } label: {
-                Label("Eintrag hinzufügen", systemImage: "plus")
+                Label(lm.t("settings.entry.add"), systemImage: "plus")
                     .font(.subheadline)
                     .padding(.horizontal, 20)
                     .padding(.vertical, 9)
@@ -264,10 +264,10 @@ struct VehicleCostFormView: View {
                                         .foregroundColor(.iosOrange)
                                 }
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text("Beleg scannen")
+                                    Text(lm.t("settings.scan.receipt"))
                                         .font(.system(size: 15, weight: .regular))
                                         .foregroundColor(.iosOrange)
-                                    Text("Positionen, Kategorien und Beträge automatisch erkennen")
+                                    Text(lm.t("settings.scan.receipt.hint"))
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }

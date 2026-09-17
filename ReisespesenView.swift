@@ -41,7 +41,13 @@ struct KFZKostenView: View {
                         // ── Zeitraum-Filter ──
                         Picker("Zeitraum", selection: $zeitFilter) {
                             ForEach(ZeitFilter.allCases, id: \.self) { f in
-                                Text(f.rawValue).tag(f)
+                                Text({
+                                    switch f {
+                                    case .woche: return lm.t("filter.woche")
+                                    case .monat: return lm.t("filter.monat")
+                                    case .jahr:  return lm.t("filter.jahr")
+                                    }
+                                }()).tag(f)
                             }
                         }
                         .pickerStyle(.segmented)
@@ -51,8 +57,8 @@ struct KFZKostenView: View {
                         ListHeaderCard(
                             icon: "wrench.and.screwdriver.fill",
                             color: .iosOrange,
-                            title: "KFZ Kosten",
-                            countLabel: "\(filteredSpesen.count) Belege",
+                            title: lm.t("kfz.title"),
+                            countLabel: "\(filteredSpesen.count) \(lm.t("kfz.belege"))",
                             total: filteredSpesen.reduce(0) { $0 + $1.amount }
                         )
                         .padding(.horizontal, 16)
@@ -79,7 +85,7 @@ struct KFZKostenView: View {
                                                 .font(.system(size: 14, weight: .regular))
                                                 .foregroundColor(.primary)
                                                 .lineLimit(1)
-                                            Text(items.isEmpty ? "Keine Einträge" : "\(items.count) Einträge")
+                                            Text(items.isEmpty ? lm.t("misc.no.entries") : "\(items.count) \(lm.t("overview.entries"))")
                                                 .font(.system(size: 11))
                                                 .foregroundColor(.secondary)
                                         }
@@ -131,13 +137,13 @@ struct KFZKostenView: View {
                             AppLogger.shared.logTap("KFZ-Spesen: Manuell erfassen")
                             showAdd = true
                         } label: {
-                            Label("Manuell erfassen", systemImage: "plus")
+                            Label(lm.t("kfz.manual"), systemImage: "plus")
                         }
                         Button {
                             AppLogger.shared.logTap("KFZ-Spesen: Beleg scannen")
                             showScanner = true
                         } label: {
-                            Label("Beleg scannen", systemImage: "doc.viewfinder.fill")
+                            Label(lm.t("kfz.scan"), systemImage: "doc.viewfinder.fill")
                         }
                     } label: {
                         Image(systemName: "plus")
@@ -204,22 +210,22 @@ struct KFZKostenView: View {
                     .foregroundColor(.iosOrange)
             }
             VStack(spacing: 6) {
-                Text("KFZ Kosten")
+                Text(lm.t("kfz.empty.title"))
                     .font(.subheadline).foregroundColor(.primary)
-                Text("Werkstatt, Leasing, Benzin und weitere Kosten erfassen")
+                Text(lm.t("kfz.empty.subtitle"))
                     .font(.subheadline).foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
             }
             HStack(spacing: 10) {
                 Button { showScanner = true } label: {
-                    Label("Scannen", systemImage: "doc.viewfinder.fill")
+                    Label(lm.t("kfz.empty.scan"), systemImage: "doc.viewfinder.fill")
                         .font(.subheadline)
                         .padding(.horizontal, 16).padding(.vertical, 9)
                         .background(Color.iosOrange).foregroundColor(.white)
                         .clipShape(Capsule())
                 }
                 Button { showAdd = true } label: {
-                    Label("Manuell", systemImage: "plus")
+                    Label(lm.t("kfz.empty.manual"), systemImage: "plus")
                         .font(.subheadline)
                         .padding(.horizontal, 16).padding(.vertical, 9)
                         .background(Color(.tertiarySystemGroupedBackground)).foregroundColor(.primary)
@@ -259,7 +265,7 @@ struct KFZKategorieDetailView: View {
                         let netto = allowance - total
                         VStack(spacing: 10) {
                             HStack {
-                                Label("Ausgaben", systemImage: "fork.knife")
+                                Label(lm.t("kfz.ausgaben"), systemImage: "fork.knife")
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
                                 Spacer()
@@ -268,7 +274,7 @@ struct KFZKategorieDetailView: View {
                                     .foregroundColor(.red)
                             }
                             HStack {
-                                Label("Verpflegungspauschale", systemImage: "eurosign.circle.fill")
+                                Label(lm.t("overview.meal.balance"), systemImage: "eurosign.circle.fill")
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
                                 Spacer()
@@ -278,7 +284,7 @@ struct KFZKategorieDetailView: View {
                             }
                             Divider()
                             HStack {
-                                Text("Netto")
+                                Text(lm.t("kfz.netto"))
                                     .font(.subheadline)
                                     .fontWeight(.regular)
                                 Spacer()
@@ -304,12 +310,12 @@ struct KFZKategorieDetailView: View {
                 }
 
                 // Einträge
-                Section(items.isEmpty ? "Keine Einträge" : "\(items.count) Einträge") {
+                Section(items.isEmpty ? lm.t("misc.no.entries") : "\(items.count) \(lm.t("overview.entries"))") {
                     if items.isEmpty {
                         Button {
                             showAdd = true
                         } label: {
-                            Label("Ersten Eintrag hinzufügen", systemImage: "plus.circle")
+                            Label(lm.t("kfz.add.first"), systemImage: "plus.circle")
                                 .foregroundColor(.iosOrange)
                                 .font(.subheadline)
                         }
@@ -416,6 +422,7 @@ enum KFZKostenFormMode { case add; case edit(ReiseSpese) }
 struct KFZKostenFormView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var store: DataStore
+    @EnvironmentObject var lm: LocalizationManager
 
     let mode: KFZKostenFormMode
     var defaultKategorie: ReisespesenKategorie = .sonstiges
@@ -450,10 +457,10 @@ struct KFZKostenFormView: View {
                                     .foregroundColor(.blue)
                             }
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("Beleg scannen")
+                                Text(lm.t("kfz.scan"))
                                     .font(.system(size: 15, weight: .regular))
                                     .foregroundColor(.blue)
-                                Text("Kamera oder Foto – Daten werden automatisch erkannt")
+                                Text(lm.t("kfz.scan.hint"))
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
@@ -467,9 +474,9 @@ struct KFZKostenFormView: View {
                 }
 
                 // ── Kategorie ──
-                Section("Kategorie") {
+                Section(lm.t("kfz.kategorie")) {
                     HStack {
-                        Label("Kategorie", systemImage: kategorie.icon)
+                        Label(lm.t("kfz.kategorie"), systemImage: kategorie.icon)
                             .foregroundColor(.primary)
                         Spacer()
                         Menu {
@@ -493,18 +500,18 @@ struct KFZKostenFormView: View {
                 }
 
                 // ── Details ──
-                Section("Details") {
-                    DatePicker("Datum", selection: $date, displayedComponents: .date)
+                Section(lm.t("misc.details")) {
+                    DatePicker(lm.t("misc.date"), selection: $date, displayedComponents: .date)
 
                     HStack {
-                        Label("Bezeichnung", systemImage: "text.alignleft")
+                        Label(lm.t("kfz.bezeichnung"), systemImage: "text.alignleft")
                         Spacer()
-                        TextField("Optional", text: $title)
+                        TextField(lm.t("misc.optional"), text: $title)
                             .multilineTextAlignment(.trailing)
                     }
 
                     HStack {
-                        Label("Betrag", systemImage: "eurosign.circle")
+                        Label(lm.t("kfz.betrag"), systemImage: "eurosign.circle")
                         Spacer()
                         TextField("0,00", text: $amountStr)
                             .keyboardType(.decimalPad)
@@ -514,9 +521,9 @@ struct KFZKostenFormView: View {
                     }
 
                     HStack {
-                        Label("Notiz", systemImage: "note.text")
+                        Label(lm.t("kfz.notiz"), systemImage: "note.text")
                         Spacer()
-                        TextField("Optional", text: $note)
+                        TextField(lm.t("misc.optional"), text: $note)
                             .multilineTextAlignment(.trailing)
                     }
                 }

@@ -145,28 +145,28 @@ struct EinstellungenView: View {
                 }
             }
             .onAppear { loadValues() }
-            .alert("Standardwerte wiederherstellen?", isPresented: $showResetAlert) {
-                Button("Zurücksetzen", role: .destructive) { resetToDefaults() }
-                Button("Abbrechen", role: .cancel) {}
+            .alert(lm.t("settings.reset.title"), isPresented: $showResetAlert) {
+                Button(lm.t("settings.reset.btn"), role: .destructive) { resetToDefaults() }
+                Button(lm.t("action.cancel"), role: .cancel) {}
             } message: {
-                Text("Alle Pauschalsätze werden auf die gesetzlichen Standardwerte zurückgesetzt.")
+                Text(lm.t("settings.reset.confirm"))
             }
-            .alert("Alle Einträge löschen?", isPresented: $showDeleteAllAlert) {
-                Button("Alles löschen", role: .destructive) {
+            .alert(lm.t("settings.delete.all.title"), isPresented: $showDeleteAllAlert) {
+                Button(lm.t("settings.delete.all.btn"), role: .destructive) {
                     AppLogger.shared.logTap("Einstellungen: Alle Einträge gelöscht")
                     backupMgr.deleteAllEntries(in: store)
-                    bannerMessage = "Alle Einträge wurden gelöscht."
+                    bannerMessage = lm.t("settings.all.deleted")
                     bannerIsError = false
                 }
-                Button("Abbrechen", role: .cancel) {}
+                Button(lm.t("action.cancel"), role: .cancel) {}
             } message: {
-                Text("Diese Aktion kann nicht rückgängig gemacht werden. Erstelle vorher ein Backup.")
+                Text(lm.t("settings.delete.confirm"))
             }
-            .alert("Backup wiederherstellen?", isPresented: $showRestoreAlert) {
-                Button("Backup laden", role: .destructive) { showBackupPicker = true }
-                Button("Abbrechen", role: .cancel) {}
+            .alert(lm.t("settings.restore.title"), isPresented: $showRestoreAlert) {
+                Button(lm.t("settings.restore.btn"), role: .destructive) { showBackupPicker = true }
+                Button(lm.t("action.cancel"), role: .cancel) {}
             } message: {
-                Text("Alle aktuellen Daten werden durch die Backup-Daten ersetzt.")
+                Text(lm.t("settings.restore.confirm"))
             }
             .sheet(isPresented: $showBackupShareSheet) {
                 if let url = backupFileURL { ShareSheet(items: [url]) }
@@ -218,12 +218,12 @@ struct EinstellungenView: View {
     @ViewBuilder private var gpsSection: some View {
         Section {
             Toggle(isOn: $carPlayAutoStartGPS) {
-                Label("GPS bei CarPlay-Verbindung starten", systemImage: "car.fill")
+                Label(lm.t("settings.gps.carplay"), systemImage: "car.fill")
             }
         } header: {
             Text("GPS / CarPlay")
         } footer: {
-            Text("Startet die GPS-Aufzeichnung automatisch, sobald dein iPhone mit CarPlay verbunden wird.")
+            Text(lm.t("settings.gps.carplay.footer"))
         }
     }
 
@@ -232,7 +232,7 @@ struct EinstellungenView: View {
     @ViewBuilder private var homeAddressSection: some View {
         Section {
             HStack {
-                Label("Heimatadresse", systemImage: "house.fill")
+                Label(lm.t("settings.home.address"), systemImage: "house.fill")
                     .foregroundStyle(.orange)
                 Spacer()
                 TextField("z.B. München", text: $homeAddress)
@@ -240,7 +240,7 @@ struct EinstellungenView: View {
                     .foregroundStyle(.secondary)
             }
         } footer: {
-            Text("Wird im Fahrtenformular als Schnellzugriff-Button (🏠) angezeigt und in der Fahrtenliste markiert.")
+            Text(lm.t("settings.home.footer"))
         }
     }
 
@@ -248,7 +248,7 @@ struct EinstellungenView: View {
         Section {
             DisclosureGroup(isExpanded: $expandRates) {
                 HStack {
-                    Label("Kilometerpauschale", systemImage: "car.fill")
+                    Label(lm.t("settings.km.label"), systemImage: "car.fill")
                     Spacer()
                     TextField("0,38", text: $kmRateStr)
                         .keyboardType(.decimalPad)
@@ -257,24 +257,24 @@ struct EinstellungenView: View {
                     Text("€ / km").foregroundStyle(.secondary).font(.subheadline)
                 }
             } label: {
-                Label("Kilometerpauschale", systemImage: "car.fill")
+                Label(lm.t("settings.km.label"), systemImage: "car.fill")
                     .foregroundStyle(.primary)
                     .fontWeight(.regular)
             }
-        } footer: { Text("Gesetzlicher Standardwert: 0,38 € / km (§ 9 Abs. 1 Nr. 4a EStG, seit Januar 2026)") }
+        } footer: { Text(lm.t("settings.km.legal.footer")) }
     }
 
     @ViewBuilder private var collapsibleMeals: some View {
         Section {
             DisclosureGroup(isExpanded: $expandMeals) {
                 VStack(alignment: .leading, spacing: 0) {
-                    Text("Inland").font(.caption).foregroundStyle(.secondary)
+                    Text(lm.t("settings.region.inland")).font(.caption).foregroundStyle(.secondary)
                         .padding(.top, 8).padding(.bottom, 4)
                     mealRow(label: "< 3 Stunden",   icon: "1.circle.fill", color: .gray,   binding: $inlandMeal1to3Str)
                     mealRow(label: "3 - 6 Stunden", icon: "2.circle.fill", color: .orange, binding: $inlandMeal3to6Str)
                     mealRow(label: "ab 6 Stunden",  icon: "3.circle.fill", color: .green,  binding: $inlandMeal6plusStr)
                     Divider().padding(.vertical, 6)
-                    Text("Schweiz (in CHF)").font(.caption).foregroundStyle(.secondary)
+                    Text(lm.t("settings.region.schweiz")).font(.caption).foregroundStyle(.secondary)
                         .padding(.bottom, 4)
                     mealRow(label: "< 3 Stunden",   icon: "1.circle.fill", color: .gray,   binding: $swissMeal1to3Str,  currency: "CHF")
                     mealRow(label: "3 - 6 Stunden", icon: "2.circle.fill", color: .orange, binding: $swissMeal3to6Str,  currency: "CHF")
@@ -302,18 +302,18 @@ struct EinstellungenView: View {
                         .foregroundStyle(.blue)
                     }
                     Divider().padding(.vertical, 6)
-                    Text("Ausland").font(.caption).foregroundStyle(.secondary)
+                    Text(lm.t("settings.region.ausland")).font(.caption).foregroundStyle(.secondary)
                         .padding(.bottom, 4)
                     mealRow(label: "< 3 Stunden",   icon: "1.circle.fill", color: .gray,   binding: $abroadMeal1to3Str)
                     mealRow(label: "3 - 6 Stunden", icon: "2.circle.fill", color: .orange, binding: $abroadMeal3to6Str)
                     mealRow(label: "ab 6 Stunden",  icon: "3.circle.fill", color: .green,  binding: $abroadMeal6plusStr)
                 }
             } label: {
-                Label("Verpflegungspauschalen", systemImage: "fork.knife")
+                Label(lm.t("settings.meals.title"), systemImage: "fork.knife")
                     .foregroundStyle(.primary)
                     .fontWeight(.regular)
             }
-        } footer: { Text("Inland: 0 € · 14 € · 28 €  |  Schweiz: 0 · 65 · 65 CHF (wird mit obigem Kurs in € umgerechnet)  |  Ausland: 0 € · 10 € · 35 €") }
+        } footer: { Text(lm.t("settings.meals.values.footer")) }
     }
 
     @ViewBuilder private var collapsibleMonteurszulage: some View {
@@ -327,7 +327,7 @@ struct EinstellungenView: View {
                         .foregroundStyle(.secondary)
                 }
                 HStack {
-                    Label("Zulage Inland / Deutschland", systemImage: "flag.fill")
+                    Label(lm.t("settings.mechanic.inland.label"), systemImage: "flag.fill")
                     Spacer()
                     TextField("12,00", text: $monteurszulageInlandStr)
                         .keyboardType(.decimalPad)
@@ -336,7 +336,7 @@ struct EinstellungenView: View {
                     Text("€").foregroundStyle(.secondary).font(.subheadline)
                 }
                 HStack {
-                    Label("Zulage Schweiz / Außerhalb des Werks", systemImage: "flag.checkered")
+                    Label(lm.t("settings.mechanic.swiss.label"), systemImage: "flag.checkered")
                     Spacer()
                     TextField("18,00", text: $monteurszulageSchweizStr)
                         .keyboardType(.decimalPad)
@@ -360,7 +360,7 @@ struct EinstellungenView: View {
                         .foregroundStyle(.secondary)
                 }
                 HStack {
-                    Label("Zulage Ausland / Außerhalb des Werks und Deutschlands", systemImage: "globe.europe.africa.fill")
+                    Label(lm.t("settings.mechanic.abroad.label"), systemImage: "globe.europe.africa.fill")
                     Spacer()
                     TextField("50,00", text: $monteurszulageAuslandStr)
                         .keyboardType(.decimalPad)
@@ -369,12 +369,12 @@ struct EinstellungenView: View {
                     Text("€").foregroundStyle(.secondary).font(.subheadline)
                 }
             } label: {
-                Label("Monteurszulage", systemImage: "wrench.and.screwdriver.fill")
+                Label(lm.t("settings.mechanic.allowance"), systemImage: "wrench.and.screwdriver.fill")
                     .foregroundStyle(.primary)
                     .fontWeight(.regular)
             }
         } footer: {
-            Text("Pauschale Zulage: 12 € bei Region Inland. Das Werk (\(werkOrtStr.isEmpty ? "Steffisburg" : werkOrtStr)) liegt selbst in der Schweiz – bei Region Schweiz gilt daher immer die Schweiz-Zulage von 18 CHF (wird mit dem CHF-Kurs oben in € umgerechnet – derselbe Kurs wie bei Verpflegungspauschalen). Bei Region Ausland gilt die Auslands-Zulage von 50 €, außer „Am Werk gearbeitet\" ist angehakt – dann gilt ebenfalls die Schweiz-Zulage. Wird über den Lohn ausbezahlt und ist daher NICHT Teil der Verpflegungspauschale/Erstattung – wird separat ausgewiesen.")
+            Text(String(format: lm.t("settings.mechanic.footer"), werkOrtStr.isEmpty ? "Steffisburg" : werkOrtStr))
         }
     }
 
@@ -382,7 +382,7 @@ struct EinstellungenView: View {
         Section {
             DisclosureGroup(isExpanded: $expandWochenendzulage) {
                 HStack {
-                    Label("Zulage Inland / Europa", systemImage: "flag.fill")
+                    Label(lm.t("settings.weekend.inland.label"), systemImage: "flag.fill")
                     Spacer()
                     TextField("60,00", text: $wochenendzulageInlandStr)
                         .keyboardType(.decimalPad)
@@ -391,7 +391,7 @@ struct EinstellungenView: View {
                     Text("€").foregroundStyle(.secondary).font(.subheadline)
                 }
                 HStack {
-                    Label("Zulage Schweiz / Europa", systemImage: "flag.checkered")
+                    Label(lm.t("settings.weekend.swiss.label"), systemImage: "flag.checkered")
                     Spacer()
                     TextField("90,00", text: $wochenendzulageSchweizStr)
                         .keyboardType(.decimalPad)
@@ -406,7 +406,7 @@ struct EinstellungenView: View {
                         .foregroundStyle(.secondary)
                 }
                 HStack {
-                    Label("Zulage Ausland / Übrige Gebiete", systemImage: "globe.europe.africa.fill")
+                    Label(lm.t("settings.weekend.abroad.label"), systemImage: "globe.europe.africa.fill")
                     Spacer()
                     TextField("72,00", text: $wochenendzulageAuslandStr)
                         .keyboardType(.decimalPad)
@@ -415,12 +415,12 @@ struct EinstellungenView: View {
                     Text("€").foregroundStyle(.secondary).font(.subheadline)
                 }
             } label: {
-                Label("Wochenend-/Feiertagszulage", systemImage: "calendar.badge.exclamationmark")
+                Label(lm.t("settings.weekend.allowance"), systemImage: "calendar.badge.exclamationmark")
                     .foregroundStyle(.primary)
                     .fontWeight(.regular)
             }
         } footer: {
-            Text("Pauschale Tageszulage bei Region Inland/Schweiz (\"Europa\"-Tarif: 60 € / 90 CHF, umgerechnet mit dem Kurs oben bei Monteurszulage) bzw. Region Ausland (\"Übrige Gebiete\": 72 €). Gilt an Samstagen/Sonntagen oder manuell markierten Feiertagen, nicht bei Weiterbildung/Schulung. Wird über den Lohn ausbezahlt und ist daher NICHT Teil der Verpflegungspauschale/Erstattung – wird separat ausgewiesen.")
+            Text(lm.t("settings.weekend.footer"))
         }
     }
 
@@ -428,7 +428,7 @@ struct EinstellungenView: View {
         Section {
             DisclosureGroup(isExpanded: $expandHotel) {
                 HStack {
-                    Label("Übernachtungspauschale", systemImage: "bed.double.fill")
+                    Label(lm.t("settings.hotel.flat"), systemImage: "bed.double.fill")
                     Spacer()
                     TextField("0,00", text: $hotelFlatStr)
                         .keyboardType(.decimalPad)
@@ -437,7 +437,7 @@ struct EinstellungenView: View {
                     Text("€").foregroundStyle(.secondary).font(.subheadline)
                 }
                 HStack {
-                    Label("Frühstückspauschale", systemImage: "cup.and.saucer.fill")
+                    Label(lm.t("settings.hotel.breakfast"), systemImage: "cup.and.saucer.fill")
                     Spacer()
                     TextField("0,00", text: $breakfastFlatStr)
                         .keyboardType(.decimalPad)
@@ -446,11 +446,11 @@ struct EinstellungenView: View {
                     Text("€").foregroundStyle(.secondary).font(.subheadline)
                 }
             } label: {
-                Label("Übernachtung/Frühstück", systemImage: "bed.double.fill")
+                Label(lm.t("settings.hotel.title"), systemImage: "bed.double.fill")
                     .foregroundStyle(.primary)
                     .fontWeight(.regular)
             }
-        } footer: { Text("Standard Deutschland: 20,00 € / Nacht (§ 9 Abs. 1 Nr. 5a EStG). Grenzgänger mit Schweizer Arbeitgeber und Tätigkeit in Deutschland: bitte individuell prüfen.") }
+        } footer: { Text(lm.t("settings.hotel.footer")) }
     }
 
     @ViewBuilder private var collapsibleFuel: some View {
@@ -458,7 +458,7 @@ struct EinstellungenView: View {
             DisclosureGroup(isExpanded: $expandFuel) {
                 // Kraftstoffart
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Antrieb / Kraftstoffart")
+                    Text(lm.t("settings.fuel.type"))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     // Zeile 1: Benzin-Typen
@@ -506,7 +506,7 @@ struct EinstellungenView: View {
 
                 // Durchschnittsverbrauch
                 HStack {
-                    Label(defaultFuelType == "elektro" ? "Verbrauch (kWh/100 km)" : "Durchschnittsverbrauch",
+                    Label(defaultFuelType == "elektro" ? lm.t("settings.fuel.consumption.kwh") : lm.t("settings.fuel.consumption"),
                           systemImage: "gauge.with.dots.needle.33percent")
                     Spacer()
                     TextField(defaultFuelType == "elektro" ? "z.B. 18,0" : "z.B. 7,5",
@@ -520,7 +520,7 @@ struct EinstellungenView: View {
 
                 // Standard-Preis
                 HStack {
-                    Label(defaultFuelType == "elektro" ? "Standard-Strompreis" : "Standard-Spritpreis",
+                    Label(defaultFuelType == "elektro" ? lm.t("settings.fuel.price.electricity") : lm.t("settings.fuel.price"),
                           systemImage: "eurosign.circle")
                     Spacer()
                     TextField(defaultFuelType == "elektro" ? "z.B. 0,30" : "z.B. 1,75",
@@ -533,7 +533,7 @@ struct EinstellungenView: View {
                 }
             } label: {
                 HStack {
-                    Label("Antrieb / Kraftstoff",
+                    Label(lm.t("settings.fuel.label"),
                           systemImage: defaultFuelType == "elektro" ? "bolt.fill" : defaultFuelType == "hybrid" ? "bolt.car.fill" : "fuelpump.fill")
                         .foregroundStyle(.primary)
                         .fontWeight(.regular)
@@ -543,7 +543,7 @@ struct EinstellungenView: View {
                         .foregroundStyle(.secondary)
                 }
             }
-        } footer: { Text("Antriebsart, Preis und Verbrauch werden beim Anlegen neuer Fahrten automatisch vorausgefüllt. Leer = manuelle Eingabe pro Fahrt.") }
+        } footer: { Text(lm.t("settings.fuel.footer")) }
     }
 
     private var fuelDisplayName: String {
@@ -565,10 +565,10 @@ struct EinstellungenView: View {
             Button(role: .destructive) {
                 showResetAlert = true
             } label: {
-                Label("Auf Standardwerte zurücksetzen", systemImage: "arrow.counterclockwise")
+                Label(lm.t("settings.reset"), systemImage: "arrow.counterclockwise")
             }
         } footer: {
-            Text("Stellt alle gesetzlichen Standardwerte gemäß § 9 Abs. 4a EStG wieder her.")
+            Text(lm.t("settings.reset.footer"))
         }
     }
 
@@ -581,7 +581,7 @@ struct EinstellungenView: View {
                 }
             } label: {
                 HStack {
-                    Label("Backup & Wiederherstellen", systemImage: "externaldrive.fill")
+                    Label(lm.t("settings.backup"), systemImage: "externaldrive.fill")
                         .foregroundColor(.primary)
                     Spacer()
                     Image(systemName: expandBackup ? "chevron.up" : "chevron.down")
@@ -604,7 +604,7 @@ struct EinstellungenView: View {
                         bannerMessage = err; bannerIsError = true
                     }
                 } label: {
-                    Label("Backup lokal speichern", systemImage: "internaldrive")
+                    Label(lm.t("settings.backup.save.local"), systemImage: "internaldrive")
                 }
 
                 // Teilen / Cloud
@@ -620,14 +620,14 @@ struct EinstellungenView: View {
                         bannerIsError = true
                     }
                 } label: {
-                    Label("Backup teilen / in Cloud exportieren", systemImage: "square.and.arrow.up")
+                    Label(lm.t("settings.backup.share"), systemImage: "square.and.arrow.up")
                 }
 
                 // Wiederherstellen
                 Button {
                     showRestoreAlert = true
                 } label: {
-                    Label("Backup wiederherstellen", systemImage: "arrow.down.doc.fill")
+                    Label(lm.t("settings.backup.restore"), systemImage: "arrow.down.doc.fill")
                 }
 
                 // Gespeicherte Backups
@@ -636,7 +636,7 @@ struct EinstellungenView: View {
                         .environmentObject(store)
                 } label: {
                     HStack {
-                        Label("Gespeicherte Backups", systemImage: "clock.arrow.circlepath")
+                        Label(lm.t("settings.backup.saved"), systemImage: "clock.arrow.circlepath")
                         Spacer()
                         if backupMgr.isLoadingBackups {
                             ProgressView().scaleEffect(0.8)
@@ -662,12 +662,12 @@ struct EinstellungenView: View {
             Button(role: .destructive) {
                 showDeleteAllAlert = true
             } label: {
-                Label("Alle Einträge löschen", systemImage: "trash.fill")
+                Label(lm.t("settings.delete.all"), systemImage: "trash.fill")
             }
         } header: {
-            Label("Daten verwalten", systemImage: "folder.fill")
+            Label(lm.t("settings.manage.data"), systemImage: "folder.fill")
         } footer: {
-            Text("Löscht unwiderruflich alle Einträge. Einstellungen bleiben erhalten.")
+            Text(lm.t("settings.delete.footer"))
         }
     }
 
@@ -695,7 +695,7 @@ struct EinstellungenView: View {
                 }
             }
         } footer: {
-            Text("Die App verwendet die iOS-Systemsprache. Zum Ändern: Einstellungen → Allgemein → Sprache & Region → iPhone-Sprache.")
+            Text(lm.t("settings.language.footer"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -709,7 +709,7 @@ struct EinstellungenView: View {
                 }
             } label: {
                 HStack {
-                    Label("App Info und Datenschutz", systemImage: "info.circle.fill")
+                    Label(lm.t("settings.app.info"), systemImage: "info.circle.fill")
                         .foregroundColor(.primary)
                     Spacer()
                     Image(systemName: expandInfo ? "chevron.up" : "chevron.down")
@@ -724,7 +724,7 @@ struct EinstellungenView: View {
                     showVersionHistory = true
                 } label: {
                     HStack {
-                        Label("App Version", systemImage: "clock.arrow.circlepath")
+                        Label(lm.t("settings.version"), systemImage: "clock.arrow.circlepath")
                         Spacer()
                         Image(systemName: "chevron.right")
                             .font(.caption)
@@ -737,7 +737,7 @@ struct EinstellungenView: View {
                 Button {
                     showDatenschutz = true
                 } label: {
-                    Label("Datenschutzerklärung", systemImage: "lock.shield.fill")
+                    Label(lm.t("settings.privacy.label"), systemImage: "lock.shield.fill")
                 }
                 .foregroundStyle(.primary)
                 .sheet(isPresented: $showDatenschutz) { DatenschutzView() }
@@ -745,7 +745,7 @@ struct EinstellungenView: View {
                 Button {
                     showAppInfo = true
                 } label: {
-                    Label("App-Funktionen & Anleitung", systemImage: "questionmark.circle.fill")
+                    Label(lm.t("settings.help.label"), systemImage: "questionmark.circle.fill")
                 }
                 .foregroundStyle(.primary)
                 .sheet(isPresented: $showAppInfo) { HilfeView() }
@@ -753,7 +753,7 @@ struct EinstellungenView: View {
                 Button {
                     showBedienungshilfen = true
                 } label: {
-                    Label("Bedienungshilfen", systemImage: "accessibility.fill")
+                    Label(lm.t("settings.accessibility"), systemImage: "accessibility.fill")
                 }
                 .foregroundStyle(.primary)
                 .sheet(isPresented: $showBedienungshilfen) { BedienungshilfenView() }
@@ -761,13 +761,13 @@ struct EinstellungenView: View {
                 Button {
                     showImpressum = true
                 } label: {
-                    Label("Impressum", systemImage: "doc.text.fill")
+                    Label(lm.t("settings.imprint"), systemImage: "doc.text.fill")
                 }
                 .foregroundStyle(.primary)
                 .sheet(isPresented: $showImpressum) { ImpressumView() }
 
                 HStack {
-                    Label("Entwickler", systemImage: "person.fill")
+                    Label(lm.t("settings.developer"), systemImage: "person.fill")
                         .foregroundStyle(.secondary)
                     Spacer()
                     Text("Thomas Wagner")
@@ -780,7 +780,7 @@ struct EinstellungenView: View {
                         UIApplication.shared.open(url)
                     }
                 } label: {
-                    Label("Kontakt", systemImage: "envelope.fill")
+                    Label(lm.t("settings.contact"), systemImage: "envelope.fill")
                 }
                 .foregroundStyle(.primary)
             }
@@ -795,7 +795,7 @@ struct EinstellungenView: View {
                 }
             } label: {
                 HStack {
-                    Label("Protokoll & Feedback", systemImage: "list.bullet.clipboard")
+                    Label(lm.t("settings.log.section"), systemImage: "list.bullet.clipboard")
                         .foregroundColor(.primary)
                     Spacer()
                     Image(systemName: expandProto ? "chevron.up" : "chevron.down")
@@ -810,7 +810,7 @@ struct EinstellungenView: View {
                     showLogViewer = true
                 } label: {
                     HStack {
-                        Label("Protokoll anzeigen", systemImage: "doc.text.magnifyingglass")
+                        Label(lm.t("settings.log.show"), systemImage: "doc.text.magnifyingglass")
                         Spacer()
                         Text(AppLogger.shared.sizeText)
                             .foregroundStyle(.secondary)
@@ -826,7 +826,7 @@ struct EinstellungenView: View {
                 Button {
                     showFeedback = true
                 } label: {
-                    Label("Feedback & Support", systemImage: "paperplane.fill")
+                    Label(lm.t("settings.feedback"), systemImage: "paperplane.fill")
                 }
                 .foregroundStyle(.primary)
                 .sheet(isPresented: $showFeedback) { FeedbackView() }
@@ -835,21 +835,21 @@ struct EinstellungenView: View {
                     Button(role: .destructive) {
                         logClearConfirm = true
                     } label: {
-                        Label("Protokoll löschen", systemImage: "trash")
+                        Label(lm.t("settings.log.delete"), systemImage: "trash")
                     }
-                    .alert("Protokoll löschen?", isPresented: $logClearConfirm) {
-                        Button("Löschen", role: .destructive) {
+                    .alert(lm.t("settings.log.delete.title"), isPresented: $logClearConfirm) {
+                        Button(lm.t("settings.swipe.delete"), role: .destructive) {
                             AppLogger.shared.clearLog()
-                            bannerMessage = "Protokoll gelöscht."
+                            bannerMessage = lm.t("settings.log.deleted")
                             bannerIsError = false
                         }
-                        Button("Abbrechen", role: .cancel) {}
+                        Button(lm.t("action.cancel"), role: .cancel) {}
                     } message: {
-                        Text("Das Protokoll wird geleert. Es wird beim nächsten App-Start automatisch neu angelegt.")
+                        Text(lm.t("settings.log.delete.msg"))
                     }
                 }
 
-                Text("Das Protokoll wird nur im Arbeitsspeicher geführt und beim nächsten App-Start automatisch geleert. Es enthält keine personenbezogenen Daten.")
+                Text(lm.t("settings.log.mem.note"))
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .padding(.top, 2)
@@ -920,7 +920,7 @@ struct EinstellungenView: View {
                 }
             } label: {
                 HStack {
-                    Label("Wischgesten", systemImage: "hand.draw.fill")
+                    Label(lm.t("settings.swipe.title"), systemImage: "hand.draw.fill")
                         .foregroundColor(.primary)
                     Spacer()
                     Image(systemName: expandSwipe ? "chevron.up" : "chevron.down")
@@ -931,17 +931,17 @@ struct EinstellungenView: View {
             .buttonStyle(.plain)
 
             if expandSwipe {
-                swipeRow(direction: "links",    iconColor: swipeColorValue(swipeLeading1Color),
+                swipeRow(direction: lm.t("settings.swipe.left"),    iconColor: swipeColorValue(swipeLeading1Color),
                          action: $swipeLeading1, color: $swipeLeading1Color,
                          defaultAction: "delete", defaultColor: "red")
-                swipeRow(direction: "rechts 1", iconColor: swipeColorValue(swipeTrailing1Color),
+                swipeRow(direction: lm.t("settings.swipe.right1"), iconColor: swipeColorValue(swipeTrailing1Color),
                          action: $swipeTrailing1, color: $swipeTrailing1Color,
                          defaultAction: "edit", defaultColor: "orange")
-                swipeRow(direction: "rechts 2", iconColor: swipeColorValue(swipeTrailing2Color),
+                swipeRow(direction: lm.t("settings.swipe.right2"), iconColor: swipeColorValue(swipeTrailing2Color),
                          action: $swipeTrailing2, color: $swipeTrailing2Color,
                          defaultAction: "duplicate", defaultColor: "blue")
 
-                Text("Legt fest welche Aktion und Farbe beim Wischen nach links oder rechts erscheint.")
+                Text(lm.t("settings.swipe.actions"))
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .padding(.top, 2)
@@ -960,13 +960,13 @@ struct EinstellungenView: View {
                     Image(systemName: direction == "links" ? "arrow.left" : "arrow.right")
                         .font(.system(size: 13, weight: .semibold)).foregroundColor(iconColor)
                 }
-                Text("Swipe \(direction)").font(.system(size: 15))
+                Text(direction).font(.system(size: 15))
                 Spacer()
                 Picker("", selection: action) {
-                    Text("Löschen").tag("delete")
-                    Text("Bearbeiten").tag("edit")
-                    Text("Kopieren").tag("duplicate")
-                    Text("-").tag("none")
+                    Text(lm.t("settings.swipe.delete")).tag("delete")
+                    Text(lm.t("settings.swipe.edit")).tag("edit")
+                    Text(lm.t("settings.swipe.copy")).tag("duplicate")
+                    Text(lm.t("settings.swipe.none")).tag("none")
                 }.pickerStyle(.menu)
             }
             // Farbauswahl
@@ -1128,6 +1128,7 @@ struct EinstellungenView: View {
 
 // MARK: - LogViewerSheet
 struct LogViewerSheet: View {
+    @EnvironmentObject var lm: LocalizationManager
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var logger = AppLogger.shared
     @State private var showShareSheet = false
@@ -1149,17 +1150,17 @@ struct LogViewerSheet: View {
                     }
                 } else {
                     ContentUnavailableView(
-                        "Keine Einträge",
+                        lm.t("misc.no.entries"),
                         systemImage: "doc.text",
-                        description: Text("Das Protokoll ist leer.")
+                        description: Text(lm.t("settings.log.empty.desc"))
                     )
                 }
             }
-            .navigationTitle("App-Protokoll")
+            .navigationTitle(lm.t("settings.log.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Schließen") { dismiss() }
+                    Button(lm.t("action.close")) { dismiss() }
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     // Teilen
@@ -1199,11 +1200,11 @@ struct LogViewerSheet: View {
                 ShareSheet(items: [data as Any])
             }
         }
-        .alert("Protokoll löschen?", isPresented: $clearConfirm) {
-            Button("Löschen", role: .destructive) { logger.clearLog() }
-            Button("Abbrechen", role: .cancel) {}
+        .alert(lm.t("settings.log.delete.title"), isPresented: $clearConfirm) {
+            Button(lm.t("settings.swipe.delete"), role: .destructive) { logger.clearLog() }
+            Button(lm.t("action.cancel"), role: .cancel) {}
         } message: {
-            Text("Das Protokoll wird geleert. Es wird beim nächsten App-Start automatisch neu angelegt.")
+            Text(lm.t("settings.log.delete.msg"))
         }
     }
 }
@@ -1218,6 +1219,7 @@ struct ShareSheet: UIViewControllerRepresentable {
 }
 
 struct SavedBackupListView: View {
+    @EnvironmentObject var lm: LocalizationManager
     @ObservedObject var backupMgr: BackupManager
     @EnvironmentObject var store: DataStore
     @State private var showRestoreConfirm: SavedBackupInfo? = nil
@@ -1231,7 +1233,7 @@ struct SavedBackupListView: View {
             if backupMgr.isLoadingBackups {
                 HStack {
                     Spacer()
-                    ProgressView("Lade Backups…")
+                    ProgressView(lm.t("settings.backup.loading"))
                     Spacer()
                 }
                 .listRowBackground(Color.clear)
@@ -1240,9 +1242,9 @@ struct SavedBackupListView: View {
                     Image(systemName: "icloud.slash")
                         .font(.system(size: 40))
                         .foregroundColor(.secondary)
-                    Text("Noch keine iCloud Backups")
+                    Text(lm.t("settings.backup.empty.title"))
                         .font(.headline)
-                    Text("Erstelle ein Backup über Einstellungen → iCloud Backup")
+                    Text(lm.t("settings.backup.empty.hint"))
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -1257,14 +1259,14 @@ struct SavedBackupListView: View {
                             Button(role: .destructive) {
                                 showDeleteConfirm = info
                             } label: {
-                                Label("Löschen", systemImage: "trash")
+                                Label(lm.t("settings.swipe.delete"), systemImage: "trash")
                             }
                         }
                         .swipeActions(edge: .leading) {
                             Button {
                                 showRestoreConfirm = info
                             } label: {
-                                Label("Wiederherstellen", systemImage: "arrow.counterclockwise")
+                                Label(lm.t("settings.backup.restore.btn"), systemImage: "arrow.counterclockwise")
                             }
                             .tint(.blue)
                         }
@@ -1272,7 +1274,7 @@ struct SavedBackupListView: View {
                 }
             }
         }
-        .navigationTitle("Gespeicherte Backups")
+        .navigationTitle(lm.t("settings.backup.saved.title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -1286,17 +1288,17 @@ struct SavedBackupListView: View {
         .task { backupMgr.loadSavedBackups() }
         // Wiederherstellen
         .confirmationDialog(
-            "Backup wiederherstellen?",
+            lm.t("settings.restore.title"),
             isPresented: Binding(get: { showRestoreConfirm != nil }, set: { if !$0 { showRestoreConfirm = nil } }),
             titleVisibility: .visible
         ) {
             if let info = showRestoreConfirm {
-                Button("Wiederherstellen", role: .destructive) {
+                Button(lm.t("settings.backup.restore.btn"), role: .destructive) {
                     Task {
                         let ok = backupMgr.restore(from: info.url, into: store)
                         let msg: String
                         if ok {
-                            msg = backupMgr.lastSuccess ?? "Wiederhergestellt"
+                            msg = backupMgr.lastSuccess ?? lm.t("settings.backup.restore.btn")
                         } else {
                             msg = backupMgr.lastError ?? "Fehler"
                         }
@@ -1306,27 +1308,27 @@ struct SavedBackupListView: View {
                         showRestoreConfirm = nil
                     }
                 }
-                Button("Abbrechen", role: .cancel) { showRestoreConfirm = nil }
+                Button(lm.t("action.cancel"), role: .cancel) { showRestoreConfirm = nil }
             }
         } message: {
             if let info = showRestoreConfirm {
-                Text("Alle aktuellen Daten werden durch das Backup vom \(info.date.formatted(date: .abbreviated, time: .shortened)) ersetzt.")
+                Text(String(format: lm.t("settings.backup.restore.msg"), info.date.formatted(date: .abbreviated, time: .shortened)))
             }
         }
         // Löschen
         .confirmationDialog(
-            "Backup löschen?",
+            lm.t("settings.backup.delete.title"),
             isPresented: Binding(get: { showDeleteConfirm != nil }, set: { if !$0 { showDeleteConfirm = nil } }),
             titleVisibility: .visible
         ) {
             if let info = showDeleteConfirm {
-                Button("Löschen", role: .destructive) {
+                Button(lm.t("settings.swipe.delete"), role: .destructive) {
                     Task {
                         backupMgr.deleteBackup(info)
                         showDeleteConfirm = nil
                     }
                 }
-                Button("Abbrechen", role: .cancel) { showDeleteConfirm = nil }
+                Button(lm.t("action.cancel"), role: .cancel) { showDeleteConfirm = nil }
             }
         }
         .overlay(alignment: .top) {

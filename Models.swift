@@ -333,13 +333,13 @@ enum VehicleCostCategory: String, Codable, CaseIterable {
     var localizedName: String {
         switch self {
         case .werkstatt:       return L("vehicle.cat.werkstatt")
-        case .leasing:         return "Leasing"
+        case .leasing:         return L("vehicle.cat.leasing")
         case .versicherung:    return L("vehicle.cat.versicherung")
         case .tuvHu:           return L("vehicle.cat.tuev")
         case .steuer:          return L("vehicle.cat.steuer")
         case .reifen:          return L("vehicle.cat.reifen")
-        case .strom:           return "Strom / Laden"
-        case .fahrzeugwaesche: return "Fahrzeugwäsche"
+        case .strom:           return L("vehicle.cat.strom")
+        case .fahrzeugwaesche: return L("vehicle.cat.waesche")
         case .sonstiges:       return L("vehicle.cat.sonstiges")
         }
     }
@@ -404,7 +404,19 @@ enum ReisespesenKategorie: String, Codable, CaseIterable, Identifiable {
         case .sonstiges:       return "gray"
         }
     }
-    var localizedName: String { rawValue }
+    var localizedName: String {
+        switch self {
+        case .werkstatt:       return L("kfz.cat.werkstatt")
+        case .leasing:         return L("kfz.cat.leasing")
+        case .vignetteMaut:    return L("kfz.cat.vignette")
+        case .benzin:          return L("kfz.cat.benzin")
+        case .strom:           return L("kfz.cat.strom")
+        case .kfzSteuer:       return L("kfz.cat.steuer")
+        case .kfzVersicherung: return L("kfz.cat.versicherung")
+        case .verpflegung:     return L("kfz.cat.verpflegung")
+        case .sonstiges:       return L("kfz.cat.sonstiges")
+        }
+    }
 
     /// true = gehört zu KFZ-Kosten, false = sonstige Reisespesen
     var isKFZ: Bool {

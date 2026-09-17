@@ -460,21 +460,21 @@ struct FahrtenView: View {
                             AppLogger.shared.logTap("Neue Fahrt (Menü)")
                             showAdd = true
                         } label: {
-                            Label("Neue Fahrt", systemImage: "plus")
+                            Label(lm.t("trips.form.new"), systemImage: "plus")
                         }
                         Button {
                             AppLogger.shared.logTap("GPS-Aufzeichnung (Menü)")
                             if isRunningOnMac { showGPSMacAlert = true }
             else if proMgr.isPro { showGPSSheet = true } else { showProUpgrade = true }
                         } label: {
-                            Label("GPS-Aufzeichnung", systemImage: "location.circle.fill")
+                            Label(lm.t("trips.gps.menu"), systemImage: "location.circle.fill")
                         }
                         Divider()
                         Button {
                             AppLogger.shared.logTap("Einstellungen (Menü)")
                             settingsCtrl.showSettings = true
                         } label: {
-                            Label("Einstellungen", systemImage: "gearshape")
+                            Label(lm.t("settings.title"), systemImage: "gearshape")
                         }
                     } label: {
                         Image(systemName: "ellipsis.circle").foregroundColor(.blue)
