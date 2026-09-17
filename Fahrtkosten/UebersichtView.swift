@@ -265,7 +265,13 @@ struct UebersichtView: View {
                 // ── Zeitraum-Filter ──
                 Picker("Zeitraum", selection: $zeitFilter) {
                     ForEach(ZeitFilter.allCases, id: \.self) { filter in
-                        Text(filter.rawValue).tag(filter)
+                        Text({
+                            switch filter {
+                            case .woche: return lm.t("filter.woche")
+                            case .monat: return lm.t("filter.monat")
+                            case .jahr:  return lm.t("filter.jahr")
+                            }
+                        }()).tag(filter)
                     }
                 }
                 .pickerStyle(.segmented)
@@ -295,7 +301,7 @@ struct UebersichtView: View {
                     icon: "car.fill", color: .blue,
                     label: lm.t("tab.trips"),
                     amount: tripAmount,
-                    detail: filteredTrips.count == 1 ? "1 Eintrag" : "\(filteredTrips.count) Einträge",
+                    detail: filteredTrips.count == 1 ? "1 \(lm.t("overview.entry"))" : "\(filteredTrips.count) \(lm.t("overview.entries"))",
                     isExpanded: $expandTrips
                 ) {
                     ForEach(filteredTrips.sorted(by: { $0.date > $1.date })) { trip in
@@ -314,7 +320,7 @@ struct UebersichtView: View {
                     icon: "fork.knife", color: .green,
                     label: lm.t("tab.meals"),
                     amount: mealAmount,
-                    detail: filteredMeals.count == 1 ? "1 Eintrag" : "\(filteredMeals.count) Einträge",
+                    detail: filteredMeals.count == 1 ? "1 \(lm.t("overview.entry"))" : "\(filteredMeals.count) \(lm.t("overview.entries"))",
                     isExpanded: $expandMeals
                 ) {
                     ForEach(filteredMeals.sorted(by: { $0.date > $1.date })) { meal in
@@ -339,15 +345,15 @@ struct UebersichtView: View {
                                 .font(.system(size: 22))
                                 .foregroundColor(.brown)
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("Verpflegung Saldo")
+                                Text(lm.t("overview.meal.balance"))
                                     .font(.system(size: 15, weight: .semibold))
                                 HStack(spacing: 6) {
-                                    Text("Pauschale \(mealAmount.euroFormatted)")
+                                    Text("\(lm.t("overview.flat.label")) \(mealAmount.euroFormatted)")
                                         .font(.system(size: 12))
                                         .foregroundColor(.secondary)
                                     Text("·")
                                         .foregroundColor(.secondary)
-                                    Text("Ausgaben \(ausgaben.euroFormatted)")
+                                    Text("\(lm.t("overview.ausgaben")) \(ausgaben.euroFormatted)")
                                         .font(.system(size: 12))
                                         .foregroundColor(.secondary)
                                 }
@@ -369,7 +375,7 @@ struct UebersichtView: View {
                     icon: "bed.double.fill", color: .blue,
                     label: lm.t("overview.accommodation.short"),
                     amount: hotelAmount,
-                    detail: filteredHotels.count == 1 ? "1 Eintrag" : "\(filteredHotels.count) Einträge",
+                    detail: filteredHotels.count == 1 ? "1 \(lm.t("overview.entry"))" : "\(filteredHotels.count) \(lm.t("overview.entries"))",
                     isExpanded: $expandHotels
                 ) {
                     ForEach(filteredHotels.sorted(by: { $0.date > $1.date })) { hotel in
@@ -392,11 +398,11 @@ struct UebersichtView: View {
 
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Ausgaben")
+                            Text(lm.t("overview.ausgaben"))
                                 .font(.system(size: 13, weight: .semibold))
                                 .foregroundColor(Color(.label).opacity(0.55))
                                 .textCase(.uppercase)
-                            Text("nicht erstattungsfähig")
+                            Text(lm.t("overview.not.reimbursable"))
                                 .font(.system(size: 11))
                                 .foregroundColor(Color(.label).opacity(0.4))
                         }
@@ -412,9 +418,9 @@ struct UebersichtView: View {
                 if !tankEintraege.isEmpty {
                     expandableCard(
                         icon: "fuelpump.fill", color: .orange,
-                        label: "Kraftstoff / Strom",
+                        label: lm.t("overview.fuel"),
                         amount: tankTotal,
-                        detail: "\(tankEintraege.count) Einträge",
+                        detail: "\(tankEintraege.count) \(lm.t("overview.entries"))",
                         isExpanded: $expandFuel
                     ) {
                         ForEach(tankEintraege.sorted(by: { $0.date > $1.date })) { spese in
@@ -434,7 +440,7 @@ struct UebersichtView: View {
                 if filteredTrips.contains(where: { $0.fuelCost != nil }) {
                     expandableCard(
                         icon: "gauge.with.needle", color: .iosTeal,
-                        label: "Kosten gefahrener km",
+                        label: lm.t("overview.driven.km"),
                         amount: filteredTrips.compactMap { $0.fuelCost }.reduce(0, +),
                         detail: filteredTrips.filter { $0.fuelCost != nil }.reduce(0.0) { $0 + $1.km }.kmFormatted,
                         isExpanded: $expandVerbrauch
@@ -448,9 +454,9 @@ struct UebersichtView: View {
                 let verpflegungAusgabenTotal = filteredVerpflegungAusgaben.reduce(0.0) { $0 + $1.amount }
                 expandableCard(
                     icon: "fork.knife.circle.fill", color: .brown,
-                    label: "Verpflegungsausgaben",
+                    label: lm.t("overview.meal.expenses"),
                     amount: verpflegungAusgabenTotal,
-                    detail: filteredVerpflegungAusgaben.isEmpty ? "Keine Einträge" : (filteredVerpflegungAusgaben.count == 1 ? "1 Eintrag" : "\(filteredVerpflegungAusgaben.count) Einträge"),
+                    detail: filteredVerpflegungAusgaben.isEmpty ? lm.t("overview.no.entries") : (filteredVerpflegungAusgaben.count == 1 ? "1 \(lm.t("overview.entry"))" : "\(filteredVerpflegungAusgaben.count) \(lm.t("overview.entries"))"),
                     isExpanded: $expandVerpflegungAusgaben,
                     onAdd: { showAddVerpflegungSpese = true }
                 ) {
@@ -485,9 +491,9 @@ struct UebersichtView: View {
                 if !reisespesenOhneTank.isEmpty {
                     expandableCard(
                         icon: "wrench.and.screwdriver.fill", color: .iosOrange,
-                        label: "Reisespesen / KFZ",
+                        label: lm.t("overview.travel.expenses"),
                         amount: reisespesenOhneTankTotal,
-                        detail: "\(reisespesenOhneTank.count) Einträge",
+                        detail: "\(reisespesenOhneTank.count) \(lm.t("overview.entries"))",
                         isExpanded: $expandReisespesen
                     ) {
                         ForEach(reisespesenOhneTank.sorted(by: { $0.date > $1.date })) { spese in
@@ -506,9 +512,9 @@ struct UebersichtView: View {
                 if !filteredVehicleCosts.isEmpty {
                     expandableCard(
                         icon: "sparkles", color: Color.cyan,
-                        label: "Fahrzeugkosten",
+                        label: lm.t("vehicle.title"),
                         amount: vehicleAmount,
-                        detail: "\(filteredVehicleCosts.count) Einträge",
+                        detail: "\(filteredVehicleCosts.count) \(lm.t("overview.entries"))",
                         isExpanded: $expandVehicle
                     ) {
                         ForEach(filteredVehicleCosts.sorted(by: { $0.date > $1.date })) { v in
@@ -526,9 +532,9 @@ struct UebersichtView: View {
                 // Private Ausgaben
                 expandableCard(
                     icon: "person.fill", color: Color.pink,
-                    label: "Private Ausgaben",
+                    label: lm.t("overview.private.expenses"),
                     amount: privateAmount,
-                    detail: filteredPrivateExpenses.isEmpty ? "Keine Einträge" : "\(filteredPrivateExpenses.count) Einträge",
+                    detail: filteredPrivateExpenses.isEmpty ? lm.t("overview.no.entries") : "\(filteredPrivateExpenses.count) \(lm.t("overview.entries"))",
                     isExpanded: $expandPrivate,
                     onAdd: { showAddPrivateExpense = true }
                 ) {
@@ -558,11 +564,11 @@ struct UebersichtView: View {
                 if gesamtAusgabenUnten > 0 {
                     VStack(spacing: 0) {
                         HStack {
-                            Text("Gesamtausgaben")
+                            Text(lm.t("overview.total.ausgaben"))
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundColor(.secondary)
                             Spacer()
-                            Text("nicht erstattungsfähig")
+                            Text(lm.t("overview.not.reimbursable"))
                                 .font(.system(size: 10, weight: .semibold))
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 6)

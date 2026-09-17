@@ -288,6 +288,45 @@ let translations: [AppLanguage: [String: String]] = [
         "settings.language.section": "App-Sprache",
         "settings.log.empty": "Keine Einträge.",
         "settings.log.clear": "Protokoll löschen?",
+
+        // Overview
+        "overview.ausgaben": "Ausgaben",
+        "overview.not.reimbursable": "nicht erstattungsfähig",
+        "overview.total.ausgaben": "Gesamtausgaben",
+        "overview.meal.balance": "Verpflegung Saldo",
+        "overview.flat.label": "Pauschale",
+        "overview.fuel": "Kraftstoff / Strom",
+        "overview.driven.km": "Kosten gefahrener km",
+        "overview.meal.expenses": "Verpflegungsausgaben",
+        "overview.travel.expenses": "Reisespesen / KFZ",
+        "overview.private.expenses": "Private Ausgaben",
+        "overview.entry": "Eintrag",
+        "overview.entries": "Einträge",
+        "overview.no.entries": "Keine Einträge",
+
+        // Filter
+        "filter.woche": "Woche",
+        "filter.monat": "Monat",
+        "filter.jahr": "Jahr",
+
+        // Statistik
+        "stat.tab.months": "Monate",
+        "stat.tab.routes": "Strecken",
+        "stat.tab.tax": "Steuer",
+        "stat.reimbursement.per.month": "Erstattung pro Monat",
+        "stat.best.month": "Bester Monat: **%@** mit %@",
+        "stat.top.routes": "Häufigste Strecken",
+        "stat.tax.year": "Steuerjahr %@",
+        "stat.total.reimbursement": "Gesamterstattung %@",
+        "stat.tax.annex.n": "Für Anlage N / Reisekostenabrechnung",
+        "stat.mechanic.allowance": "Monteurszulage %@",
+        "stat.payroll.note": "Lohnbestandteil – nicht Teil der Reisekosten (Anlage N)",
+        "stat.disclaimer": "Diese Auswertung dient als Orientierung. Bitte prüfe die Beträge mit deinem Steuerberater oder Steuerprogramm.",
+
+        // Summary tiles (Jahresübersicht)
+        "stat.trips.label": "Fahrten",
+        "stat.km.label": "Kilometer",
+        "stat.reimbursement.label": "Erstattung",
     ],
 
     .english: [
@@ -519,6 +558,45 @@ let translations: [AppLanguage: [String: String]] = [
         "settings.language.section": "App Language",
         "settings.log.empty": "No entries.",
         "settings.log.clear": "Clear log?",
+
+        // Overview
+        "overview.ausgaben": "Expenses",
+        "overview.not.reimbursable": "not reimbursable",
+        "overview.total.ausgaben": "Total Expenses",
+        "overview.meal.balance": "Meal Balance",
+        "overview.flat.label": "Allowance",
+        "overview.fuel": "Fuel / Electricity",
+        "overview.driven.km": "Driven km costs",
+        "overview.meal.expenses": "Meal Expenses",
+        "overview.travel.expenses": "Travel Expenses / Vehicle",
+        "overview.private.expenses": "Private Expenses",
+        "overview.entry": "Entry",
+        "overview.entries": "Entries",
+        "overview.no.entries": "No entries",
+
+        // Filter
+        "filter.woche": "Week",
+        "filter.monat": "Month",
+        "filter.jahr": "Year",
+
+        // Statistik
+        "stat.tab.months": "Months",
+        "stat.tab.routes": "Routes",
+        "stat.tab.tax": "Tax",
+        "stat.reimbursement.per.month": "Reimbursement per Month",
+        "stat.best.month": "Best month: **%@** with %@",
+        "stat.top.routes": "Top Routes",
+        "stat.tax.year": "Tax Year %@",
+        "stat.total.reimbursement": "Total Reimbursement %@",
+        "stat.tax.annex.n": "For Annex N / Business Travel Report",
+        "stat.mechanic.allowance": "Mechanic's Allowance %@",
+        "stat.payroll.note": "Payroll component – not part of travel expenses (Annex N)",
+        "stat.disclaimer": "This report is for guidance only. Please verify the amounts with your tax advisor or tax software.",
+
+        // Summary tiles
+        "stat.trips.label": "Trips",
+        "stat.km.label": "Kilometers",
+        "stat.reimbursement.label": "Reimbursement",
     ],
 
     .polish: [
@@ -746,6 +824,45 @@ let translations: [AppLanguage: [String: String]] = [
         "settings.language.section": "Język aplikacji",
         "settings.log.empty": "Brak wpisów.",
         "settings.log.clear": "Wyczyścić dziennik?",
+
+        // Overview
+        "overview.ausgaben": "Wydatki",
+        "overview.not.reimbursable": "nierefundowane",
+        "overview.total.ausgaben": "Łączne wydatki",
+        "overview.meal.balance": "Saldo diety",
+        "overview.flat.label": "Ryczałt",
+        "overview.fuel": "Paliwo / Prąd",
+        "overview.driven.km": "Koszty przejechanych km",
+        "overview.meal.expenses": "Wydatki na wyżywienie",
+        "overview.travel.expenses": "Reisespesen / KFZ",
+        "overview.private.expenses": "Wydatki prywatne",
+        "overview.entry": "Wpis",
+        "overview.entries": "Wpisy",
+        "overview.no.entries": "Brak wpisów",
+
+        // Filter
+        "filter.woche": "Tydzień",
+        "filter.monat": "Miesiąc",
+        "filter.jahr": "Rok",
+
+        // Statistik
+        "stat.tab.months": "Miesiące",
+        "stat.tab.routes": "Trasy",
+        "stat.tab.tax": "Podatek",
+        "stat.reimbursement.per.month": "Zwrot na miesiąc",
+        "stat.best.month": "Najlepszy miesiąc: **%@** z %@",
+        "stat.top.routes": "Najpopularniejsze trasy",
+        "stat.tax.year": "Rok podatkowy %@",
+        "stat.total.reimbursement": "Łączny zwrot %@",
+        "stat.tax.annex.n": "Dla Anlage N / rozliczenie kosztów podróży",
+        "stat.mechanic.allowance": "Dodatek montera %@",
+        "stat.payroll.note": "Składnik wynagrodzenia – nie część kosztów podróży (Anlage N)",
+        "stat.disclaimer": "Zestawienie ma charakter orientacyjny. Sprawdź kwoty z doradcą podatkowym.",
+
+        // Summary tiles
+        "stat.trips.label": "Podróże",
+        "stat.km.label": "Kilometry",
+        "stat.reimbursement.label": "Zwrot",
     ],
 
     .czech: [
@@ -973,6 +1090,45 @@ let translations: [AppLanguage: [String: String]] = [
         "settings.language.section": "Jazyk aplikace",
         "settings.log.empty": "Žádné záznamy.",
         "settings.log.clear": "Smazat protokol?",
+
+        // Overview
+        "overview.ausgaben": "Výdaje",
+        "overview.not.reimbursable": "nehradí se",
+        "overview.total.ausgaben": "Celkové výdaje",
+        "overview.meal.balance": "Saldo stravného",
+        "overview.flat.label": "Paušál",
+        "overview.fuel": "Palivo / Elektřina",
+        "overview.driven.km": "Náklady ujetých km",
+        "overview.meal.expenses": "Výdaje na stravování",
+        "overview.travel.expenses": "Cestovní výdaje / Vozidlo",
+        "overview.private.expenses": "Soukromé výdaje",
+        "overview.entry": "Záznam",
+        "overview.entries": "Záznamy",
+        "overview.no.entries": "Žádné záznamy",
+
+        // Filter
+        "filter.woche": "Týden",
+        "filter.monat": "Měsíc",
+        "filter.jahr": "Rok",
+
+        // Statistik
+        "stat.tab.months": "Měsíce",
+        "stat.tab.routes": "Trasy",
+        "stat.tab.tax": "Daň",
+        "stat.reimbursement.per.month": "Náhrada za měsíc",
+        "stat.best.month": "Nejlepší měsíc: **%@** s %@",
+        "stat.top.routes": "Nejčastější trasy",
+        "stat.tax.year": "Daňový rok %@",
+        "stat.total.reimbursement": "Celková náhrada %@",
+        "stat.tax.annex.n": "Pro Anlage N / vyúčtování cestovních nákladů",
+        "stat.mechanic.allowance": "Příplatek montéra %@",
+        "stat.payroll.note": "Složka mzdy – není součástí cestovních nákladů (Anlage N)",
+        "stat.disclaimer": "Tato analýza slouží jako orientace. Ověřte částky se svým daňovým poradcem.",
+
+        // Summary tiles
+        "stat.trips.label": "Jízdy",
+        "stat.km.label": "Kilometry",
+        "stat.reimbursement.label": "Náhrada",
     ],
 
     .turkish: [
@@ -1200,6 +1356,45 @@ let translations: [AppLanguage: [String: String]] = [
         "settings.language.section": "Uygulama dili",
         "settings.log.empty": "Kayıt yok.",
         "settings.log.clear": "Günlük silinsin mi?",
+
+        // Overview
+        "overview.ausgaben": "Harcamalar",
+        "overview.not.reimbursable": "geri ödenmiyor",
+        "overview.total.ausgaben": "Toplam harcamalar",
+        "overview.meal.balance": "Yemek bakiyesi",
+        "overview.flat.label": "Ödenek",
+        "overview.fuel": "Yakıt / Elektrik",
+        "overview.driven.km": "Gidilen km maliyeti",
+        "overview.meal.expenses": "Yemek harcamaları",
+        "overview.travel.expenses": "Seyahat Giderleri / Araç",
+        "overview.private.expenses": "Özel harcamalar",
+        "overview.entry": "Kayıt",
+        "overview.entries": "Kayıtlar",
+        "overview.no.entries": "Kayıt yok",
+
+        // Filter
+        "filter.woche": "Hafta",
+        "filter.monat": "Ay",
+        "filter.jahr": "Yıl",
+
+        // Statistik
+        "stat.tab.months": "Aylar",
+        "stat.tab.routes": "Güzergahlar",
+        "stat.tab.tax": "Vergi",
+        "stat.reimbursement.per.month": "Aylık geri ödeme",
+        "stat.best.month": "En iyi ay: **%@** – %@",
+        "stat.top.routes": "En sık güzergahlar",
+        "stat.tax.year": "Vergi yılı %@",
+        "stat.total.reimbursement": "Toplam geri ödeme %@",
+        "stat.tax.annex.n": "Anlage N / iş seyahati raporu için",
+        "stat.mechanic.allowance": "Teknisyen ödeneği %@",
+        "stat.payroll.note": "Maaş bileşeni – seyahat giderlerinin parçası değil (Anlage N)",
+        "stat.disclaimer": "Bu rapor yalnızca yönlendirme amaçlıdır. Tutarları vergi danışmanınızla doğrulayın.",
+
+        // Summary tiles
+        "stat.trips.label": "Seyahatler",
+        "stat.km.label": "Kilometre",
+        "stat.reimbursement.label": "Geri ödeme",
     ],
 
 ]

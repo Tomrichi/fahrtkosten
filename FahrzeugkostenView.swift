@@ -27,9 +27,15 @@ struct FahrzeugkostenView: View {
             List {
                 // ── Zeitraum-Filter Chips ──
                 Section {
-                    FilterChipBar(selection: $zeitFilter)
-                        .listRowBackground(Color.clear)
-                        .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+                    FilterChipBar(selection: $zeitFilter, labelFor: { filter in
+                        switch filter {
+                        case .woche: return lm.t("filter.woche")
+                        case .monat: return lm.t("filter.monat")
+                        case .jahr:  return lm.t("filter.jahr")
+                        }
+                    })
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
                 }
 
                 if filteredCosts.isEmpty {

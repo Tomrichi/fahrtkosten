@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SplashScreenView: View {
+    @EnvironmentObject var lm: LocalizationManager
 
     // MARK: – Animation States
     @State private var logoScale:      CGFloat = 0.05   // startet winzig (Tiefe)
@@ -204,7 +205,7 @@ struct SplashScreenView: View {
                         .progressViewStyle(.circular)
                         .tint(Color(red: 0.20, green: 0.75, blue: 0.90).opacity(0.6))
                         .scaleEffect(0.8)
-                    Text("Wird geladen …")
+                    Text(lm.t("misc.loading"))
                         .font(.system(size: 12, weight: .regular))
                         .foregroundStyle(Color(red: 0.40, green: 0.65, blue: 0.78).opacity(0.55))
                 }

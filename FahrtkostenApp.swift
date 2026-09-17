@@ -65,6 +65,7 @@ struct FahrtkostenApp: App {
                             showSplash = false
                         }
                     }
+                    .environmentObject(lm)
                     .transition(.opacity)
                     .zIndex(1)
                 }

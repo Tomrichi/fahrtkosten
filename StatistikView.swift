@@ -4,6 +4,7 @@ import Charts
 // MARK: - Statistik View
 struct StatistikView: View {
     @EnvironmentObject var store: DataStore
+    @EnvironmentObject var lm: LocalizationManager
     @State private var selectedYear: Int = Calendar.current.component(.year, from: Date())
     @State private var selectedTab: StatTab = .monate
 
@@ -79,9 +80,9 @@ struct StatistikView: View {
         let euro  = km * store.kmRate
 
         return HStack(spacing: 12) {
-            summaryTile(icon: "car.fill",          color: .orange,  value: "\(trips.count)",                 label: "Fahrten")
-            summaryTile(icon: "road.lanes",        color: .blue,    value: "\(Int(km)) km",                  label: "Kilometer")
-            summaryTile(icon: "eurosign.circle",   color: .green,   value: euro.euroFormatted,               label: "Erstattung")
+            summaryTile(icon: "car.fill",          color: .orange,  value: "\(trips.count)",                 label: lm.t("stat.trips.label"))
+            summaryTile(icon: "road.lanes",        color: .blue,    value: "\(Int(km)) km",                  label: lm.t("stat.km.label"))
+            summaryTile(icon: "eurosign.circle",   color: .green,   value: euro.euroFormatted,               label: lm.t("stat.reimbursement.label"))
         }
     }
 
@@ -116,7 +117,13 @@ struct StatistikView: View {
                         Image(systemName: tab.icon)
                             .font(.system(size: 12))
                             .accessibilityHidden(true)
-                        Text(tab.label)
+                        Text({
+                            switch tab {
+                            case .monate:   return lm.t("stat.tab.months")
+                            case .strecken: return lm.t("stat.tab.routes")
+                            case .steuer:   return lm.t("stat.tab.tax")
+                            }
+                        }())
                             .font(.system(size: 13, weight: .medium))
                     }
                     .foregroundColor(selectedTab == tab ? .white : .primary)
@@ -143,7 +150,7 @@ struct StatistikView: View {
         let data = monthlyData
 
         return VStack(alignment: .leading, spacing: 16) {
-            Text("Erstattung pro Monat")
+            Text(lm.t("stat.reimbursement.per.month"))
                 .font(.headline)
 
             if data.allSatisfy({ $0.euro == 0 }) {
@@ -187,7 +194,7 @@ struct StatistikView: View {
                     HStack {
                         Image(systemName: "trophy.fill").foregroundColor(.orange)
                             .accessibilityHidden(true)
-                        Text("Bester Monat: **\(best.month)** mit \(best.euro.euroFormatted)")
+                        Text("**\(best.month)** · \(best.euro.euroFormatted)")
                             .font(.subheadline)
                     }
                     .padding(12)
@@ -208,7 +215,7 @@ struct StatistikView: View {
         let strecken = topRoutes
 
         return VStack(alignment: .leading, spacing: 16) {
-            Text("Häufigste Strecken")
+            Text(lm.t("stat.top.routes"))
                 .font(.headline)
 
             if strecken.isEmpty {
@@ -269,7 +276,7 @@ struct StatistikView: View {
         let gesamt  = euro + mealSum + hotelSum
 
         return VStack(alignment: .leading, spacing: 16) {
-            Text("Steuerjahr \(selectedYear)")
+            Text(String(format: lm.t("stat.tax.year"), String(selectedYear)))
                 .font(.headline)
 
             VStack(spacing: 0) {
@@ -285,9 +292,9 @@ struct StatistikView: View {
             // Gesamt
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Gesamterstattung \(selectedYear)")
+                    Text(String(format: lm.t("stat.total.reimbursement"), String(selectedYear)))
                         .font(.subheadline.bold())
-                    Text("Für Anlage N / Reisekostenabrechnung")
+                    Text(lm.t("stat.tax.annex.n"))
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -304,9 +311,9 @@ struct StatistikView: View {
             if monteurszulageSum > 0 {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Monteurszulage \(selectedYear)")
+                        Text(String(format: lm.t("stat.mechanic.allowance"), String(selectedYear)))
                             .font(.subheadline.bold())
-                        Text("Lohnbestandteil – nicht Teil der Reisekosten (Anlage N)")
+                        Text(lm.t("stat.payroll.note"))
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -326,7 +333,7 @@ struct StatistikView: View {
                     .foregroundColor(.secondary)
                     .font(.footnote)
                     .accessibilityHidden(true)
-                Text("Diese Auswertung dient als Orientierung. Bitte prüfe die Beträge mit deinem Steuerberater oder Steuerprogramm.")
+                Text(lm.t("stat.disclaimer"))
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

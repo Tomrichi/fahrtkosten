@@ -96,6 +96,7 @@ struct ContentView: View {
 
                 StatistikView()
                     .environmentObject(store)
+                    .environmentObject(lm)
                     .opacity(selectedTab == .statistik ? 1 : 0)
                     .allowsHitTesting(selectedTab == .statistik)
             }
