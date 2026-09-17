@@ -8,6 +8,7 @@ enum AppLanguage: String, CaseIterable, Codable, Identifiable {
     case english = "en"
     case polish = "pl"
     case czech = "cs"
+    case turkish = "tr"
 
     var id: String { rawValue }
 
@@ -17,6 +18,7 @@ enum AppLanguage: String, CaseIterable, Codable, Identifiable {
         case .english:   return "English"
         case .polish:    return "Polski"
         case .czech:     return "Čeština"
+        case .turkish:   return "Türkçe"
         }
     }
 
@@ -26,6 +28,7 @@ enum AppLanguage: String, CaseIterable, Codable, Identifiable {
         case .english:   return "🇬🇧"
         case .polish:    return "🇵🇱"
         case .czech:     return "🇨🇿"
+        case .turkish:   return "🇹🇷"
         }
     }
 }
@@ -34,19 +37,14 @@ enum AppLanguage: String, CaseIterable, Codable, Identifiable {
 class LocalizationManager: ObservableObject {
     static let shared = LocalizationManager()
 
-    @Published var language: AppLanguage {
-        didSet {
-            UserDefaults.standard.set(language.rawValue, forKey: "appLanguage")
-        }
-    }
+    @Published var language: AppLanguage
 
     init() {
-        if let saved = UserDefaults.standard.string(forKey: "appLanguage"),
-           let language = AppLanguage(rawValue: saved) {
-            self.language = language
-        } else {
-            self.language = .german
-        }
+        // iOS-Systemsprache verwenden; Fallback auf Deutsch
+        let preferred = Locale.preferredLanguages.first.flatMap { tag in
+            AppLanguage(rawValue: String(tag.prefix(2)))
+        } ?? .german
+        self.language = preferred
     }
 
     func t(_ key: String) -> String {
@@ -78,12 +76,18 @@ let translations: [AppLanguage: [String: String]] = [
         "common.amount": "Betrag",
         "common.region": "Region",
 
-        // Tabs
+        // Tabs (Tab Bar)
         "tab.trips": "Fahrten",
         "tab.meals": "Verpflegung",
         "tab.accommodation": "Übernachtung",
         "tab.vehicle": "Fahrzeug",
         "tab.overview": "Übersicht",
+        "tab.fahrten": "Fahrzeit",
+        "tab.arbeitszeit": "Verpflegung",
+        "tab.uebernachtung": "Übernacht.",
+        "tab.kfz": "KFZ",
+        "tab.statistik": "Statistik",
+        "tab.search": "Suche",
 
         // TravelRegion
         "region.inland": "Inland",
@@ -217,6 +221,22 @@ let translations: [AppLanguage: [String: String]] = [
         "vehicle.mileage": "Kilometerstand (km)",
         "vehicle.summary": "Zusammenfassung",
 
+        // Navigation titles
+        "nav.arbeitszeit": "Verpflegung & Spesen",
+        "nav.kfz": "KFZ Kosten",
+        "nav.search": "Suche",
+        "nav.uebernachtung": "Übernachtungen",
+        "nav.trips": "Fahrten",
+
+        // Misc
+        "misc.today": "Heute",
+        "misc.no.entries": "Keine Einträge",
+        "misc.no.entries.period": "Keine Einträge im gewählten Zeitraum",
+        "misc.trip.end": "Fahrt beenden",
+        "misc.edit": "Bearbeiten",
+        "misc.new": "Neu",
+        "misc.all.trips": "Alle Fahrten",
+
         // Settings
         "settings.title": "Einstellungen",
         "settings.km.title": "Kilometererstattung",
@@ -259,12 +279,18 @@ let translations: [AppLanguage: [String: String]] = [
         "common.amount": "Amount",
         "common.region": "Region",
 
-        // Tabs
+        // Tabs (Tab Bar)
         "tab.trips": "Trips",
         "tab.meals": "Meals",
         "tab.accommodation": "Accommodation",
         "tab.vehicle": "Vehicle",
         "tab.overview": "Overview",
+        "tab.fahrten": "Trips",
+        "tab.arbeitszeit": "Allowances",
+        "tab.uebernachtung": "Overnight",
+        "tab.kfz": "Vehicle",
+        "tab.statistik": "Statistics",
+        "tab.search": "Search",
 
         // TravelRegion
         "region.inland": "Domestic",
@@ -398,6 +424,22 @@ let translations: [AppLanguage: [String: String]] = [
         "vehicle.mileage": "Mileage (km)",
         "vehicle.summary": "Summary",
 
+        // Navigation titles
+        "nav.arbeitszeit": "Allowances & Expenses",
+        "nav.kfz": "Vehicle Costs",
+        "nav.search": "Search",
+        "nav.uebernachtung": "Accommodation",
+        "nav.trips": "Trips",
+
+        // Misc
+        "misc.today": "Today",
+        "misc.no.entries": "No Entries",
+        "misc.no.entries.period": "No entries in selected period",
+        "misc.trip.end": "End Trip",
+        "misc.edit": "Edit",
+        "misc.new": "New",
+        "misc.all.trips": "All Trips",
+
         // Settings
         "settings.title": "Settings",
         "settings.km.title": "Kilometer Reimbursement",
@@ -440,12 +482,18 @@ let translations: [AppLanguage: [String: String]] = [
         "common.amount": "Kwota",
         "common.region": "Region",
 
-        // Tabs
+        // Tabs (Tab Bar)
         "tab.trips": "Podróże",
         "tab.meals": "Posiłki",
         "tab.accommodation": "Noclegi",
         "tab.vehicle": "Pojazd",
         "tab.overview": "Przegląd",
+        "tab.fahrten": "Podróże",
+        "tab.arbeitszeit": "Diety",
+        "tab.uebernachtung": "Noclegi",
+        "tab.kfz": "Pojazd",
+        "tab.statistik": "Statystyki",
+        "tab.search": "Szukaj",
 
         // TravelRegion
         "region.inland": "Kraj",
@@ -579,6 +627,22 @@ let translations: [AppLanguage: [String: String]] = [
         "vehicle.mileage": "Przebieg (km)",
         "vehicle.summary": "Podsumowanie",
 
+        // Navigation titles
+        "nav.arbeitszeit": "Diety i wydatki",
+        "nav.kfz": "Koszty pojazdu",
+        "nav.search": "Szukaj",
+        "nav.uebernachtung": "Noclegi",
+        "nav.trips": "Podróże",
+
+        // Misc
+        "misc.today": "Dzisiaj",
+        "misc.no.entries": "Brak wpisów",
+        "misc.no.entries.period": "Brak wpisów w wybranym okresie",
+        "misc.trip.end": "Zakończ podróż",
+        "misc.edit": "Edytuj",
+        "misc.new": "Nowy",
+        "misc.all.trips": "Wszystkie podróże",
+
         // Settings
         "settings.title": "Ustawienia",
         "settings.km.title": "Zwrot za kilometry",
@@ -621,12 +685,18 @@ let translations: [AppLanguage: [String: String]] = [
         "common.amount": "Částka",
         "common.region": "Oblast",
 
-        // Tabs
+        // Tabs (Tab Bar)
         "tab.trips": "Jízdy",
         "tab.meals": "Stravné",
         "tab.accommodation": "Ubytování",
         "tab.vehicle": "Vozidlo",
         "tab.overview": "Přehled",
+        "tab.fahrten": "Jízdy",
+        "tab.arbeitszeit": "Stravné",
+        "tab.uebernachtung": "Ubytov.",
+        "tab.kfz": "Vozidlo",
+        "tab.statistik": "Statistika",
+        "tab.search": "Hledat",
 
         // TravelRegion
         "region.inland": "Tuzemsko",
@@ -760,6 +830,22 @@ let translations: [AppLanguage: [String: String]] = [
         "vehicle.mileage": "Stav km",
         "vehicle.summary": "Souhrn",
 
+        // Navigation titles
+        "nav.arbeitszeit": "Stravné a výdaje",
+        "nav.kfz": "Náklady na vozidlo",
+        "nav.search": "Hledat",
+        "nav.uebernachtung": "Ubytování",
+        "nav.trips": "Jízdy",
+
+        // Misc
+        "misc.today": "Dnes",
+        "misc.no.entries": "Žádné záznamy",
+        "misc.no.entries.period": "Žádné záznamy ve zvoleném období",
+        "misc.trip.end": "Ukončit jízdu",
+        "misc.edit": "Upravit",
+        "misc.new": "Nový",
+        "misc.all.trips": "Všechny jízdy",
+
         // Settings
         "settings.title": "Nastavení",
         "settings.km.title": "Náhrada za km",
@@ -783,6 +869,209 @@ let translations: [AppLanguage: [String: String]] = [
         "settings.language.section": "Jazyk aplikace",
         "settings.log.empty": "Žádné záznamy.",
         "settings.log.clear": "Smazat protokol?",
+    ],
+
+    .turkish: [
+        // Actions
+        "action.add": "Ekle",
+        "action.edit": "Düzenle",
+        "action.delete": "Sil",
+        "action.cancel": "İptal",
+        "action.save": "Kaydet",
+        "action.done": "Tamam",
+        "action.close": "Kapat",
+
+        // Common
+        "common.optional": "İsteğe bağlı",
+        "common.note": "Not",
+        "common.date": "Tarih",
+        "common.amount": "Tutar",
+        "common.region": "Bölge",
+
+        // Tabs (Tab Bar)
+        "tab.trips": "Seyahatler",
+        "tab.meals": "Yemek",
+        "tab.accommodation": "Konaklama",
+        "tab.vehicle": "Araç",
+        "tab.overview": "Genel Bakış",
+        "tab.fahrten": "Seyahat",
+        "tab.arbeitszeit": "Yemek",
+        "tab.uebernachtung": "Konaklama",
+        "tab.kfz": "Araç",
+        "tab.statistik": "İstatistik",
+        "tab.search": "Ara",
+
+        // TravelRegion
+        "region.inland": "Yurt içi",
+        "region.schweiz": "İsviçre",
+        "region.ausland": "Yurt dışı",
+
+        // HotelMode
+        "hotel.mode.flat": "Sabit ücret",
+        "hotel.mode.actual": "Gerçek tutar",
+
+        // VehicleCostCategory
+        "vehicle.cat.werkstatt": "Servis / Onarım",
+        "vehicle.cat.versicherung": "Sigorta",
+        "vehicle.cat.tuev": "Araç muayenesi",
+        "vehicle.cat.steuer": "Motorlu taşıt vergisi",
+        "vehicle.cat.reifen": "Lastik",
+        "vehicle.cat.leasing": "Leasing",
+        "vehicle.cat.sonstiges": "Diğer",
+
+        // Overview
+        "overview.empty.title": "Veri yok",
+        "overview.empty.subtitle": "Seyahat, yemek veya\nkonaklama ekleyin",
+        "overview.total": "Toplam geri ödeme",
+        "overview.trips.unit": "Seyahat",
+        "overview.days.unit": "Gün",
+        "overview.nights.unit": "Gece",
+        "overview.accommodation.short": "Konaklama",
+
+        // Trips
+        "trips.gps.tile": "GPS\nBaşlat",
+        "trips.new.tile": "Yeni\nSeyahat",
+        "trips.empty.title": "Seyahat yok",
+        "trips.empty.subtitle": "GPS kaydı başlatın veya manuel seyahat ekleyin",
+        "trips.all": "Tüm seyahatler",
+        "trips.unit": "Seyahat",
+        "trips.form.new": "Yeni seyahat",
+        "trips.form.edit": "Seyahati düzenle",
+        "trips.from": "Nereden",
+        "trips.to": "Nereye",
+        "trips.km.label": "Kilometre",
+        "trips.result": "Sonuç",
+        "trips.distance": "Mesafe",
+        "trips.rate": "Oran",
+        "trips.reimbursement": "Geri ödeme",
+        "trips.start": "Başlangıç yeri",
+        "trips.destination": "Hedef",
+        "trips.route": "Güzergah",
+        "trips.navigation.section": "Navigasyon",
+        "trips.calculation": "Hesaplama",
+        "trips.maps.title": "Harita entegrasyonu",
+        "trips.maps.subtitle": "Otomatik güzergah hesaplama · yalnızca Pro",
+        "trips.maps.open": "Navigasyonu şununla aç",
+        "trips.apple.maps": "Apple Haritalar",
+        "trips.google.maps": "Google Haritalar",
+        "trips.maps.open.btn": "Haritada aç",
+        "trips.auto.label": "Otomatik",
+        "trips.auto.hint": "Başlangıç ve hedef girin – km otomatik hesaplanır",
+        "trips.auto.calc": "Otomatik hesaplanıyor…",
+        "trips.route.computing": "Güzergah otomatik hesaplanıyor…",
+        "trips.route.error": "Lütfen başlangıç ve hedefi kontrol edin",
+        "trips.live.route": "Canlı güzergah",
+        "trips.gps.title": "GPS seyahati",
+        "trips.gps.heading": "GPS seyahati kaydet",
+        "trips.gps.desc": "Kat edilen mesafe GPS ile ölçülür\nve otomatik aktarılır.",
+        "trips.gps.startbtn": "Kaydı başlat",
+        "trips.gps.running": "Kayıt devam ediyor",
+        "trips.gps.stop": "Seyahati bitir ve aktar",
+        "trips.gps.permission": "Konum izni isteniyor…",
+        "trips.gps.permission.desc": "Lütfen iletişim kutusunda konum erişimine izin verin.",
+        "trips.gps.geocoding": "Adresler belirleniyor…",
+        "trips.gps.geocoding.wait": "Bir an lütfen",
+        "trips.gps.detected": "GPS seyahati algılandı",
+        "trips.gps.detected.desc": "Mesafe, başlangıç ve hedef otomatik belirlendi. Lütfen kontrol edin ve gerekirse düzeltin.",
+        "trips.gps.waiting": "GPS bekleniyor…",
+        "trips.nav.start": "Navigasyonu başlat",
+
+        // Meals
+        "meals.add": "Yemek ekle",
+        "meals.add.hint": "Gün eklemek için dokunun",
+        "meals.all": "Tüm kayıtlar",
+        "meals.unit": "Gün",
+        "meals.form.new": "Yeni yemek",
+        "meals.form.edit": "Kaydı düzenle",
+        "meals.region": "Seyahat bölgesi",
+        "meals.absence": "Toplam çalışma süresi",
+        "meals.begin": "Başlangıç",
+        "meals.end": "Bitiş",
+        "meals.result": "Sonuç",
+        "meals.absence.label": "Devamsızlık",
+        "meals.level": "Seviye",
+        "meals.allowance": "Yemek ödeneği",
+        "meals.badge.none": "Yok",
+        "meals.level.none": "Yok (< 1 s)",
+        "meals.level.1": "Seviye 1 (1–3 s)",
+        "meals.level.2": "Seviye 2 (3–6 s)",
+        "meals.level.3": "Seviye 3 (6+ s)",
+
+        // Accommodation
+        "hotel.title": "Konaklamalar",
+        "hotel.add": "Konaklama ekle",
+        "hotel.add.hint": "Konaklama eklemek için dokunun",
+        "hotel.all": "Tüm konaklamalar",
+        "hotel.unit": "Gece",
+        "hotel.section": "Konaklama",
+        "hotel.form.new": "Yeni konaklama",
+        "hotel.form.edit": "Konaklamayı düzenle",
+        "hotel.city": "Şehir / Konum",
+        "hotel.city.placeholder": "örn. İstanbul",
+        "hotel.name": "Otel",
+        "hotel.billing": "Faturalama yöntemi",
+        "hotel.type": "Tür",
+        "hotel.cost": "Tutar (€)",
+        "hotel.reimbursement": "Geri ödeme",
+        "hotel.flat.label": "Konaklama ödeneği",
+        "hotel.actual.cost": "Gerçek maliyetler",
+        "hotel.flat.badge": "Sabit ücret",
+        "hotel.actual.badge": "Gerçek tutar",
+        "hotel.info": "Ödenek %@ / gece. Gerçek maliyetler ödeneği aşarsa tam tutar geri ödenir.",
+        "hotel.over.flat": "Ödenek üstü (%@)",
+
+        // Vehicle
+        "vehicle.title": "Araç giderleri",
+        "vehicle.add": "Araç gideri ekle",
+        "vehicle.add.hint": "Servis, sigorta veya diğer araç giderleri",
+        "vehicle.unit": "Kayıt",
+        "vehicle.form.new": "Yeni gider",
+        "vehicle.form.edit": "Gideri düzenle",
+        "vehicle.category.section": "Kategori",
+        "vehicle.details": "Ayrıntılar",
+        "vehicle.title.label": "Açıklama",
+        "vehicle.mileage": "Kilometre sayacı (km)",
+        "vehicle.summary": "Özet",
+
+        // Navigation titles
+        "nav.arbeitszeit": "Yemek & Giderler",
+        "nav.kfz": "Araç Giderleri",
+        "nav.search": "Ara",
+        "nav.uebernachtung": "Konaklamalar",
+        "nav.trips": "Seyahatler",
+
+        // Misc
+        "misc.today": "Bugün",
+        "misc.no.entries": "Kayıt yok",
+        "misc.no.entries.period": "Seçilen dönemde kayıt yok",
+        "misc.trip.end": "Seyahati bitir",
+        "misc.edit": "Düzenle",
+        "misc.new": "Yeni",
+        "misc.all.trips": "Tüm seyahatler",
+
+        // Settings
+        "settings.title": "Ayarlar",
+        "settings.km.title": "Kilometre geri ödemesi",
+        "settings.km.rate": "Km oranı",
+        "settings.km.footer": "Vergi azami 2026: 0,38 € / km",
+        "settings.meals.title": "Yemek ödenekleri",
+        "settings.meals.footer": "Tüm tutarlar serbestçe yapılandırılabilir. 1 saatin altındaki devamsızlık için ödenek her zaman 0 €'dur.",
+        "settings.hotel.footer": "Almanya standardı: 20,00 € / gece. Bireysel tutarlar serbest girilebilir.",
+        "settings.hours.1to3": "1 – 3 saat",
+        "settings.hours.3to6": "3 – 6 saat",
+        "settings.hours.6plus": "6+ saat",
+        "settings.reset": "Varsayılanlara sıfırla",
+        "settings.diagnosis": "Teşhis",
+        "settings.feedback": "Geri bildirim & Destek",
+        "settings.log": "Hata günlüğü",
+        "settings.info": "Bilgi & Yasal",
+        "settings.privacy": "Gizlilik",
+        "settings.help": "Uygulama özellikleri & Yardım",
+        "settings.imprint": "Künye",
+        "settings.language": "Dil",
+        "settings.language.section": "Uygulama dili",
+        "settings.log.empty": "Kayıt yok.",
+        "settings.log.clear": "Günlük silinsin mi?",
     ],
 
 ]

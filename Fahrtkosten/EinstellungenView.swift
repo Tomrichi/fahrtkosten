@@ -100,7 +100,6 @@ struct EinstellungenView: View {
     @State private var expandWochenendzulage = false
     @State private var expandHotel   = false
     @State private var expandFuel    = false
-    @State private var expandLang    = false
     @State private var expandSwipe   = false
     @State private var expandBackup  = false
     @State private var expandInfo    = false
@@ -136,12 +135,12 @@ struct EinstellungenView: View {
             }
             .safeAreaInset(edge: .top) { bannerView }
             .animation(.spring(response: 0.3), value: bannerMessage)
-            .navigationTitle("Einstellungen")
+            .navigationTitle(lm.t("settings.title"))
             .navigationBarTitleDisplayMode(.inline)
             .preferredColorScheme(resolvedColorScheme)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Fertig") { saveAndDismiss() }
+                    Button(lm.t("action.done")) { saveAndDismiss() }
                         .fontWeight(.regular)
                 }
             }
@@ -674,46 +673,31 @@ struct EinstellungenView: View {
 
     @ViewBuilder private var languageSection: some View {
         Section {
-            DisclosureGroup(isExpanded: $expandLang) {
-                ForEach(AppLanguage.allCases.filter { ["de","en","pl","cs"].contains($0.rawValue) }) { lang in
-                    Button {
-                        withOptionalAnimation(.easeInOut(duration: 0.2)) {
-                            lm.language = lang
-                            expandLang = false
-                        }
-                    } label: {
-                        HStack(spacing: 14) {
-                            Text(lang.flag)
-                                .font(.system(size: 22))
-                            Text(lang.displayName)
-                                .font(.system(size: 15, weight: .regular))
-                                .foregroundColor(.primary)
-                            Spacer()
-                            if lm.language == lang {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.blue)
-                                    .font(.system(size: 18))
-                            }
-                        }
-                        .contentShape(Rectangle())
-                        .padding(.vertical, 3)
-                    }
-                    .buttonStyle(.plain)
+            Button {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
                 }
             } label: {
-                HStack(spacing: 12) {
-                    Label("Sprache / Language", systemImage: "globe")
-                        .foregroundStyle(.primary)
-                        .fontWeight(.regular)
+                HStack {
+                    Label(lm.t("settings.language"), systemImage: "globe")
+                        .foregroundColor(.primary)
                     Spacer()
                     HStack(spacing: 6) {
                         Text(lm.language.flag)
                         Text(lm.language.displayName)
-                            .font(.caption)
+                            .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
+                    Image(systemName: "arrow.up.right.square")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .padding(.leading, 2)
                 }
             }
+        } footer: {
+            Text("Die App verwendet die iOS-Systemsprache. Zum Ändern: Einstellungen → Allgemein → Sprache & Region → iPhone-Sprache.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
     }
 

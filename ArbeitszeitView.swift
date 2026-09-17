@@ -157,7 +157,7 @@ struct ArbeitszeitView: View {
         NavigationStack {
             listContent
                 .listStyle(.insetGrouped)
-                .navigationTitle("Arbeitszeit & Spesen")
+                .navigationTitle(lm.t("nav.arbeitszeit"))
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Menu {

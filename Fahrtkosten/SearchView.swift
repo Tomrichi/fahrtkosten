@@ -288,7 +288,7 @@ struct SearchView: View {
                 }
             }
             .background(Color(.systemGroupedBackground))
-            .navigationTitle("Suche")
+            .navigationTitle(lm.t("nav.search"))
             .sheet(item: $editTrip) { trip in
                 TripFormView(mode: .edit(trip))
                     .environmentObject(store)

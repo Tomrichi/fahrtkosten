@@ -190,6 +190,7 @@ private func datenschutzHTML(for lang: AppLanguage) -> String {
     case .english: return datenschutzHTML_en
     case .polish:  return datenschutzHTML_pl
     case .czech:   return datenschutzHTML_cs
+    case .turkish: return datenschutzHTML_en  // Fallback auf Englisch
     }
 }
 
@@ -1338,13 +1339,36 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.32 – aktuell -->
+<!-- 1.17.33 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.32
+        Version 1.17.33
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">Vollständige Lokalisierung · Türkisch NEU</div>
+    </div>
+    <span class="build-info">17. September 2026 · Build 57</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEU</span> <strong>Türkisch:</strong> Die App ist jetzt vollständig auf Türkisch verfügbar.</li>
+      <li><span class="badge-new">NEU</span> <strong>Vollständige Lokalisierung:</strong> Englisch, Polnisch und Tschechisch sind jetzt komplett übersetzt – Tab-Leiste, Navigation, Formulare und alle Ansichten.</li>
+      <li><span class="badge-new">NEU</span> <strong>iOS-Systemsprache:</strong> Die App verwendet automatisch die eingestellte iPhone-Sprache. Änderung über Einstellungen → Allgemein → Sprache & Region.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.32 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.32
       </div>
       <div class="preview-text">iCloud-Sync · GPS-Spritdaten · Bugfixes</div>
     </div>

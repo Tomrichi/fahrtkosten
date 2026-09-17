@@ -123,7 +123,7 @@ struct KFZKostenView: View {
                 .padding(.bottom, 24)
             }
             .background(Color(.systemGroupedBackground))
-            .navigationTitle("KFZ Kosten")
+            .navigationTitle(lm.t("nav.kfz"))
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {

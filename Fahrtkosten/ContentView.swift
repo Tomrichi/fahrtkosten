@@ -11,15 +11,15 @@ class SettingsController: ObservableObject {
 private enum AppTab: Int, CaseIterable {
     case fahrten, arbeitszeit, uebernachtung, kfzKosten, uebersicht, statistik, suche
 
-    var label: String {
+    func localizedLabel(_ lm: LocalizationManager) -> String {
         switch self {
-        case .fahrten:       return "Fahrzeit"
-        case .arbeitszeit:   return "Arbeitszeit"
-        case .uebernachtung: return "Übernacht."
-        case .kfzKosten:     return "KFZ"
-        case .uebersicht:    return "Übersicht"
-        case .statistik:     return "Statistik"
-        case .suche:         return "Suche"
+        case .fahrten:       return lm.t("tab.fahrten")
+        case .arbeitszeit:   return lm.t("tab.arbeitszeit")
+        case .uebernachtung: return lm.t("tab.uebernachtung")
+        case .kfzKosten:     return lm.t("tab.kfz")
+        case .uebersicht:    return lm.t("tab.overview")
+        case .statistik:     return lm.t("tab.statistik")
+        case .suche:         return lm.t("tab.search")
         }
     }
 
@@ -103,6 +103,7 @@ struct ContentView: View {
 
             // Custom Tab Bar
             CustomTabBar(selectedTab: $selectedTab)
+                .environmentObject(lm)
         }
         .ignoresSafeArea(edges: .bottom)
         .tint(.blue)
@@ -137,6 +138,7 @@ struct ContentView: View {
 
 private struct CustomTabBar: View {
     @Binding var selectedTab: AppTab
+    @EnvironmentObject var lm: LocalizationManager
 
     private var safeAreaBottom: CGFloat {
         UIApplication.shared.connectedScenes
@@ -149,7 +151,7 @@ private struct CustomTabBar: View {
             Divider()
             HStack(spacing: 0) {
                 ForEach(AppTab.allCases, id: \.self) { tab in
-                    TabBarButton(tab: tab, isSelected: selectedTab == tab) {
+                    TabBarButton(tab: tab, label: tab.localizedLabel(lm), isSelected: selectedTab == tab) {
                         selectedTab = tab
                     }
                 }
@@ -163,6 +165,7 @@ private struct CustomTabBar: View {
 
 private struct TabBarButton: View {
     let tab: AppTab
+    let label: String
     let isSelected: Bool
     let action: () -> Void
 
@@ -172,7 +175,7 @@ private struct TabBarButton: View {
                 Image(systemName: tab.icon)
                     .font(.system(size: 17, weight: .medium))
                     .frame(height: 20)
-                Text(tab.label)
+                Text(label)
                     .font(.system(size: 9, weight: .regular))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
