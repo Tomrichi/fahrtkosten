@@ -183,7 +183,7 @@ struct SearchView: View {
                         Image(systemName: "magnifyingglass")
                             .foregroundColor(.secondary)
                             .font(.system(size: 15))
-                        TextField("Suche nach Text, Ort, Notiz …", text: $searchText)
+                        TextField(lm.t("nav.search"), text: $searchText)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
                             .submitLabel(.search)
@@ -231,7 +231,7 @@ struct SearchView: View {
                         Button {
                             selectedDate = nil
                         } label: {
-                            Text("Entfernen")
+                            Text(lm.t("action.delete"))
                                 .font(.caption)
                                 .foregroundColor(.blue)
                         }
@@ -255,7 +255,7 @@ struct SearchView: View {
                         .padding(.horizontal, 12)
                         .background(Color(.secondarySystemGroupedBackground))
 
-                        Button("Datum entfernen") {
+                        Button(lm.t("action.delete")) {
                             selectedDate = nil
                             showDatePicker = false
                         }
@@ -315,7 +315,7 @@ struct SearchView: View {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 48, weight: .thin))
                 .foregroundColor(.secondary.opacity(0.5))
-            Text("Tippe einen Begriff ein oder\nwähle ein Datum")
+            Text(lm.t("misc.search.hint"))
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
@@ -330,10 +330,10 @@ struct SearchView: View {
             Image(systemName: "doc.text.magnifyingglass")
                 .font(.system(size: 48, weight: .thin))
                 .foregroundColor(.secondary.opacity(0.5))
-            Text("Keine Einträge gefunden")
+            Text(lm.t("misc.no.entries.search"))
                 .font(.headline)
                 .foregroundColor(.secondary)
-            Text("Versuche einen anderen Suchbegriff\noder ein anderes Datum")
+            Text(lm.t("misc.search.hint2"))
                 .font(.subheadline)
                 .foregroundColor(.secondary.opacity(0.7))
                 .multilineTextAlignment(.center)

@@ -313,8 +313,15 @@ struct FahrtenView: View {
                     Section {
                         VStack(spacing: 10) {
                             // Filter Chips
-                            FilterChipBar(selection: $selectedFilter)
-                                .padding(.vertical, 2)
+                            FilterChipBar(selection: $selectedFilter, labelFor: { filter in
+                                switch filter {
+                                case .tag:   return lm.t("filter.day")
+                                case .woche: return lm.t("filter.week")
+                                case .monat: return lm.t("filter.month")
+                                case .alle:  return lm.t("filter.all")
+                                }
+                            })
+                            .padding(.vertical, 2)
 
                             // Datumswähler – nur sichtbar wenn nicht "Alle"
                             if selectedFilter != .alle {
@@ -775,7 +782,7 @@ struct GPSTripSheet: View {
                     Image(systemName: "pause.circle.fill")
                         .foregroundColor(.orange)
                         .font(.system(size: 22))
-                    Text("PAUSIERT")
+                    Text(lm.t("misc.paused").uppercased())
                         .font(.system(size: 13, weight: .regular))
                         .foregroundColor(.orange)
                         .kerning(1.2)
@@ -795,7 +802,7 @@ struct GPSTripSheet: View {
                     Text(gpsDistanceFormatted(tracker.totalKm))
                         .font(.system(size: 42, weight: .regular, design: .monospaced))
                         .foregroundColor(.primary)
-                    Text("aufgezeichnet bisher")
+                    Text(lm.t("misc.recorded.so.far"))
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -814,7 +821,7 @@ struct GPSTripSheet: View {
                     HStack(spacing: 10) {
                         Image(systemName: "play.circle.fill")
                             .font(.system(size: 20))
-                        Text("Jetzt fortsetzen")
+                        Text(lm.t("misc.resume"))
                             .fontWeight(.regular)
                     }
                     .foregroundColor(.white)
@@ -837,7 +844,7 @@ struct GPSTripSheet: View {
                     HStack(spacing: 10) {
                         Image(systemName: "stop.circle.fill")
                             .font(.system(size: 20))
-                        Text("Fahrt beenden")
+                        Text(lm.t("misc.end.trip"))
                             .fontWeight(.regular)
                     }
                     .foregroundColor(.white)
@@ -1328,7 +1335,7 @@ struct TripFormView: View {
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: "briefcase.fill")
-                                Text("Geschäftlich")
+                                Text(lm.t("misc.business"))
                                     .fontWeight(.semibold)
                             }
                             .frame(maxWidth: .infinity)
@@ -1343,7 +1350,7 @@ struct TripFormView: View {
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: "house.fill")
-                                Text("Privat")
+                                Text(lm.t("misc.private"))
                                     .fontWeight(.semibold)
                             }
                             .frame(maxWidth: .infinity)

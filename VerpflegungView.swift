@@ -128,7 +128,7 @@ struct VerpflegungView: View {
                                     Button {
                                         withOptionalAnimation(.easeInOut(duration: 0.2)) { selectedDate = Date() }
                                     } label: {
-                                        Text("Heute")
+                                        Text(lm.t("misc.today"))
                                             .font(.caption)
                                             .foregroundColor(.green)
                                             .padding(.horizontal, 10)
@@ -169,7 +169,7 @@ struct VerpflegungView: View {
                                     Image(systemName: "magnifyingglass")
                                         .font(.system(size: 32))
                                         .foregroundColor(.secondary.opacity(0.6))
-                                    Text("Keine Einträge im gewählten Zeitraum")
+                                    Text(lm.t("misc.no.entries.period"))
                                         .font(.subheadline)
                                         .foregroundColor(.secondary)
                                         .multilineTextAlignment(.center)

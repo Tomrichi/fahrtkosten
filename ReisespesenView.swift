@@ -676,6 +676,7 @@ struct VehicleCostTilesSection: View {
 struct FahrzeugwaescheFormView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var store: DataStore
+    @EnvironmentObject var lm: LocalizationManager
     @State private var showAdd = false
     @State private var editItem: VehicleCost?
 
@@ -693,7 +694,7 @@ struct FahrzeugwaescheFormView: View {
                         VStack(spacing: 12) {
                             Image(systemName: "sparkles")
                                 .font(.system(size: 36)).foregroundColor(.cyan.opacity(0.5))
-                            Text("Keine Einträge").font(.subheadline)
+                            Text(lm.t("misc.no.entries")).font(.subheadline)
                             Text("Tippe auf + um eine Fahrzeugwäsche zu erfassen.")
                                 .font(.subheadline).foregroundColor(.secondary).multilineTextAlignment(.center)
                         }

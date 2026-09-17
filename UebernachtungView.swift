@@ -74,8 +74,15 @@ struct UebernachtungView: View {
                     // ── Zeitraum-Filter ──
                     Section {
                         VStack(spacing: 10) {
-                            FilterChipBar(selection: $selectedFilter)
-                                .padding(.vertical, 2)
+                            FilterChipBar(selection: $selectedFilter, labelFor: { filter in
+                                switch filter {
+                                case .tag:   return lm.t("filter.day")
+                                case .woche: return lm.t("filter.week")
+                                case .monat: return lm.t("filter.month")
+                                case .alle:  return lm.t("filter.all")
+                                }
+                            })
+                            .padding(.vertical, 2)
 
                             if selectedFilter != .alle {
                                 HStack(spacing: 8) {
@@ -89,7 +96,7 @@ struct UebernachtungView: View {
                                     Button {
                                         withOptionalAnimation(.easeInOut(duration: 0.2)) { selectedDate = Date() }
                                     } label: {
-                                        Text("Heute")
+                                        Text(lm.t("misc.today"))
                                             .font(.caption)
                                             .foregroundColor(.blue)
                                             .padding(.horizontal, 10)
@@ -130,7 +137,7 @@ struct UebernachtungView: View {
                                     Image(systemName: "magnifyingglass")
                                         .font(.system(size: 32))
                                         .foregroundColor(.secondary.opacity(0.5))
-                                    Text("Keine Einträge im gewählten Zeitraum")
+                                    Text(lm.t("misc.no.entries.period"))
                                         .font(.subheadline)
                                         .foregroundColor(.secondary)
                                         .multilineTextAlignment(.center)

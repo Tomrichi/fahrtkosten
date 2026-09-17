@@ -254,10 +254,10 @@ struct ArbeitszeitView: View {
                             .font(.system(size: 30, weight: .semibold))
                             .foregroundColor(.blue)
                     }
-                    Text("Arbeitstag erfassen")
+                    Text(lm.t("arbeitszeit.add.title"))
                         .font(.headline)
                         .foregroundColor(.primary)
-                    Text("Gesamtarbeitszeit und Verpflegungspauschale erfassen")
+                    Text(lm.t("arbeitszeit.add.subtitle"))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -281,8 +281,15 @@ struct ArbeitszeitView: View {
     private var filterSection: some View {
         Section {
             VStack(spacing: 10) {
-                FilterChipBar(selection: $selectedFilter)
-                    .padding(.vertical, 2)
+                FilterChipBar(selection: $selectedFilter, labelFor: { filter in
+                    switch filter {
+                    case .tag:   return lm.t("filter.day")
+                    case .woche: return lm.t("filter.week")
+                    case .monat: return lm.t("filter.month")
+                    case .alle:  return lm.t("filter.all")
+                    }
+                })
+                .padding(.vertical, 2)
 
                 if selectedFilter != .alle {
                     HStack(spacing: 8) {
@@ -296,7 +303,7 @@ struct ArbeitszeitView: View {
                         Button {
                             withOptionalAnimation(.easeInOut(duration: 0.2)) { selectedDate = Date() }
                         } label: {
-                            Text("Heute")
+                            Text(lm.t("misc.today"))
                                 .font(.caption.bold())
                                 .foregroundColor(.blue)
                                 .padding(.horizontal, 10)
@@ -338,7 +345,7 @@ struct ArbeitszeitView: View {
                     Image(systemName: "wrench.and.screwdriver.fill")
                         .font(.caption)
                         .foregroundColor(.blue)
-                    Text("Monteurszulage (über Lohn, separat)")
+                    Text(lm.t("arbeitszeit.monteur"))
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -353,7 +360,7 @@ struct ArbeitszeitView: View {
                     Image(systemName: "calendar.badge.exclamationmark")
                         .font(.caption)
                         .foregroundColor(.blue)
-                    Text("Wochenend-/Feiertagszulage (über Lohn, separat)")
+                    Text(lm.t("arbeitszeit.wochenende"))
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -375,7 +382,7 @@ struct ArbeitszeitView: View {
                     Image(systemName: "magnifyingglass")
                         .font(.system(size: 32))
                         .foregroundColor(.secondary.opacity(0.5))
-                    Text("Keine Einträge im gewählten Zeitraum")
+                    Text(lm.t("arbeitszeit.no.entries"))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
