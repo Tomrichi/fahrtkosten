@@ -61,6 +61,11 @@ class DataStore: ObservableObject {
     @Published var wochenendzulageSchweiz: Double { didSet { local.set(wochenendzulageSchweiz, forKey: "wochenendzulageSchweiz") } }
     @Published var wochenendzulageAusland: Double { didSet { local.set(wochenendzulageAusland, forKey: "wochenendzulageAusland") } }
 
+    // MARK: - Profil
+    @Published var profilName:       String { didSet { local.set(profilName,       forKey: "profilName") } }
+    @Published var profilAdresse:    String { didSet { local.set(profilAdresse,    forKey: "profilAdresse") } }
+    @Published var profilKennzeichen: String { didSet { local.set(profilKennzeichen, forKey: "profilKennzeichen") } }
+
     // MARK: - Init
     init() {
         // Einstellungen laden
@@ -90,6 +95,9 @@ class DataStore: ObservableObject {
         wochenendzulageInland  = local.double(forKey: "wochenendzulageInland").ifZeroAllowed(Constants.wochenendzulageInland)
         wochenendzulageSchweiz = local.double(forKey: "wochenendzulageSchweiz").ifZeroAllowed(Constants.wochenendzulageSchweiz)
         wochenendzulageAusland = local.double(forKey: "wochenendzulageAusland").ifZeroAllowed(Constants.wochenendzulageAusland)
+        profilName        = local.string(forKey: "profilName")        ?? ""
+        profilAdresse     = local.string(forKey: "profilAdresse")     ?? ""
+        profilKennzeichen = local.string(forKey: "profilKennzeichen") ?? ""
 
         // SCHRITT 1: Migration einmalig ausführen (Standard → App Group)
         migrateFromStandardToAppGroup()

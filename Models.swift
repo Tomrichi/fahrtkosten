@@ -82,6 +82,7 @@ struct Trip: Identifiable, Codable {
     var fuelTypeRaw: String?        // Kraftstoffart (e5 / e10 / diesel)
     var startTime: Date?            // Abfahrtszeit (Uhrzeit)
     var endTime: Date?              // Ankunftszeit (Uhrzeit)
+    var purpose: String             // Fahrtgrund (z.B. Einzeltraining, Besprechung)
 
     var fuelCost: Double? {
         guard km > 0 else { return nil }
@@ -105,7 +106,7 @@ struct Trip: Identifiable, Codable {
 
     enum CodingKeys: String, CodingKey {
         case id, from, to, date, km, note, art, distanceText, durationText, fahrzeitText
-        case fuelPricePerLiter, fuelConsumption, fuelTypeRaw, startTime, endTime
+        case fuelPricePerLiter, fuelConsumption, fuelTypeRaw, startTime, endTime, purpose
     }
 
     init(id: UUID = UUID(), from: String, to: String, date: Date = Date(),
@@ -113,12 +114,14 @@ struct Trip: Identifiable, Codable {
          distanceText: String? = nil,
          durationText: String? = nil, fahrzeitText: String? = nil,
          fuelPricePerLiter: Double? = nil, fuelConsumption: Double? = nil,
-         fuelTypeRaw: String? = nil, startTime: Date? = nil, endTime: Date? = nil) {
+         fuelTypeRaw: String? = nil, startTime: Date? = nil, endTime: Date? = nil,
+         purpose: String = "") {
         self.id = id; self.from = from; self.to = to; self.date = date
         self.km = km; self.note = note; self.art = art; self.distanceText = distanceText
         self.durationText = durationText; self.fahrzeitText = fahrzeitText
         self.fuelPricePerLiter = fuelPricePerLiter; self.fuelConsumption = fuelConsumption
         self.fuelTypeRaw = fuelTypeRaw; self.startTime = startTime; self.endTime = endTime
+        self.purpose = purpose
     }
 
     init(from decoder: Decoder) throws {
@@ -138,6 +141,7 @@ struct Trip: Identifiable, Codable {
         fuelTypeRaw = try c.decodeIfPresent(String.self, forKey: .fuelTypeRaw)
         startTime = try c.decodeIfPresent(Date.self, forKey: .startTime)
         endTime   = try c.decodeIfPresent(Date.self, forKey: .endTime)
+        purpose   = try c.decodeIfPresent(String.self, forKey: .purpose) ?? ""
     }
 }
 

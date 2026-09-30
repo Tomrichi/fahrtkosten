@@ -3,10 +3,12 @@ import WebKit
 
 // MARK: - Versionshinweise View
 struct VersionHistoryView: View {
+    @EnvironmentObject var lm: LocalizationManager
+
     var body: some View {
         NavigationStack {
-            HTMLWebView(html: versionHistoryHTML)
-                .navigationTitle("Versionshinweise")
+            HTMLWebView(html: versionHistoryHTML(for: lm.language))
+                .navigationTitle(lm.t("settings.version.history"))
                 .navigationBarTitleDisplayMode(.inline)
         }
     }
@@ -1270,7 +1272,14 @@ Kontakt: <a href="mailto:info@wagner-fahrtkosten.de">info@wagner-fahrtkosten.de<
 // ─────────────────────────────────────────────────────────────────────────────
 // VERSIONSHINWEISE
 // ─────────────────────────────────────────────────────────────────────────────
-private let versionHistoryHTML = #"""
+private func versionHistoryHTML(for lang: AppLanguage) -> String {
+    switch lang {
+    case .english: return versionHistoryHTML_en
+    default:       return versionHistoryHTML_de
+    }
+}
+
+private let versionHistoryHTML_de = #"""
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -1339,13 +1348,65 @@ private let versionHistoryHTML = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.33 – aktuell -->
+<!-- 1.17.39 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.33
+        Version 1.17.39
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">PDF-Export überarbeitet · Profil · Tag/Monat/Jahr-Auswahl</div>
+    </div>
+    <span class="build-info">30. September 2026 · Build 64</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEU</span> <strong>PDF-Export – neues Layout:</strong> 7 Spalten (Datum, Von, Nach, Grund, Fahrt, €/km, Betrag) mit vollem Adresstext und dynamischer Zeilenhöhe.</li>
+      <li><span class="badge-new">NEU</span> <strong>PDF-Export – Zeitraum-Art:</strong> Im Export-Dialog lässt sich jetzt Tag, Monat oder Jahr als Ausgabezeitraum wählen – unabhängig vom aktiven Filter in der Übersicht.</li>
+      <li><span class="badge-new">NEU</span> <strong>PDF – Profil:</strong> Name, Adresse und Kennzeichen aus dem Profil erscheinen im PDF-Kopf.</li>
+      <li><span class="badge-new">NEU</span> <strong>PDF – Zusammenfassung:</strong> Kompakte Übersichtstabelle mit Gesamtkilometern, Erstattungsbetrag und weiteren Kennzahlen am Ende des Dokuments.</li>
+      <li><span class="badge-fix">FIX</span> <strong>PDF – Texte abgeschnitten:</strong> Spaltenbreiten wurden so angepasst, dass Adressen und Inhalte vollständig lesbar sind.</li>
+      <li><span class="badge-fix">FIX</span> <strong>PDF – Spalten überlappend:</strong> Fahrt, €/km und Betrag haben sich mit dem Inhalt der Grund-Spalte überlagert – Abstände korrigiert.</li>
+      <li><span class="badge-fix">FIX</span> <strong>PDF – Zeilenhöhe:</strong> Zeilen hatten eine fixe Höhe, sodass langer Text abgeschnitten wurde. Zeilenhöhe passt sich jetzt automatisch dem Inhalt an.</li>
+      <li><span class="badge-fix">FIX</span> <strong>PDF – Grund-Spalte:</strong> Statt Fahrtgrund und Notiz wurde nur die Fahrtart (z. B. „GPS Fahrt") angezeigt. Inhalt zeigt jetzt korrekt Fahrtgrund und Notiz als Klartext.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.37 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.37
+      </div>
+      <div class="preview-text">Lokalisierung vervollständigt · Erscheinungsbild & Formulare</div>
+    </div>
+    <span class="build-info">17. September 2026 · Build 62</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-fix">FIX</span> <strong>Erscheinungsbild:</strong> System / Hell / Dunkel werden jetzt in der jeweiligen Systemsprache angezeigt.</li>
+      <li><span class="badge-fix">FIX</span> <strong>Fahrzeugwäsche:</strong> Kategoriename, Navtitel und leere-Liste-Hinweise waren noch auf Deutsch.</li>
+      <li><span class="badge-fix">FIX</span> <strong>Formulare:</strong> „Abbrechen", „Hinzufügen", „Speichern" und „Fertig" in KFZ-Kosten, Fahrzeugwäsche und private Ausgaben jetzt vollständig übersetzt.</li>
+      <li><span class="badge-fix">FIX</span> <strong>Versionshinweise:</strong> Titel und Inhalt werden jetzt sprachabhängig angezeigt.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.33 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.33
       </div>
       <div class="preview-text">Vollständige Lokalisierung · Türkisch NEU</div>
     </div>
@@ -1502,6 +1563,294 @@ private let versionHistoryHTML = #"""
   </div>
 </details>
 
+
+<p class="meta" style="margin-top:24px;">Fahrtkosten · Thomas Wagner · info@wagner-fahrtkosten.de</p>
+
+</body>
+</html>
+"""#
+
+private let versionHistoryHTML_en = #"""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-size: 15px; line-height: 1.55; margin: 0;
+    padding: 16px 18px 40px; background: #f2f2f7; color: #1c1c1e;
+  }
+  html[data-scheme="dark"] body { background: #1c1c1e; color: #f2f2f7; }
+  html[data-scheme="dark"] details { background: #2c2c2e; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+  html[data-scheme="dark"] details summary { background: #2c2c2e; }
+  html[data-scheme="dark"] details summary:hover { background: #3a3a3c; }
+  html[data-scheme="dark"] details[open] summary { background: #2c2c2e; border-bottom: 1px solid #3a3a3c; }
+  html[data-scheme="dark"] .detail-content { color: #f2f2f7; }
+  html[data-scheme="dark"] .version-title { color: #f2f2f7; }
+  html[data-scheme="dark"] .preview-text { color: #ebebf599; }
+  html[data-scheme="dark"] .build-info { color: #8e8e93; }
+  html[data-scheme="dark"] .chevron { color: #8e8e93; }
+  html[data-scheme="dark"] li { color: #f2f2f7; }
+  html[data-scheme="dark"] li strong { color: #ffffff; }
+  html[data-scheme="dark"] .badge-new    { background: #0d2e1a; color: #30d158; }
+  html[data-scheme="dark"] .badge-fix    { background: #2a1a00; color: #ff9f0a; }
+  html[data-scheme="dark"] .badge-change { background: #1a1a2e; color: #64acff; }
+  html[data-scheme="dark"] .current-badge { background: #0d2e1a; color: #30d158; }
+  html[data-scheme="dark"] .meta { color: #8e8e93; }
+  html[data-scheme="dark"] hr { border-top-color: #3a3a3c; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .meta { font-size: 13px; color: #6e6e73; margin-bottom: 20px; }
+  details {
+    background: #ffffff; border-radius: 14px; margin-bottom: 12px;
+    overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+  }
+  details summary {
+    list-style: none; cursor: pointer; padding: 14px 16px;
+    display: flex; align-items: center; gap: 10px;
+    user-select: none; background: #ffffff;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary:hover { background: #f8f8f8; }
+  details[open] summary { border-bottom: 1px solid #e5e5ea; }
+  .summary-inner { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .version-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .preview-text { font-size: 12px; color: #6e6e73; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .build-info { font-size: 12px; color: #8e8e93; white-space: nowrap; }
+  .chevron { font-size: 12px; color: #8e8e93; transition: transform 0.2s; flex-shrink: 0; }
+  details[open] .chevron { transform: rotate(90deg); }
+  .detail-content { padding: 12px 16px 16px; }
+  ul { margin: 0; padding-left: 18px; }
+  li { margin-bottom: 7px; }
+  .badge-new, .badge-fix, .badge-change, .current-badge {
+    display: inline-block; border-radius: 5px; padding: 1px 7px;
+    font-size: 11px; font-weight: 700; vertical-align: middle;
+    margin-right: 2px; white-space: nowrap;
+  }
+  .badge-new    { background: #e6f7ec; color: #1a7a3c; }
+  .badge-fix    { background: #fff3e0; color: #c0620a; }
+  .badge-change { background: #e8f0ff; color: #2251cc; }
+  .current-badge { background: #e6f7ec; color: #1a7a3c; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<h1>Release Notes</h1>
+<p class="meta">Fahrtkosten · Thomas Wagner</p>
+
+<!-- 1.17.39 – current -->
+<details open>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.39
+        <span class="current-badge">● Current</span>
+      </div>
+      <div class="preview-text">PDF export redesigned · Profile · Day/Month/Year selection</div>
+    </div>
+    <span class="build-info">September 30, 2026 · Build 64</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEW</span> <strong>PDF Export – new layout:</strong> 7 columns (Date, From, To, Purpose, Trip, €/km, Amount) with full address text and dynamic row height.</li>
+      <li><span class="badge-new">NEW</span> <strong>PDF Export – period type:</strong> The export dialog now lets you choose Day, Month or Year as the output period – independent of the active filter in the overview.</li>
+      <li><span class="badge-new">NEW</span> <strong>PDF – Profile:</strong> Name, address and licence plate from your profile appear in the PDF header.</li>
+      <li><span class="badge-new">NEW</span> <strong>PDF – Summary:</strong> Compact overview table with total kilometres, reimbursement amount and further key figures at the end of the document.</li>
+      <li><span class="badge-fix">FIX</span> <strong>PDF – text clipped:</strong> Column widths adjusted so that addresses and content are fully readable.</li>
+      <li><span class="badge-fix">FIX</span> <strong>PDF – overlapping columns:</strong> Trip, €/km and Amount were overlapping the Purpose column content – spacing corrected.</li>
+      <li><span class="badge-fix">FIX</span> <strong>PDF – row height:</strong> Rows had a fixed height causing long text to be cut off. Row height now adjusts automatically to the content.</li>
+      <li><span class="badge-fix">FIX</span> <strong>PDF – Purpose column:</strong> Instead of the trip reason and notes, only the trip type (e.g. "GPS Trip") was shown. Content now correctly displays trip reason and notes as plain text.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.37 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.37
+      </div>
+      <div class="preview-text">Localization completed · Appearance &amp; forms</div>
+    </div>
+    <span class="build-info">September 17, 2026 · Build 62</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-fix">FIX</span> <strong>Appearance:</strong> System / Light / Dark labels now shown in the device language.</li>
+      <li><span class="badge-fix">FIX</span> <strong>Car Wash:</strong> Category name, navigation title and empty-state hints were still in German.</li>
+      <li><span class="badge-fix">FIX</span> <strong>Forms:</strong> "Cancel", "Add", "Save" and "Done" in Vehicle Costs, Car Wash and Private Expenses are now fully translated.</li>
+      <li><span class="badge-fix">FIX</span> <strong>Release Notes:</strong> Title and content now shown in the device language.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.33 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.33
+      </div>
+      <div class="preview-text">Full localization · Turkish NEW</div>
+    </div>
+    <span class="build-info">September 17, 2026 · Build 57</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEW</span> <strong>Turkish:</strong> The app is now fully available in Turkish.</li>
+      <li><span class="badge-new">NEW</span> <strong>Full localization:</strong> English, Polish and Czech are now completely translated – tab bar, navigation, forms and all views.</li>
+      <li><span class="badge-new">NEW</span> <strong>iOS system language:</strong> The app automatically uses the iPhone's language. Change via Settings → General → Language &amp; Region.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.32 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.32
+      </div>
+      <div class="preview-text">iCloud Sync · GPS fuel data · Bug fixes</div>
+    </div>
+    <span class="build-info">September 16, 2026 · Build 55</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEW</span> <strong>iCloud Sync (Pro):</strong> Trips, expenses, overnight stays and vehicle costs are automatically synced between iPhone, iPad and Mac – exclusively for Pro users.</li>
+      <li><span class="badge-fix">FIX</span> <strong>GPS – Fuel type:</strong> The fuel type configured in Settings (e.g. Diesel or Electric) is now reliably applied to every GPS trip.</li>
+      <li><span class="badge-fix">FIX</span> <strong>CarPlay – Fuel data:</strong> When ending a GPS trip via CarPlay, fuel type, price and consumption from Settings are now saved correctly.</li>
+      <li><span class="badge-fix">FIX</span> <strong>GPS – Pause:</strong> The GPS sheet can no longer be accidentally dismissed during a pause. The Cancel button now also stops recording correctly.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.29 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.29
+      </div>
+      <div class="preview-text">Bug fix · CarPlay Pause/Resume</div>
+    </div>
+    <span class="build-info">September 9, 2026 · Build 53</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-fix">FIX</span> <strong>CarPlay – Pause/Resume:</strong> After pausing a GPS trip the button in CarPlay now correctly switches to "Resume" and recording can be continued.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.25 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.25
+      </div>
+      <div class="preview-text">Freemium · GPS &amp; Export &amp; Backup as Pro features</div>
+    </div>
+    <span class="build-info">September 1, 2026 · Build 47</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEW</span> <strong>Freemium model:</strong> Fahrtkosten is now free. GPS recording, export (PDF &amp; CSV), backup and CarPlay are unlocked as a one-time Pro upgrade (€6.99).</li>
+      <li><span class="badge-new">NEW</span> <strong>Redesigned GPS view:</strong> Larger map, speed displayed compactly above – everything at a glance, no scrolling needed.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.24 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.24
+      </div>
+      <div class="preview-text">Hotel breakfast · GPS fixes · New color design</div>
+    </div>
+    <span class="build-info">August 31, 2026 · Build 46</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEW</span> <strong>Hotel breakfast:</strong> If breakfast is included in the hotel price, one tap is enough – the app automatically deducts 20 % of the meal allowance (§ 9 para. 4a EStG, applies to technicians employed in Germany).</li>
+      <li><span class="badge-new">NEW</span> <strong>Fresh color design:</strong> Overnight stays, trips, leasing and vehicle tax now appear in a clear blue.</li>
+      <li><span class="badge-fix">FIX</span> <strong>GPS – Per-second update:</strong> CarPlay and iPhone were only updating every 4–5 seconds instead of every second.</li>
+      <li><span class="badge-fix">FIX</span> <strong>GPS – Complete fuel data:</strong> After ending a GPS trip, fuel type, price and consumption from Settings are now fully applied.</li>
+      <li><span class="badge-fix">FIX</span> <strong>GPS – Distance display:</strong> Below 1 km, distance is now shown in 100-meter steps (e.g. 300 m, 400 m).</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.23 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.23
+      </div>
+      <div class="preview-text">CarPlay: speed first, pause button, auto-start · GPS meter display</div>
+    </div>
+    <span class="build-info">August 11, 2026 · Build 34</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEW</span> <strong>CarPlay – Speed first:</strong> Speed is now shown as the primary value during a GPS trip.</li>
+      <li><span class="badge-new">NEW</span> <strong>CarPlay – Pause button:</strong> GPS recording can be paused and resumed directly from CarPlay.</li>
+      <li><span class="badge-new">NEW</span> <strong>CarPlay – Auto-start:</strong> GPS recording starts automatically when CarPlay is connected (optional, configurable in Settings).</li>
+      <li><span class="badge-new">NEW</span> <strong>GPS – Meter display:</strong> Distances under 1 km are now shown in meters.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.21 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.21
+      </div>
+      <div class="preview-text">Mechanic allowance hour rule · GPS speed · iOS 18 fix</div>
+    </div>
+    <span class="build-info">August 2026 · Build 33</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEW</span> <strong>Mechanic allowance – Hour rule:</strong> The allowance now depends on actual deployment duration – under 3 hours no allowance, 3–6 hours 50 % of the flat rate, 6 hours and above full allowance.</li>
+      <li><span class="badge-new">NEW</span> <strong>GPS – Speed display:</strong> Current speed is shown on iPhone during recording.</li>
+      <li><span class="badge-fix">FIX</span> <strong>iOS 18 – Tab bar:</strong> Map content was showing through the background of the floating tab bar.</li>
+    </ul>
+  </div>
+</details>
 
 <p class="meta" style="margin-top:24px;">Fahrtkosten · Thomas Wagner · info@wagner-fahrtkosten.de</p>
 

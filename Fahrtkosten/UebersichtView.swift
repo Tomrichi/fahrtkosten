@@ -23,6 +23,7 @@ enum UebersichtTab: String, CaseIterable, Identifiable {
 
 // MARK: - Zeit-Filter Enum
 enum ZeitFilter: String, CaseIterable {
+    case tag    = "Tag"
     case woche  = "Woche"
     case monat  = "Monat"
     case jahr   = "Jahr"
@@ -131,10 +132,12 @@ struct UebersichtView: View {
             .sheet(isPresented: $showAddPrivateExpense) {
                 PrivateExpenseFormView(mode: .add)
                     .environmentObject(store)
+                    .environmentObject(lm)
             }
             .sheet(item: $editPrivateExpense) { item in
                 PrivateExpenseFormView(mode: .edit(item))
                     .environmentObject(store)
+                    .environmentObject(lm)
             }
             .sheet(item: $pdfPreviewItem) { item in
                 PDFPreviewView(pdfData: item.data, filename: item.filename)
@@ -143,20 +146,28 @@ struct UebersichtView: View {
                 PDFExportDatePickerSheet(
                     selectedDate: $pdfExportDate,
                     zeitFilter: zeitFilter
-                ) { exportDate in
-                    let exportedTrips = store.trips.filter { inPeriodOf($0.date, reference: exportDate) }
-                    let exportedMeals = store.meals.filter { inPeriodOf($0.date, reference: exportDate) }
-                    let exportedHotels = store.hotels.filter { inPeriodOf($0.date, reference: exportDate) }
-                    let exportedVehicle = store.vehicleCosts.filter { inPeriodOf($0.date, reference: exportDate) }
-                    let exportedSpesen = store.reiseSpesen.filter { inPeriodOf($0.date, reference: exportDate) }
-                    let exportedPrivate = store.privateExpenses.filter { inPeriodOf($0.date, reference: exportDate) }
+                ) { exportDate, granularitaet in
+                    let cal = Calendar.current
+                    func inExport(_ date: Date) -> Bool {
+                        switch granularitaet {
+                        case .tag:   return cal.isDate(date, equalTo: exportDate, toGranularity: .day)
+                        case .monat: return cal.isDate(date, equalTo: exportDate, toGranularity: .month)
+                        case .jahr:  return cal.isDate(date, equalTo: exportDate, toGranularity: .year)
+                        }
+                    }
+                    let exportedTrips   = store.trips.filter { inExport($0.date) }
+                    let exportedMeals   = store.meals.filter { inExport($0.date) }
+                    let exportedHotels  = store.hotels.filter { inExport($0.date) }
+                    let exportedVehicle = store.vehicleCosts.filter { inExport($0.date) }
+                    let exportedSpesen  = store.reiseSpesen.filter { inExport($0.date) }
+                    let exportedPrivate = store.privateExpenses.filter { inExport($0.date) }
 
                     let formatter = DateFormatter()
                     formatter.locale = Locale(identifier: "de_DE")
-                    switch zeitFilter {
+                    switch granularitaet {
+                    case .tag:   formatter.dateFormat = "dd_MMMM_yyyy"
                     case .monat: formatter.dateFormat = "MMMM_yyyy"
                     case .jahr:  formatter.dateFormat = "yyyy"
-                    case .woche: formatter.dateFormat = "'KW'ww_yyyy"
                     }
                     let zeitraumLabel = formatter.string(from: exportDate)
 
@@ -195,6 +206,7 @@ struct UebersichtView: View {
         let cal = Calendar.current
         let now = Date()
         switch zeitFilter {
+        case .tag:    return cal.isDate(date, equalTo: now, toGranularity: .day)
         case .woche:  return cal.isDate(date, equalTo: now, toGranularity: .weekOfYear)
         case .monat:  return cal.isDate(date, equalTo: now, toGranularity: .month)
         case .jahr:   return cal.isDate(date, equalTo: now, toGranularity: .year)
@@ -204,6 +216,7 @@ struct UebersichtView: View {
     private func inPeriodOf(_ date: Date, reference: Date) -> Bool {
         let cal = Calendar.current
         switch zeitFilter {
+        case .tag:    return cal.isDate(date, equalTo: reference, toGranularity: .day)
         case .woche:  return cal.isDate(date, equalTo: reference, toGranularity: .weekOfYear)
         case .monat:  return cal.isDate(date, equalTo: reference, toGranularity: .month)
         case .jahr:   return cal.isDate(date, equalTo: reference, toGranularity: .year)
@@ -267,6 +280,7 @@ struct UebersichtView: View {
                     ForEach(ZeitFilter.allCases, id: \.self) { filter in
                         Text({
                             switch filter {
+                            case .tag:   return lm.t("filter.tag")
                             case .woche: return lm.t("filter.woche")
                             case .monat: return lm.t("filter.monat")
                             case .jahr:  return lm.t("filter.jahr")

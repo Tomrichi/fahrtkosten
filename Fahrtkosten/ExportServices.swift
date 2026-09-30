@@ -35,18 +35,27 @@ struct PDFExportService {
 
         let pageWidth: CGFloat   = 595.2    // A4
         let pageHeight: CGFloat  = 841.8
-        let margin: CGFloat      = 40
-        let rowH: CGFloat        = 18
+        let margin: CGFloat      = 18
+        let rowH: CGFloat        = 26       // höher für 2-zeilige Adressen
         let sectionH: CGFloat    = 24
         let tableW               = pageWidth - 2 * margin
 
-        // Spalten
-        let cDatum: CGFloat      = margin
-        let cDesc: CGFloat       = margin + 75
-        let cDetail: CGFloat     = margin + 310
-        let cBetrag: CGFloat     = pageWidth - margin - 65
+        // Spalten: Datum | Von | Nach | Grund | Fahrt | €/km | Betrag
+        let cDatum:    CGFloat = margin
+        let cVon:      CGFloat = margin + 44
+        let cNach:     CGFloat = margin + 150
+        let cZweck:    CGFloat = margin + 256
+        let cStrecke:  CGFloat = margin + 362
+        let cKmSatz:   CGFloat = margin + 412
+        let cBetrag:   CGFloat = margin + 456
 
-        let accent   = UIColor(red: 0.12, green: 0.35, blue: 0.75, alpha: 1)
+        // Spaltenbreiten
+        let wDatum:    CGFloat = 42
+        let wVon:      CGFloat = 104
+        let wNach:     CGFloat = 104
+        let wZweck:    CGFloat = 78
+
+        let accent   = UIColor(red: 0.24, green: 0.29, blue: 0.36, alpha: 1) // #3d4a5c
         let textPri  = UIColor(red: 0.10, green: 0.10, blue: 0.12, alpha: 1)
         let textSec  = UIColor(red: 0.38, green: 0.38, blue: 0.42, alpha: 1)
         let rowEven  = UIColor(red: 0.96, green: 0.96, blue: 0.97, alpha: 1)
@@ -58,10 +67,6 @@ struct PDFExportService {
         let spesenTotal  = reiseSpesen.reduce(0.0) { $0 + $1.amount }
         let vehicleTotal = vehicleCosts.reduce(0.0) { $0 + $1.amount }
         let privateTotal = privateExpenses.reduce(0.0) { $0 + $1.amount }
-        // Monteurszulage: Lohnbestandteil, NICHT Teil der Reisekosten-Erstattung – separat ausgewiesen
-        let monteurszulageTotal = store.totalMonteurszulage(meals)
-        // Wochenend-/Feiertagszulage: ebenfalls Lohnbestandteil, separat ausgewiesen
-        let wochenendzulageTotal = store.totalWochenendzulage(meals)
         let grandTotal   = tripTotal + mealTotal + hotelTotal
 
         // Hilfsfunktionen
@@ -138,21 +143,91 @@ struct PDFExportService {
 
             func drawTableHeader() {
                 accent.setFill()
-                UIBezierPath(roundedRect: CGRect(x: margin, y: y, width: tableW, height: 20),
+                UIBezierPath(roundedRect: CGRect(x: margin, y: y, width: tableW, height: 18),
                              cornerRadius: 3).fill()
-                let hA = a(.boldSystemFont(ofSize: 8), .white)
-                "Datum".draw(at: CGPoint(x: cDatum + 3, y: y + 5), withAttributes: hA)
-                "Beschreibung".draw(at: CGPoint(x: cDesc + 3, y: y + 5), withAttributes: hA)
-                "Details".draw(at: CGPoint(x: cDetail + 3, y: y + 5), withAttributes: hA)
-                "Betrag".draw(at: CGPoint(x: cBetrag + 3, y: y + 5), withAttributes: hA)
-                y += 24
+                let hA = a(.boldSystemFont(ofSize: 7.5), .white)
+                "Datum".draw(at: CGPoint(x: cDatum + 2, y: y + 4), withAttributes: hA)
+                "Von".draw(at: CGPoint(x: cVon + 2, y: y + 4), withAttributes: hA)
+                "Nach".draw(at: CGPoint(x: cNach + 2, y: y + 4), withAttributes: hA)
+                "Grund".draw(at: CGPoint(x: cZweck + 2, y: y + 4), withAttributes: hA)
+                "Fahrt".draw(at: CGPoint(x: cStrecke + 2, y: y + 4), withAttributes: hA)
+                "€/km".draw(at: CGPoint(x: cKmSatz + 2, y: y + 4), withAttributes: hA)
+                "Betrag".draw(at: CGPoint(x: cBetrag + 2, y: y + 4), withAttributes: hA)
+                y += 22
                 rowIdx = 0
             }
 
+            // Fahrt-Zeile: 7 Spalten
+            func drawTripRow(trip: Trip) {
+                let hasPurpose = !trip.purpose.isEmpty
+                let addrFont = UIFont.systemFont(ofSize: 7.0)
+                let addrAttrs: [NSAttributedString.Key: Any] = [.font: addrFont]
+                let opts: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
+                let fromH = (trip.from as NSString).boundingRect(
+                    with: CGSize(width: wVon - 4, height: .greatestFiniteMagnitude),
+                    options: opts, attributes: addrAttrs, context: nil).height
+                let toH = (trip.to as NSString).boundingRect(
+                    with: CGSize(width: wNach - 4, height: .greatestFiniteMagnitude),
+                    options: opts, attributes: addrAttrs, context: nil).height
+                // Zeilenhöhe: max(Adresstexte, Grund-Texte)
+                var grundParts = [trip.art.rawValue]
+                if hasPurpose { grundParts.append(trip.purpose) }
+                let filteredNoteH = trip.note.lowercased().contains("gps") ? "" : trip.note
+                if !filteredNoteH.isEmpty { grundParts.append(filteredNoteH) }
+                let grundStr = grundParts.joined(separator: "\n")
+                let grundH = (grundStr as NSString).boundingRect(
+                    with: CGSize(width: wZweck - 4, height: .greatestFiniteMagnitude),
+                    options: [.usesLineFragmentOrigin, .usesFontLeading],
+                    attributes: [.font: UIFont.systemFont(ofSize: 6.5)],
+                    context: nil).height
+                let effectiveRowH = max(max(fromH, toH) + 6, grundH + 6, 20)
+                newPageIfNeeded(needed: effectiveRowH + 1)
+                if rowIdx % 2 == 0 {
+                    rowEven.setFill()
+                    UIBezierPath(rect: CGRect(x: margin, y: y, width: tableW, height: effectiveRowH)).fill()
+                }
+                let rA  = a(.systemFont(ofSize: 7.0), textPri)
+                let rAs = a(.systemFont(ofSize: 7.0), textSec)
+                let rAb = a(.systemFont(ofSize: 7.0, weight: .semibold), textPri)
+
+                let dateStr = {
+                    let df = DateFormatter()
+                    df.locale = Locale(identifier: "de_DE")
+                    df.dateFormat = "d. MMM yyyy"
+                    return df.string(from: trip.date)
+                }()
+                dateStr.draw(in: CGRect(x: cDatum + 2, y: y + 3, width: wDatum, height: effectiveRowH), withAttributes: rAs)
+                trip.from.draw(in: CGRect(x: cVon + 2, y: y + 3, width: wVon - 4, height: effectiveRowH), withAttributes: rA)
+                trip.to.draw(in: CGRect(x: cNach + 2, y: y + 3, width: wNach - 4, height: effectiveRowH), withAttributes: rA)
+
+                // Grund: Art + Fahrtgrund + Notiz — reiner Text, auf Spaltenbreite begrenzt
+                let grundRect = CGRect(x: cZweck + 2, y: y + 3, width: wZweck - 4, height: effectiveRowH - 4)
+                var grundLines: [String] = [trip.art.rawValue]
+                if hasPurpose { grundLines.append(trip.purpose) }
+                let filteredNote = trip.note.lowercased().contains("gps") ? "" : trip.note
+                if !filteredNote.isEmpty { grundLines.append(filteredNote) }
+                let grundText = grundLines.joined(separator: "\n")
+                grundText.draw(in: grundRect, withAttributes: a(.systemFont(ofSize: 6.5), textSec))
+
+                km(trip.km).draw(at: CGPoint(x: cStrecke + 2, y: y + 3), withAttributes: rAs)
+                String(format: "€%.2f", store.kmRate).draw(at: CGPoint(x: cKmSatz + 2, y: y + 3), withAttributes: rAs)
+                euro(trip.km * store.kmRate).draw(at: CGPoint(x: cBetrag + 2, y: y + 3), withAttributes: rAb)
+
+                // Trennlinie
+                UIColor(red: 0.85, green: 0.85, blue: 0.87, alpha: 1).setStroke()
+                let line = UIBezierPath()
+                line.move(to: CGPoint(x: margin, y: y + effectiveRowH))
+                line.addLine(to: CGPoint(x: pageWidth - margin, y: y + effectiveRowH))
+                line.lineWidth = 0.3; line.stroke()
+
+                y += effectiveRowH
+                rowIdx += 1
+            }
+
+            // Allgemeine Zeile für nicht-Fahrten-Einträge (Verpflegung etc.)
             func drawRow(date: String, desc: String, detail: String, betrag: Double,
                          highlight: Bool = false) {
-                newPageIfNeeded(needed: rowH + 2)
-                // Zebra-Streifen
+                newPageIfNeeded(needed: rowH + 1)
                 if rowIdx % 2 == 0 {
                     rowEven.setFill()
                     UIBezierPath(rect: CGRect(x: margin, y: y, width: tableW, height: rowH)).fill()
@@ -161,15 +236,13 @@ struct PDFExportService {
                     UIColor(red: 0.90, green: 0.95, blue: 1.0, alpha: 1).setFill()
                     UIBezierPath(rect: CGRect(x: margin, y: y, width: tableW, height: rowH)).fill()
                 }
-                let rA = a(.systemFont(ofSize: 8.5), textPri)
-                let rAs = a(.systemFont(ofSize: 8.5), textSec)
-                date.draw(at: CGPoint(x: cDatum + 3, y: y + 3), withAttributes: rAs)
-                desc.draw(in: CGRect(x: cDesc + 3, y: y + 3, width: cDetail - cDesc - 8, height: rowH),
-                          withAttributes: rA)
-                detail.draw(in: CGRect(x: cDetail + 3, y: y + 3, width: cBetrag - cDetail - 6, height: rowH),
-                            withAttributes: rAs)
-                euro(betrag).draw(at: CGPoint(x: cBetrag + 3, y: y + 3),
-                                  withAttributes: a(.systemFont(ofSize: 8.5, weight: .semibold), textPri))
+                let rA  = a(.systemFont(ofSize: 7.5), textPri)
+                let rAs = a(.systemFont(ofSize: 7.5), textSec)
+                date.draw(at: CGPoint(x: cDatum + 2, y: y + 3), withAttributes: rAs)
+                desc.draw(in: CGRect(x: cVon + 2, y: y + 3, width: cZweck - cVon - 6, height: rowH), withAttributes: rA)
+                detail.draw(in: CGRect(x: cZweck + 2, y: y + 3, width: cBetrag - cZweck - 4, height: rowH), withAttributes: rAs)
+                euro(betrag).draw(at: CGPoint(x: cBetrag + 2, y: y + 3),
+                                  withAttributes: a(.systemFont(ofSize: 7.5, weight: .semibold), textPri))
                 y += rowH
                 rowIdx += 1
             }
@@ -178,7 +251,9 @@ struct PDFExportService {
 
             // Logo-Bereich / Titel
             accent.setFill()
-            UIBezierPath(roundedRect: CGRect(x: margin, y: y, width: tableW, height: 52),
+            let headerHasProfile = !store.profilName.isEmpty || !store.profilKennzeichen.isEmpty
+            let headerH: CGFloat = headerHasProfile ? 70 : 52
+            UIBezierPath(roundedRect: CGRect(x: margin, y: y, width: tableW, height: headerH),
                          cornerRadius: 8).fill()
             "Reisekostenabrechnung"
                 .draw(at: CGPoint(x: margin + 16, y: y + 10),
@@ -186,7 +261,16 @@ struct PDFExportService {
             "Zeitraum: \(zeitraum)"
                 .draw(at: CGPoint(x: margin + 16, y: y + 32),
                       withAttributes: a(.systemFont(ofSize: 10), UIColor.white.withAlphaComponent(0.8)))
-            y += 60
+            if headerHasProfile {
+                var profilParts: [String] = []
+                if !store.profilName.isEmpty       { profilParts.append(store.profilName) }
+                if !store.profilAdresse.isEmpty    { profilParts.append(store.profilAdresse) }
+                if !store.profilKennzeichen.isEmpty { profilParts.append("Kfz: \(store.profilKennzeichen)") }
+                profilParts.joined(separator: "  ·  ")
+                    .draw(at: CGPoint(x: margin + 16, y: y + 50),
+                          withAttributes: a(.systemFont(ofSize: 9), UIColor.white.withAlphaComponent(0.85)))
+            }
+            y += headerH + 8
 
             // Zusammenfassung-Kacheln
             let tileW = (tableW - 12) / 3
@@ -223,30 +307,8 @@ struct PDFExportService {
             // ── FAHRTEN ──────────────────────────────────────────────────────
             if !trips.isEmpty {
                 drawSectionHeader(title: "Fahrten  (\(trips.count) Einträge)", subtotal: tripTotal)
-                for trip in trips.sorted(by: { $0.date > $1.date }) {
-                    let from = cityOnly(from: trip.from)
-                    let to   = cityOnly(from: trip.to)
-                    let desc = "\(from) → \(to)"
-
-                    var details: [String] = []
-                    details.append(km(trip.km))
-                    details.append(String(format: "× %.2f €/km", store.kmRate))
-                    if let preis = trip.fuelPricePerLiter, preis > 0 {
-                        details.append(String(format: "Sprit: %.3f €/L", preis))
-                    }
-                    if let cons = trip.fuelConsumption, let preis = trip.fuelPricePerLiter,
-                       cons > 0, preis > 0 {
-                        let liter = (trip.km / 100.0) * cons
-                        details.append(String(format: "%.1f L", liter))
-                    }
-                    let detail = details.joined(separator: "  ·  ")
-
-                    drawRow(
-                        date: trip.date.formatted(date: .numeric, time: .omitted),
-                        desc: desc,
-                        detail: detail,
-                        betrag: trip.km * store.kmRate
-                    )
+                for trip in trips.sorted(by: { $0.date < $1.date }) {
+                    drawTripRow(trip: trip)
                 }
                 y += 6
             }
@@ -264,46 +326,6 @@ struct PDFExportService {
                         detail: detail,
                         betrag: allowance,
                         highlight: allowance == 0
-                    )
-                }
-                y += 6
-            }
-
-            // ── MONTEURSZULAGE (separat: Lohnbestandteil, NICHT Teil der Erstattung) ──
-            if monteurszulageTotal > 0 {
-                drawSectionHeader(title: "Monteurszulage – über Lohn ausbezahlt", subtotal: monteurszulageTotal)
-                for meal in meals.sorted(by: { $0.date > $1.date }) {
-                    let mz = store.monteurszulage(for: meal)
-                    guard mz > 0 else { continue }
-                    drawRow(
-                        date: meal.date.formatted(date: .numeric, time: .omitted),
-                        desc: "Monteurszulage",
-                        detail: {
-                            if meal.region == .inland { return "Inland" }
-                            if meal.region == .schweiz { return "Schweiz" }
-                            return meal.workedAtPlant ? "Schweiz" : "Ausland"
-                        }(),
-                        betrag: mz
-                    )
-                }
-                y += 6
-            }
-
-            // ── WOCHENEND-/FEIERTAGSZULAGE (separat: Lohnbestandteil, NICHT Teil der Erstattung) ──
-            if wochenendzulageTotal > 0 {
-                drawSectionHeader(title: "Wochenend-/Feiertagszulage – über Lohn ausbezahlt", subtotal: wochenendzulageTotal)
-                for meal in meals.sorted(by: { $0.date > $1.date }) {
-                    let wz = store.wochenendzulage(for: meal)
-                    guard wz > 0 else { continue }
-                    drawRow(
-                        date: meal.date.formatted(date: .numeric, time: .omitted),
-                        desc: "Wochenend-/Feiertagszulage",
-                        detail: {
-                            if meal.region == .inland { return "Inland" }
-                            if meal.region == .schweiz { return "Schweiz" }
-                            return meal.workedAtPlant ? "Schweiz" : "Ausland"
-                        }(),
-                        betrag: wz
                     )
                 }
                 y += 6
@@ -392,7 +414,7 @@ struct PDFExportService {
             y += 40
 
             // Hinweis
-            let hinweis = "* KFZ-Kosten, private Ausgaben, Monteurszulage und Wochenend-/Feiertagszulage (Lohnbestandteile) sind in der Gesamterstattung nicht enthalten."
+            let hinweis = "* KFZ-Kosten und private Ausgaben sind in der Gesamterstattung nicht enthalten."
             hinweis.draw(at: CGPoint(x: margin, y: y),
                          withAttributes: a(.systemFont(ofSize: 7.5), textSec))
 
@@ -448,11 +470,16 @@ struct PDFKitView: UIViewRepresentable {
         pdfView.displayMode = .singlePageContinuous
         pdfView.displayDirection = .vertical
         pdfView.backgroundColor = .white
-        pdfView.document = PDFDocument(data: data)
+        // Asynchron laden: Sheet ist beim makeUIView-Aufruf noch nicht vollständig
+        // präsentiert → synchrones Setzen des Dokuments kann ein schwarzes Frame erzeugen
+        DispatchQueue.main.async {
+            pdfView.document = PDFDocument(data: data)
+        }
         return pdfView
     }
 
     func updateUIView(_ pdfView: PDFView, context: Context) {
+        // Nur neu setzen wenn sich das Dokument wirklich geändert hat
         if pdfView.document == nil {
             pdfView.document = PDFDocument(data: data)
         }
@@ -490,16 +517,8 @@ struct CSVExportService {
         // Verpflegung
         for meal in meals.sorted(by: { $0.date > $1.date }) {
             let amt = meal.allowance(rates: store.mealRates(for: meal.region))
-            let mz = store.monteurszulage(for: meal)
-            let wz = store.wochenendzulage(for: meal)
             let date = meal.date.formatted(date: .numeric, time: .omitted)
             csv += "\(date);Verpflegung;\(meal.region.localizedName);;;;;;;;\(String(format: "%.2f", amt));\(meal.note)\n"
-            if mz > 0 {
-                csv += "\(date);Monteurszulage;\(meal.region.localizedName);;;;;;;;\(String(format: "%.2f", mz));\n"
-            }
-            if wz > 0 {
-                csv += "\(date);Wochenend-/Feiertagszulage;\(meal.region.localizedName);;;;;;;;\(String(format: "%.2f", wz));\n"
-            }
         }
 
         // Hotels

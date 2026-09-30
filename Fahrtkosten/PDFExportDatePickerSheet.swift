@@ -1,21 +1,27 @@
 import SwiftUI
 
+enum ExportGranularitaet: String, CaseIterable {
+    case tag   = "Tag"
+    case monat = "Monat"
+    case jahr  = "Jahr"
+}
+
 // MARK: - PDF Export Datumswahl Sheet
 struct PDFExportDatePickerSheet: View {
     @Binding var selectedDate: Date
     let zeitFilter: ZeitFilter
-    let onExport: (Date) -> Void
+    let onExport: (Date, ExportGranularitaet) -> Void
 
     @Environment(\.dismiss) private var dismiss
 
-    // Für Monatspicker: Monat + Jahr separat
+    @State private var granularitaet: ExportGranularitaet = .monat
     @State private var selectedMonth: Int
     @State private var selectedYear: Int
 
     private let calendar = Calendar.current
     private let currentYear = Calendar.current.component(.year, from: Date())
 
-    init(selectedDate: Binding<Date>, zeitFilter: ZeitFilter, onExport: @escaping (Date) -> Void) {
+    init(selectedDate: Binding<Date>, zeitFilter: ZeitFilter, onExport: @escaping (Date, ExportGranularitaet) -> Void) {
         self._selectedDate = selectedDate
         self.zeitFilter = zeitFilter
         self.onExport = onExport
@@ -32,40 +38,52 @@ struct PDFExportDatePickerSheet: View {
     private let monthNames: [String] = {
         let fmt = DateFormatter()
         fmt.locale = Locale(identifier: "de_DE")
-        return (1...12).map { month in
-            fmt.monthSymbols[month - 1].capitalized
-        }
+        return (1...12).map { fmt.monthSymbols[$0 - 1].capitalized }
     }()
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
+            VStack(spacing: 20) {
 
                 // Icon + Titel
-                VStack(spacing: 8) {
+                VStack(spacing: 6) {
                     Image(systemName: "doc.richtext.fill")
-                        .font(.system(size: 40))
+                        .font(.system(size: 36))
                         .foregroundColor(.orange)
-                    Text("Zeitraum für PDF wählen")
+                    Text("PDF exportieren")
                         .font(.title3.bold())
-                    Text("Wähle den \(zeitFilter.rawValue), den du exportieren möchtest.")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
                 }
                 .padding(.top, 8)
 
                 Divider()
 
-                // Picker je nach Zeitfilter
-                switch zeitFilter {
+                // Granularität wählen
+                VStack(spacing: 8) {
+                    Text("Zeitraum-Art")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
+
+                    Picker("Zeitraum-Art", selection: $granularitaet) {
+                        ForEach(ExportGranularitaet.allCases, id: \.self) { g in
+                            Text(g.rawValue).tag(g)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .padding(.horizontal)
+                }
+
+                Divider()
+
+                // Datum wählen je nach Granularität
+                switch granularitaet {
+                case .tag:
+                    dayPicker
                 case .monat:
                     monthYearPicker
                 case .jahr:
                     yearPicker
-                case .woche:
-                    weekPicker
                 }
 
                 Spacer()
@@ -75,7 +93,7 @@ struct PDFExportDatePickerSheet: View {
                     let date = buildDate()
                     dismiss()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        onExport(date)
+                        onExport(date, granularitaet)
                     }
                 } label: {
                     Label("PDF erstellen", systemImage: "doc.richtext.fill")
@@ -99,74 +117,71 @@ struct PDFExportDatePickerSheet: View {
         }
     }
 
+    // MARK: - Tag Picker
+    private var dayPicker: some View {
+        VStack(spacing: 8) {
+            Text("Tag wählen")
+                .font(.caption).foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
+            DatePicker("Datum", selection: $selectedDate, displayedComponents: .date)
+                .datePickerStyle(.graphical)
+                .padding(.horizontal)
+        }
+    }
+
     // MARK: - Monat + Jahr Picker
     private var monthYearPicker: some View {
-        HStack(spacing: 0) {
-            // Monats-Picker
-            Picker("Monat", selection: $selectedMonth) {
-                ForEach(1...12, id: \.self) { month in
-                    Text(monthNames[month - 1]).tag(month)
+        VStack(spacing: 8) {
+            Text("Monat und Jahr wählen")
+                .font(.caption).foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
+            HStack(spacing: 0) {
+                Picker("Monat", selection: $selectedMonth) {
+                    ForEach(1...12, id: \.self) { Text(monthNames[$0 - 1]).tag($0) }
                 }
-            }
-            .pickerStyle(.wheel)
-            .frame(maxWidth: .infinity)
+                .pickerStyle(.wheel)
+                .frame(maxWidth: .infinity)
 
-            // Jahr-Picker
-            Picker("Jahr", selection: $selectedYear) {
-                ForEach(years, id: \.self) { year in
-                    Text(String(year)).tag(year)
+                Picker("Jahr", selection: $selectedYear) {
+                    ForEach(years, id: \.self) { Text(String($0)).tag($0) }
                 }
+                .pickerStyle(.wheel)
+                .frame(maxWidth: .infinity)
             }
-            .pickerStyle(.wheel)
-            .frame(maxWidth: .infinity)
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
     }
 
     // MARK: - Nur Jahr Picker
     private var yearPicker: some View {
-        Picker("Jahr", selection: $selectedYear) {
-            ForEach(years, id: \.self) { year in
-                Text(String(year)).tag(year)
+        VStack(spacing: 8) {
+            Text("Jahr wählen")
+                .font(.caption).foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
+            Picker("Jahr", selection: $selectedYear) {
+                ForEach(years, id: \.self) { Text(String($0)).tag($0) }
             }
-        }
-        .pickerStyle(.wheel)
-        .padding(.horizontal)
-    }
-
-    // MARK: - Woche Picker (DatePicker)
-    private var weekPicker: some View {
-        VStack(spacing: 12) {
-            Text("Wähle ein Datum in der gewünschten Woche:")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-            DatePicker(
-                "Datum",
-                selection: $selectedDate,
-                displayedComponents: .date
-            )
-            .datePickerStyle(.graphical)
+            .pickerStyle(.wheel)
             .padding(.horizontal)
         }
     }
 
     // MARK: - Datum aus Picker-Werten bauen
     private func buildDate() -> Date {
-        switch zeitFilter {
-        case .monat:
-            var components = DateComponents()
-            components.year  = selectedYear
-            components.month = selectedMonth
-            components.day   = 1
-            return calendar.date(from: components) ?? Date()
-        case .jahr:
-            var components = DateComponents()
-            components.year  = selectedYear
-            components.month = 1
-            components.day   = 1
-            return calendar.date(from: components) ?? Date()
-        case .woche:
+        switch granularitaet {
+        case .tag:
             return selectedDate
+        case .monat:
+            var c = DateComponents()
+            c.year = selectedYear; c.month = selectedMonth; c.day = 1
+            return calendar.date(from: c) ?? Date()
+        case .jahr:
+            var c = DateComponents()
+            c.year = selectedYear; c.month = 1; c.day = 1
+            return calendar.date(from: c) ?? Date()
         }
     }
 }

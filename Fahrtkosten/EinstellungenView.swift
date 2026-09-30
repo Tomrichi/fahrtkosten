@@ -123,6 +123,7 @@ struct EinstellungenView: View {
                 collapsibleMonteurszulage
                 collapsibleWochenendzulage
                 collapsibleHotel
+                profilSection
                 resetSection
                 backupSection
                 deleteSection
@@ -560,6 +561,34 @@ struct EinstellungenView: View {
     @ViewBuilder private var verpflegungSection: some View { collapsibleMeals }
     @ViewBuilder private var hotelSection: some View { collapsibleHotel }
 
+    @ViewBuilder private var profilSection: some View {
+        Section {
+            HStack {
+                Label(lm.t("profil.name"), systemImage: "person.fill")
+                Spacer()
+                TextField(lm.t("common.optional"), text: $store.profilName)
+                    .multilineTextAlignment(.trailing)
+            }
+            HStack {
+                Label(lm.t("profil.adresse"), systemImage: "house.fill")
+                Spacer()
+                TextField(lm.t("common.optional"), text: $store.profilAdresse)
+                    .multilineTextAlignment(.trailing)
+            }
+            HStack {
+                Label(lm.t("profil.kennzeichen"), systemImage: "car.fill")
+                Spacer()
+                TextField(lm.t("common.optional"), text: $store.profilKennzeichen)
+                    .multilineTextAlignment(.trailing)
+                    .autocapitalization(.allCharacters)
+            }
+        } header: {
+            Text(lm.t("einstellungen.profil"))
+        } footer: {
+            Text(lm.t("profil.footer"))
+        }
+    }
+
     @ViewBuilder private var resetSection: some View {
         Section {
             Button(role: .destructive) {
@@ -732,7 +761,7 @@ struct EinstellungenView: View {
                     }
                 }
                 .foregroundStyle(.primary)
-                .sheet(isPresented: $showVersionHistory) { VersionHistoryView() }
+                .sheet(isPresented: $showVersionHistory) { VersionHistoryView().environmentObject(lm) }
 
                 Button {
                     showDatenschutz = true
@@ -862,7 +891,7 @@ struct EinstellungenView: View {
             HStack(spacing: 10) {
                 Image(systemName: "devices.fill")
                     .foregroundStyle(.secondary)
-                Text("Optimiert für iPhone, iPad & Mac")
+                Text(lm.t("platform.optimized"))
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
@@ -877,9 +906,9 @@ struct EinstellungenView: View {
     @ViewBuilder private var appearanceSection: some View {
         Section {
             HStack(spacing: 0) {
-                ForEach([("System", "circle.lefthalf.filled", "system"),
-                         ("Hell",   "sun.max.fill",           "light"),
-                         ("Dunkel", "moon.fill",              "dark")],
+                ForEach([(lm.t("appearance.system"), "circle.lefthalf.filled", "system"),
+                         (lm.t("appearance.light"),  "sun.max.fill",           "light"),
+                         (lm.t("appearance.dark"),   "moon.fill",              "dark")],
                         id: \.2) { label, icon, key in
                     Button {
                         withOptionalAnimation(.easeInOut(duration: 0.2)) { colorSchemePref = key }
@@ -907,7 +936,7 @@ struct EinstellungenView: View {
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
         } header: {
-            Label("Erscheinungsbild", systemImage: "paintbrush.fill")
+            Label(lm.t("settings.appearance"), systemImage: "paintbrush.fill")
         }
     }
 

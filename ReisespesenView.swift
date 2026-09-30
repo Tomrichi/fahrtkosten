@@ -17,6 +17,7 @@ struct KFZKostenView: View {
         let cal = Calendar.current
         let now = Date()
         switch zeitFilter {
+        case .tag:   return cal.isDate(date, equalTo: now, toGranularity: .day)
         case .woche: return cal.isDate(date, equalTo: now, toGranularity: .weekOfYear)
         case .monat: return cal.isDate(date, equalTo: now, toGranularity: .month)
         case .jahr:  return cal.isDate(date, equalTo: now, toGranularity: .year)
@@ -43,6 +44,7 @@ struct KFZKostenView: View {
                             ForEach(ZeitFilter.allCases, id: \.self) { f in
                                 Text({
                                     switch f {
+                                    case .tag:   return lm.t("filter.tag")
                                     case .woche: return lm.t("filter.woche")
                                     case .monat: return lm.t("filter.monat")
                                     case .jahr:  return lm.t("filter.jahr")
@@ -337,7 +339,7 @@ struct KFZKategorieDetailView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Fertig") { dismiss() }
+                    Button(lm.t("action.done")) { dismiss() }
                 }
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
@@ -541,12 +543,12 @@ struct KFZKostenFormView: View {
                     }
                 }
             }
-            .navigationTitle(isEdit ? "Bearbeiten" : (kategorie == .verpflegung ? "Neue Verpflegungsausgabe" : "Neue KFZ Kosten"))
+            .navigationTitle(isEdit ? lm.t("kfz.edit.title") : (kategorie == .verpflegung ? lm.t("kfz.new.meal") : lm.t("kfz.new.title")))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Abbrechen") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) { Button(lm.t("action.cancel")) { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(isEdit ? "Speichern" : "Hinzufügen") { save() }
+                    Button(isEdit ? lm.t("action.save") : lm.t("action.add")) { save() }
                         .disabled(!isValid)
                         .fontWeight(.regular)
                 }
@@ -609,6 +611,7 @@ struct VehicleCostTilesSection: View {
         let cal = Calendar.current
         let now = Date()
         switch zeitFilter {
+        case .tag:   return cal.isDate(date, equalTo: now, toGranularity: .day)
         case .woche: return cal.isDate(date, equalTo: now, toGranularity: .weekOfYear)
         case .monat: return cal.isDate(date, equalTo: now, toGranularity: .month)
         case .jahr:  return cal.isDate(date, equalTo: now, toGranularity: .year)
@@ -744,22 +747,24 @@ struct FahrzeugwaescheFormView: View {
                 }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("Fahrzeugwäsche")
+            .navigationTitle(lm.t("kfz.waesche.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) { Button("Fertig") { dismiss() } }
+                ToolbarItem(placement: .navigationBarLeading) { Button(lm.t("action.done")) { dismiss() } }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button { showAdd = true } label: { Image(systemName: "plus") }
-                        .accessibilityLabel("Neuen Eintrag hinzufügen")
+                        .accessibilityLabel(lm.t("kfz.add.first"))
                 }
             }
             .sheet(isPresented: $showAdd) {
                 WaescheEntryFormView()
                     .environmentObject(store)
+                    .environmentObject(lm)
             }
             .sheet(item: $editItem) { item in
                 WaescheEntryFormView(editItem: item)
                     .environmentObject(store)
+                    .environmentObject(lm)
             }
         }
     }
@@ -768,6 +773,7 @@ struct FahrzeugwaescheFormView: View {
 struct WaescheEntryFormView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var store: DataStore
+    @EnvironmentObject var lm: LocalizationManager
     var editItem: VehicleCost? = nil
 
     @State private var date      = Date()
@@ -796,12 +802,12 @@ struct WaescheEntryFormView: View {
                     }
                 }
             }
-            .navigationTitle(isEdit ? "Eintrag bearbeiten" : "Fahrzeugwäsche")
+            .navigationTitle(isEdit ? lm.t("kfz.edit.title") : lm.t("kfz.waesche.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Abbrechen") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) { Button(lm.t("action.cancel")) { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(isEdit ? "Speichern" : "Hinzufügen") {
+                    Button(isEdit ? lm.t("action.save") : lm.t("action.add")) {
                         let entry = VehicleCost(
                             id: editItem?.id ?? UUID(),
                             date: date, category: .fahrzeugwaesche,
@@ -831,6 +837,7 @@ enum PrivateExpenseFormMode { case add; case edit(PrivateExpense) }
 struct PrivateExpenseFormView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var store: DataStore
+    @EnvironmentObject var lm: LocalizationManager
     let mode: PrivateExpenseFormMode
 
     @State private var date      = Date()
@@ -864,18 +871,18 @@ struct PrivateExpenseFormView: View {
                         Text("€").foregroundColor(.secondary)
                     }
                     HStack {
-                        Label("Notiz", systemImage: "note.text")
+                        Label(lm.t("misc.note"), systemImage: "note.text")
                         Spacer()
-                        TextField("Optional", text: $note).multilineTextAlignment(.trailing)
+                        TextField(lm.t("misc.optional"), text: $note).multilineTextAlignment(.trailing)
                     }
                 }
             }
-            .navigationTitle(isEdit ? "Ausgabe bearbeiten" : "Private Ausgabe")
+            .navigationTitle(isEdit ? lm.t("private.edit.title") : lm.t("private.new.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Abbrechen") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) { Button(lm.t("action.cancel")) { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(isEdit ? "Speichern" : "Hinzufügen") { save() }
+                    Button(isEdit ? lm.t("action.save") : lm.t("action.add")) { save() }
                         .disabled(amount <= 0).fontWeight(.regular)
                 }
             }

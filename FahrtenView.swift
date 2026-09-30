@@ -1089,6 +1089,7 @@ struct TripFormView: View {
     @State private var date              = Date()
     @State private var kmString          = ""
     @State private var note              = ""
+    @State private var purpose           = ""
     @State private var tripArt: TripArt  = .geschaeftlich
     @State private var fahrzeitText      = ""
     @State private var fahrzeitStart     : Date = Calendar.current.date(bySettingHour: 8, minute: 0, second: 0, of: Date()) ?? Date()
@@ -1322,6 +1323,12 @@ struct TripFormView: View {
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
                             .frame(width: 80)
+                    }
+                    HStack {
+                        Label(lm.t("trips.purpose"), systemImage: "tag")
+                        Spacer()
+                        TextField(lm.t("trips.purpose.placeholder"), text: $purpose)
+                            .multilineTextAlignment(.trailing)
                     }
                     HStack {
                         Label(lm.t("common.note"), systemImage: "note.text")
@@ -1854,6 +1861,7 @@ struct TripFormView: View {
             date        = t.date
             kmString    = String(Int(t.km.rounded()))
             note        = t.note
+            purpose     = t.purpose
             tripArt     = t.art
             fahrzeitText = t.fahrzeitText ?? t.durationText ?? ""
             // Picker-Modus aktivieren wenn Fahrzeit vorhanden
@@ -1964,7 +1972,8 @@ struct TripFormView: View {
             fuelConsumption: parseFuelInput(fuelConsumptionStr),
             fuelTypeRaw: hybridExtra ?? ((parseFuelInput(fuelPriceStr) != nil || parseFuelInput(fuelConsumptionStr) != nil) ? selectedFuelType.tankerkoenigKey : nil),
             startTime: fahrzeitEnd > fahrzeitStart ? fahrzeitStart : nil,
-            endTime:   fahrzeitEnd > fahrzeitStart ? fahrzeitEnd   : nil
+            endTime:   fahrzeitEnd > fahrzeitStart ? fahrzeitEnd   : nil,
+            purpose: purpose
         )
         trip.fahrzeitText = fahrzeitText.isEmpty ? nil : fahrzeitText
         if let existing = editingTrip { trip.id = existing.id }

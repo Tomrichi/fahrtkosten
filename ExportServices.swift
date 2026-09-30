@@ -35,16 +35,28 @@ struct PDFExportService {
 
         let pageWidth: CGFloat   = 595.2    // A4
         let pageHeight: CGFloat  = 841.8
-        let margin: CGFloat      = 40
+        let margin: CGFloat      = 28
         let rowH: CGFloat        = 18
         let sectionH: CGFloat    = 24
         let tableW               = pageWidth - 2 * margin
 
-        // Spalten
-        let cDatum: CGFloat      = margin
-        let cDesc: CGFloat       = margin + 75
-        let cDetail: CGFloat     = margin + 310
-        let cBetrag: CGFloat     = pageWidth - margin - 65
+        // Spalten: Datum | Von | Nach | Zweck | Strecke | Km-Satz | Betrag
+        let cDatum:    CGFloat = margin
+        let cVon:      CGFloat = margin + 60
+        let cNach:     CGFloat = margin + 165
+        let cZweck:    CGFloat = margin + 270
+        let cStrecke:  CGFloat = margin + 355
+        let cKmSatz:   CGFloat = margin + 395
+        let cBetrag:   CGFloat = margin + 435
+
+        // Spaltenbreiten
+        let wDatum:    CGFloat = 58
+        let wVon:      CGFloat = 100
+        let wNach:     CGFloat = 100
+        let wZweck:    CGFloat = 80
+        let wStrecke:  CGFloat = 36
+        let wKmSatz:   CGFloat = 36
+        let wBetrag:   CGFloat = pageWidth - margin - cBetrag - 4
 
         let accent   = UIColor(red: 0.12, green: 0.35, blue: 0.75, alpha: 1)
         let textPri  = UIColor(red: 0.10, green: 0.10, blue: 0.12, alpha: 1)
@@ -134,21 +146,75 @@ struct PDFExportService {
 
             func drawTableHeader() {
                 accent.setFill()
-                UIBezierPath(roundedRect: CGRect(x: margin, y: y, width: tableW, height: 20),
+                UIBezierPath(roundedRect: CGRect(x: margin, y: y, width: tableW, height: 18),
                              cornerRadius: 3).fill()
-                let hA = a(.boldSystemFont(ofSize: 8), .white)
-                "Datum".draw(at: CGPoint(x: cDatum + 3, y: y + 5), withAttributes: hA)
-                "Beschreibung".draw(at: CGPoint(x: cDesc + 3, y: y + 5), withAttributes: hA)
-                "Details".draw(at: CGPoint(x: cDetail + 3, y: y + 5), withAttributes: hA)
-                "Betrag".draw(at: CGPoint(x: cBetrag + 3, y: y + 5), withAttributes: hA)
-                y += 24
+                let hA = a(.boldSystemFont(ofSize: 7.5), .white)
+                "Datum".draw(at: CGPoint(x: cDatum + 2, y: y + 4), withAttributes: hA)
+                "Von".draw(at: CGPoint(x: cVon + 2, y: y + 4), withAttributes: hA)
+                "Nach".draw(at: CGPoint(x: cNach + 2, y: y + 4), withAttributes: hA)
+                "Grund".draw(at: CGPoint(x: cZweck + 2, y: y + 4), withAttributes: hA)
+                "Wegstrecke".draw(at: CGPoint(x: cStrecke + 2, y: y + 4), withAttributes: hA)
+                "Km-Pauschale".draw(at: CGPoint(x: cKmSatz + 2, y: y + 4), withAttributes: hA)
+                "Betrag".draw(at: CGPoint(x: cBetrag + 2, y: y + 4), withAttributes: hA)
+                y += 22
                 rowIdx = 0
             }
 
+            // Fahrt-Zeile: 7 Spalten
+            func drawTripRow(trip: Trip) {
+                let hasPurpose = !trip.purpose.isEmpty
+                let effectiveRowH: CGFloat = hasPurpose ? rowH + 10 : rowH
+                newPageIfNeeded(needed: effectiveRowH + 1)
+                if rowIdx % 2 == 0 {
+                    rowEven.setFill()
+                    UIBezierPath(rect: CGRect(x: margin, y: y, width: tableW, height: effectiveRowH)).fill()
+                }
+                let rA  = a(.systemFont(ofSize: 7.5), textPri)
+                let rAs = a(.systemFont(ofSize: 7.5), textSec)
+                let rAb = a(.systemFont(ofSize: 7.5, weight: .semibold), textPri)
+                let chipA = a(.systemFont(ofSize: 6.5), UIColor(red: 0.20, green: 0.20, blue: 0.24, alpha: 1))
+
+                let dateStr = {
+                    let df = DateFormatter()
+                    df.locale = Locale(identifier: "de_DE")
+                    df.dateFormat = "d. MMM yyyy"
+                    return df.string(from: trip.date)
+                }()
+                dateStr.draw(in: CGRect(x: cDatum + 2, y: y + 3, width: wDatum, height: effectiveRowH), withAttributes: rAs)
+                trip.from.draw(in: CGRect(x: cVon + 2, y: y + 3, width: wVon - 4, height: effectiveRowH), withAttributes: rA)
+                trip.to.draw(in: CGRect(x: cNach + 2, y: y + 3, width: wNach - 4, height: effectiveRowH), withAttributes: rA)
+
+                // Zweck: Art + optional Chip
+                let artText = trip.art.rawValue
+                artText.draw(at: CGPoint(x: cZweck + 2, y: y + 3), withAttributes: rAs)
+                if hasPurpose {
+                    let chipText = trip.purpose
+                    let chipSize = (chipText as NSString).size(withAttributes: chipA)
+                    let chipRect = CGRect(x: cZweck + 1, y: y + 13, width: chipSize.width + 8, height: 10)
+                    UIColor(red: 0.88, green: 0.88, blue: 0.90, alpha: 1).setFill()
+                    UIBezierPath(roundedRect: chipRect, cornerRadius: 3).fill()
+                    chipText.draw(at: CGPoint(x: cZweck + 5, y: y + 14), withAttributes: chipA)
+                }
+
+                km(trip.km).draw(at: CGPoint(x: cStrecke + 2, y: y + 3), withAttributes: rAs)
+                String(format: "€%.2f", store.kmRate).draw(at: CGPoint(x: cKmSatz + 2, y: y + 3), withAttributes: rAs)
+                euro(trip.km * store.kmRate).draw(at: CGPoint(x: cBetrag + 2, y: y + 3), withAttributes: rAb)
+
+                // Trennlinie
+                UIColor(red: 0.85, green: 0.85, blue: 0.87, alpha: 1).setStroke()
+                let line = UIBezierPath()
+                line.move(to: CGPoint(x: margin, y: y + effectiveRowH))
+                line.addLine(to: CGPoint(x: pageWidth - margin, y: y + effectiveRowH))
+                line.lineWidth = 0.3; line.stroke()
+
+                y += effectiveRowH
+                rowIdx += 1
+            }
+
+            // Allgemeine Zeile für nicht-Fahrten-Einträge (Verpflegung etc.)
             func drawRow(date: String, desc: String, detail: String, betrag: Double,
                          highlight: Bool = false) {
-                newPageIfNeeded(needed: rowH + 2)
-                // Zebra-Streifen
+                newPageIfNeeded(needed: rowH + 1)
                 if rowIdx % 2 == 0 {
                     rowEven.setFill()
                     UIBezierPath(rect: CGRect(x: margin, y: y, width: tableW, height: rowH)).fill()
@@ -157,15 +223,13 @@ struct PDFExportService {
                     UIColor(red: 0.90, green: 0.95, blue: 1.0, alpha: 1).setFill()
                     UIBezierPath(rect: CGRect(x: margin, y: y, width: tableW, height: rowH)).fill()
                 }
-                let rA = a(.systemFont(ofSize: 8.5), textPri)
-                let rAs = a(.systemFont(ofSize: 8.5), textSec)
-                date.draw(at: CGPoint(x: cDatum + 3, y: y + 3), withAttributes: rAs)
-                desc.draw(in: CGRect(x: cDesc + 3, y: y + 3, width: cDetail - cDesc - 8, height: rowH),
-                          withAttributes: rA)
-                detail.draw(in: CGRect(x: cDetail + 3, y: y + 3, width: cBetrag - cDetail - 6, height: rowH),
-                            withAttributes: rAs)
-                euro(betrag).draw(at: CGPoint(x: cBetrag + 3, y: y + 3),
-                                  withAttributes: a(.systemFont(ofSize: 8.5, weight: .semibold), textPri))
+                let rA  = a(.systemFont(ofSize: 7.5), textPri)
+                let rAs = a(.systemFont(ofSize: 7.5), textSec)
+                date.draw(at: CGPoint(x: cDatum + 2, y: y + 3), withAttributes: rAs)
+                desc.draw(in: CGRect(x: cVon + 2, y: y + 3, width: cZweck - cVon - 6, height: rowH), withAttributes: rA)
+                detail.draw(in: CGRect(x: cZweck + 2, y: y + 3, width: cBetrag - cZweck - 4, height: rowH), withAttributes: rAs)
+                euro(betrag).draw(at: CGPoint(x: cBetrag + 2, y: y + 3),
+                                  withAttributes: a(.systemFont(ofSize: 7.5, weight: .semibold), textPri))
                 y += rowH
                 rowIdx += 1
             }
@@ -174,7 +238,9 @@ struct PDFExportService {
 
             // Logo-Bereich / Titel
             accent.setFill()
-            UIBezierPath(roundedRect: CGRect(x: margin, y: y, width: tableW, height: 52),
+            let headerHasProfile = !store.profilName.isEmpty || !store.profilKennzeichen.isEmpty
+            let headerH: CGFloat = headerHasProfile ? 70 : 52
+            UIBezierPath(roundedRect: CGRect(x: margin, y: y, width: tableW, height: headerH),
                          cornerRadius: 8).fill()
             "Reisekostenabrechnung"
                 .draw(at: CGPoint(x: margin + 16, y: y + 10),
@@ -182,7 +248,16 @@ struct PDFExportService {
             "Zeitraum: \(zeitraum)"
                 .draw(at: CGPoint(x: margin + 16, y: y + 32),
                       withAttributes: a(.systemFont(ofSize: 10), UIColor.white.withAlphaComponent(0.8)))
-            y += 60
+            if headerHasProfile {
+                var profilParts: [String] = []
+                if !store.profilName.isEmpty       { profilParts.append(store.profilName) }
+                if !store.profilAdresse.isEmpty    { profilParts.append(store.profilAdresse) }
+                if !store.profilKennzeichen.isEmpty { profilParts.append("Kfz: \(store.profilKennzeichen)") }
+                profilParts.joined(separator: "  ·  ")
+                    .draw(at: CGPoint(x: margin + 16, y: y + 50),
+                          withAttributes: a(.systemFont(ofSize: 9), UIColor.white.withAlphaComponent(0.85)))
+            }
+            y += headerH + 8
 
             // Zusammenfassung-Kacheln
             let tileW = (tableW - 12) / 3
@@ -219,30 +294,8 @@ struct PDFExportService {
             // ── FAHRTEN ──────────────────────────────────────────────────────
             if !trips.isEmpty {
                 drawSectionHeader(title: "Fahrten  (\(trips.count) Einträge)", subtotal: tripTotal)
-                for trip in trips.sorted(by: { $0.date > $1.date }) {
-                    let from = cityOnly(from: trip.from)
-                    let to   = cityOnly(from: trip.to)
-                    let desc = "\(from) → \(to)"
-
-                    var details: [String] = []
-                    details.append(km(trip.km))
-                    details.append(String(format: "× %.2f €/km", store.kmRate))
-                    if let preis = trip.fuelPricePerLiter, preis > 0 {
-                        details.append(String(format: "Sprit: %.3f €/L", preis))
-                    }
-                    if let cons = trip.fuelConsumption, let preis = trip.fuelPricePerLiter,
-                       cons > 0, preis > 0 {
-                        let liter = (trip.km / 100.0) * cons
-                        details.append(String(format: "%.1f L", liter))
-                    }
-                    let detail = details.joined(separator: "  ·  ")
-
-                    drawRow(
-                        date: trip.date.formatted(date: .numeric, time: .omitted),
-                        desc: desc,
-                        detail: detail,
-                        betrag: trip.km * store.kmRate
-                    )
+                for trip in trips.sorted(by: { $0.date < $1.date }) {
+                    drawTripRow(trip: trip)
                 }
                 y += 6
             }

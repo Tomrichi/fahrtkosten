@@ -16,6 +16,7 @@ struct FahrzeugkostenView: View {
         let cal = Calendar.current
         let now = Date()
         switch zeitFilter {
+        case .tag:   return cal.isDate(date, equalTo: now, toGranularity: .day)
         case .woche: return cal.isDate(date, equalTo: now, toGranularity: .weekOfYear)
         case .monat: return cal.isDate(date, equalTo: now, toGranularity: .month)
         case .jahr:  return cal.isDate(date, equalTo: now, toGranularity: .year)
@@ -29,6 +30,7 @@ struct FahrzeugkostenView: View {
                 Section {
                     FilterChipBar(selection: $zeitFilter, labelFor: { filter in
                         switch filter {
+                        case .tag:   return lm.t("filter.tag")
                         case .woche: return lm.t("filter.woche")
                         case .monat: return lm.t("filter.monat")
                         case .jahr:  return lm.t("filter.jahr")
