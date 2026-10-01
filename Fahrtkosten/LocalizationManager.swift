@@ -90,7 +90,7 @@ let translations: [AppLanguage: [String: String]] = [
         "tab.vehicle": "Fahrzeug",
         "tab.overview": "Übersicht",
         "tab.fahrten": "Fahrzeit",
-        "tab.arbeitszeit": "Verpflegung",
+        "tab.arbeitszeit": "Arbeitszeit",
         "tab.uebernachtung": "Übernacht.",
         "tab.kfz": "KFZ",
         "tab.statistik": "Statistik",

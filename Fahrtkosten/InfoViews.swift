@@ -1358,7 +1358,7 @@ private let versionHistoryHTML_de = #"""
       </div>
       <div class="preview-text">PDF-Export überarbeitet · Profil · Tag/Monat/Jahr-Auswahl</div>
     </div>
-    <span class="build-info">30. September 2026 · Build 64</span>
+    <span class="build-info">1. Oktober 2026 · Build 65</span>
     <span class="chevron">›</span>
   </summary>
   <div class="detail-content">
@@ -1649,7 +1649,7 @@ private let versionHistoryHTML_en = #"""
       </div>
       <div class="preview-text">PDF export redesigned · Profile · Day/Month/Year selection</div>
     </div>
-    <span class="build-info">September 30, 2026 · Build 64</span>
+    <span class="build-info">October 1, 2026 · Build 65</span>
     <span class="chevron">›</span>
   </summary>
   <div class="detail-content">
