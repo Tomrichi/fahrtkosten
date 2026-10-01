@@ -265,7 +265,7 @@ let translations: [AppLanguage: [String: String]] = [
         "vehicle.summary": "Zusammenfassung",
 
         // Navigation titles
-        "nav.arbeitszeit": "Verpflegung & Spesen",
+        "nav.arbeitszeit": "Arbeitszeit & Spesen",
         "nav.kfz": "KFZ Kosten",
         "nav.search": "Suche",
         "nav.uebernachtung": "Übernachtungen",
