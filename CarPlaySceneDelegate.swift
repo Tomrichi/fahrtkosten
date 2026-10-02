@@ -42,9 +42,10 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
         refreshTimer?.invalidate()
         refreshTimer = nil
 
-        // GPS läuft noch → automatisch stoppen und an die App übergeben
+        // GPS läuft aktiv → automatisch stoppen und an die App übergeben.
+        // Pausierte Fahrt NICHT stoppen – der Nutzer kann nach Wiederverbinden mit "Weiter" fortfahren.
         let gps = readGPSState()
-        if gps.recording {
+        if gps.recording && !gps.paused {
             guard let ud = UserDefaults(suiteName: Self.appGroup) else { return }
             ud.set(true, forKey: "carPlayStopGPS")
             ud.set(true, forKey: "carPlayAutoStopped") // Marker: App soll GPS-Sheet öffnen
