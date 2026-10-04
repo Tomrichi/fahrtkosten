@@ -116,15 +116,15 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
                 ? String(format: "%d:%02d:%02d", h, m, s)
                 : String(format: "%02d:%02d", m, s)
 
-            let statusIcon = gps.paused ? "⏸" : "🔴"
-            let statusText = gps.paused ? "Pausiert" : "Aufzeichnung läuft"
+            let avgSpeed = gps.elapsed > 10 ? gps.km / (Double(gps.elapsed) / 3600.0) : 0.0
+            let tripEuro = carPlayEuro(gps.km * CarPlayDataAccess.kmRate())
 
-            // Tempo an erster Stelle — wichtigste Info beim Fahren
-            items.append(CPInformationItem(title: "⚡ Tempo",   detail: "\(Int(gps.speedKmh)) km/h"))
-            items.append(CPInformationItem(title: "📍 Strecke", detail: gpsDistanceFormatted(gps.km)))
-            items.append(CPInformationItem(title: "⏱ Fahrzeit", detail: timeStr))
-            items.append(CPInformationItem(title: "💶 Erstattung ca.", detail: carPlayEuro(gps.km * CarPlayDataAccess.kmRate())))
-            items.append(CPInformationItem(title: statusIcon + " Status", detail: statusText))
+            items.append(CPInformationItem(title: "⚡ Tempo",        detail: "\(Int(gps.speedKmh)) km/h"))
+            items.append(CPInformationItem(title: "Ø Durchschnitt", detail: "\(Int(avgSpeed)) km/h"))
+            items.append(CPInformationItem(title: "📍 Strecke",      detail: gpsDistanceFormatted(gps.km)))
+            items.append(CPInformationItem(title: "⏱ Fahrzeit",     detail: timeStr))
+            items.append(CPInformationItem(title: "💶 Erstattung",   detail: tripEuro))
+            items.append(CPInformationItem(title: "📅 Monat gesamt", detail: carPlayEuro(monthly.monthEuro)))
 
             // Pause / Weiter Button
             let pauseResumeBtn: CPTextButton
@@ -156,19 +156,13 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
             actions.append(startGPSBtn)
         }
 
-        // ── Monatsdaten nur anzeigen wenn GPS läuft oder Fahrt aktiv ─
-        if active != nil || gps.recording {
-            items.append(CPInformationItem(
-                title: monthly.monthLabel,
-                detail: "\(Int(monthly.monthKm)) km · \(carPlayEuro(monthly.monthEuro))"
-            ))
-        }
+        // Monatsdaten sind bereits in den 6 Kacheln enthalten (📅 Monat gesamt)
 
         // ── Template ───────────────────────────────────────────────
         let title = active != nil
             ? "Fahrt läuft"
             : gps.recording
-                ? "GPS · Fahrt"
+                ? "Fahrtkosten GPS"
                 : "Fahrtkosten"
 
         // Bestehendes Template nur aktualisieren statt komplett neu zu setzen – verhindert das
