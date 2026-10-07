@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import WidgetKit
 
 /// Antwortformat der Frankfurter-API (https://api.frankfurter.dev/v2/rate/EUR/CHF),
 /// liefert EZB-Referenzkurse: {"date":"...","base":"EUR","quote":"CHF","rate":0.925}
@@ -279,6 +280,7 @@ class DataStore: ObservableObject {
     private func save<T: Codable>(_ value: T, key: String) {
         guard let data = try? JSONEncoder().encode(value) else { return }
         local.set(data, forKey: key)
+        if key == "trips" { WidgetCenter.shared.reloadAllTimelines() }
         guard isSyncEnabled else { return }
         icloud.set(data, forKey: key)
         icloud.synchronize()
