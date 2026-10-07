@@ -195,6 +195,7 @@ class DataStore: ObservableObject {
 
         if migrated > 0 {
             icloud.synchronize()
+            WidgetCenter.shared.reloadAllTimelines()
             AppLogger.shared.logData("Migration Standard→AppGroup: \(migrated) Datensätze übertragen")
         }
 

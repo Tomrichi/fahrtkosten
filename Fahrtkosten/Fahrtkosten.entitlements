@@ -8,7 +8,7 @@
 	<string>$(TeamIdentifierPrefix)de.tommwagner.fahrtkosten</string>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.de.wagner.Tankbuch</string>
+		<string>group.de.tommwagner.fahrtkosten</string>
 	</array>
 </dict>
 </plist>
