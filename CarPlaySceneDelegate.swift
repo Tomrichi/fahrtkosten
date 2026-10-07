@@ -119,12 +119,9 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
             let avgSpeed = gps.elapsed > 10 ? gps.km / (Double(gps.elapsed) / 3600.0) : 0.0
             let tripEuro = carPlayEuro(gps.km * CarPlayDataAccess.kmRate())
 
-            items.append(CPInformationItem(title: "⚡ Tempo",        detail: "\(Int(gps.speedKmh)) km/h"))
-            items.append(CPInformationItem(title: "Ø Durchschnitt", detail: "\(Int(avgSpeed)) km/h"))
-            items.append(CPInformationItem(title: "📍 Strecke",      detail: gpsDistanceFormatted(gps.km)))
-            items.append(CPInformationItem(title: "⏱ Fahrzeit",     detail: timeStr))
-            items.append(CPInformationItem(title: "💶 Erstattung",   detail: tripEuro))
-            items.append(CPInformationItem(title: "📅 Monat gesamt", detail: carPlayEuro(monthly.monthEuro)))
+            items.append(CPInformationItem(title: "⚡ \(Int(gps.speedKmh)) km/h",           detail: "Ø \(Int(avgSpeed)) km/h"))
+            items.append(CPInformationItem(title: "📍 \(gpsDistanceFormatted(gps.km))",     detail: "⏱ \(timeStr)"))
+            items.append(CPInformationItem(title: "💶 \(tripEuro)",                          detail: "📅 \(carPlayEuro(monthly.monthEuro))"))
 
             // Pause / Weiter Button
             let pauseResumeBtn: CPTextButton

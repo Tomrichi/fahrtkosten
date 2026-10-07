@@ -18,19 +18,34 @@ struct ProUpgradeView: View {
                 VStack(spacing: 24) {
 
                     // ── Hero ─────────────────────────────────────────────────
-                    VStack(spacing: 8) {
+                    VStack(spacing: 16) {
                         Image(systemName: "star.circle.fill")
-                            .font(.system(size: 64))
+                            .font(.system(size: 60))
                             .foregroundStyle(.yellow, .orange)
+                            .padding(.top, 8)
+
                         Text("Fahrtkosten Pro")
                             .font(.title.bold())
-                        Text("Einmalig kaufen – dauerhaft alle Features")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
+
+                        // Rendite-Argument
+                        VStack(spacing: 6) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "eurosign.circle.fill")
+                                    .foregroundStyle(.orange)
+                                Text("Ø 3.200 € Erstattung pro Jahr")
+                                    .font(.system(size: 15, weight: .semibold))
+                            }
+                            Text("Pro kostet einmalig 6,99 € – das ist weniger als 2 Minuten deiner jährlichen Erstattung.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                        .padding(14)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.orange.opacity(0.08))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .padding(.horizontal)
                     }
-                    .padding(.top, 8)
 
                     // ── Feature-Liste ─────────────────────────────────────────
                     VStack(spacing: 0) {

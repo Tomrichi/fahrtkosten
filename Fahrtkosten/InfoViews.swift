@@ -1185,6 +1185,7 @@ private let hilfeHTML = #"""
 
 <h2>Backup &amp; Wiederherstellen</h2>
 <p>Alle Daten lassen sich als JSON-Backup sichern. Über <strong>Lokal speichern</strong> wird das Backup in der Dateien-App abgelegt. Über <strong>Teilen</strong> kannst du es per AirDrop, E-Mail oder in Cloud-Dienste exportieren. Es werden maximal 10 lokale Backups aufbewahrt.</p>
+<p>Das Backup sichert seit Version 1.17.43 auch alle Einstellungen: Heimatadresse, Kraftstoffart, Kraftstoffpreise (E5, E10, Diesel, Elektro, Hybrid) und Verbrauchswerte. Diese werden beim Wiederherstellen automatisch eingetragen – du musst sie nicht mehr manuell nachtragen.</p>
 <div class="tip">💡 Vor dem Löschen aller Daten immer ein Backup erstellen! Die Aktion kann nicht rückgängig gemacht werden.</div>
 
 <hr>
@@ -1199,9 +1200,12 @@ private let hilfeHTML = #"""
 </details>
 
 <details class="faq">
-  <summary>Wie nutze ich die neue Suchfunktion?<span class="faq-chevron">›</span></summary>
+  <summary>Wie nutze ich die Suchfunktion?<span class="faq-chevron">›</span></summary>
   <div class="faq-body">
-    Tippe auf den Tab <strong>Suche</strong> in der unteren Leiste. Gib einen Suchbegriff ein (z.B. Ortsname, Hotelname, Notiz) oder wähle über den Kalender-Button ein Datum. Treffer werden in allen Kategorien gleichzeitig gesucht und nach Kategorie gruppiert angezeigt. Tippe auf einen Eintrag um ihn direkt zu bearbeiten.
+    Tippe auf den Tab <strong>Suche</strong> in der unteren Leiste. Gib einen Suchbegriff ein (z.B. Ortsname, Hotelname, Notiz) oder wähle über den Kalender-Button ein Datum. Treffer werden in allen Kategorien gleichzeitig gesucht und nach Kategorie gruppiert angezeigt. Tippe auf einen Eintrag um ihn direkt zu bearbeiten.<br><br>
+    <strong>Bereichsfilter:</strong> Tippe auf das Filter-Symbol um Fahrten nach km-Bereich oder Eintraege nach Betrag einzugrenzen. Aktive Filter werden als Chips unter dem Suchfeld angezeigt und lassen sich einzeln entfernen.<br><br>
+    <strong>Ortsvorschlaege:</strong> Im leeren Suchfeld erscheinen deine haeufigsten Orte als antippbare Chips – ideal zum schnellen Filtern.<br><br>
+    <strong>Gefilterter Export:</strong> Sobald Ergebnisse angezeigt werden, erscheint unten eine Zusammenfassung (Fahrten · km · €) mit einem Export-Symbol. Darüber lassen sich die aktuell gefilterten Ergebnisse direkt als PDF exportieren.
   </div>
 </details>
 
@@ -1213,9 +1217,11 @@ private let hilfeHTML = #"""
 </details>
 
 <details class="faq">
-  <summary>Wie funktioniert die GPS-Aufzeichnung im Hintergrund?<span class="faq-chevron">›</span></summary>
+  <summary>Wie funktioniert die GPS-Aufzeichnung?<span class="faq-chevron">›</span></summary>
   <div class="faq-body">
-    Starte die Aufzeichnung über die GPS-Kachel im Fahrten-Tab. Der Standortzugriff muss auf „Immer erlauben" gesetzt sein (Einstellungen → Datenschutz → Ortungsdienste → Fahrtkosten). Die Aufzeichnung pausiert automatisch nach 5 Minuten Stillstand und stoppt nach 30 Minuten.
+    Starte die Aufzeichnung über die GPS-Kachel im Fahrten-Tab. Der Standortzugriff muss auf „Immer erlauben" gesetzt sein (Einstellungen → Datenschutz → Ortungsdienste → Fahrtkosten). Die Aufzeichnung pausiert automatisch nach 5 Minuten Stillstand und stoppt nach 30 Minuten.<br><br>
+    <strong>Manuelle Pause:</strong> Während der Aufzeichnung kannst du die Fahrt jederzeit manuell pausieren – z.B. für einen Zwischenstopp. Tippe auf <strong>Pause</strong>, um die Aufzeichnung anzuhalten, und auf <strong>Fortsetzen</strong>, um sie wieder zu starten. Die automatische Pause bei Stillstand bleibt zusaetzlich aktiv.<br><br>
+    <strong>GPS kostenlos testen:</strong> Nicht-Pro-Nutzer koennen GPS einmalig kostenlos ausprobieren, bevor Pro freigeschaltet werden muss.
   </div>
 </details>
 
@@ -1230,7 +1236,8 @@ private let hilfeHTML = #"""
 <details class="faq">
   <summary>Wie erstelle ich ein Backup und stelle es wieder her?<span class="faq-chevron">›</span></summary>
   <div class="faq-body">
-    Gehe zu <strong>Einstellungen → Backup &amp; Wiederherstellen</strong>. Tippe auf „Backup lokal speichern" oder „Teilen" für Export per AirDrop/E-Mail/Cloud. Zum Wiederherstellen tippe auf „Backup wiederherstellen" und wähle die Datei. Achtung: Alle aktuellen Daten werden dabei ersetzt.
+    Gehe zu <strong>Einstellungen → Backup &amp; Wiederherstellen</strong>. Tippe auf „Backup lokal speichern" oder „Teilen" für Export per AirDrop/E-Mail/Cloud. Zum Wiederherstellen tippe auf „Backup wiederherstellen" und wähle die Datei. Achtung: Alle aktuellen Daten werden dabei ersetzt.<br><br>
+    Ab Version 1.17.43 sichert das Backup auch <strong>alle Einstellungen</strong>: Heimatadresse, Kraftstoffart sowie alle Kraftstoffpreise und Verbrauchswerte. Diese werden beim Wiederherstellen automatisch eingetragen.
   </div>
 </details>
 
@@ -1262,7 +1269,7 @@ private let hilfeHTML = #"""
   </div>
 </details>
 
-<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.16.11 · Thomas Wagner · 9. Juni 2026<br>
+<p class="meta" style="margin-top:32px;">Fahrtkosten · Version 1.17.43 · Thomas Wagner · 7. Oktober 2026<br>
 Kontakt: <a href="mailto:info@wagner-fahrtkosten.de">info@wagner-fahrtkosten.de</a></p>
 
 </body>
@@ -1348,13 +1355,44 @@ private let versionHistoryHTML_de = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.39 – aktuell -->
+<!-- 1.17.43 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.39
+        Version 1.17.43
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">GPS-Pause · Statistik · Suche · Lock Screen Widget · GPS-Probe · Backup</div>
+    </div>
+    <span class="build-info">7. Oktober 2026 · Build 70</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEU</span> <strong>GPS-Pause:</strong> Während der GPS-Aufzeichnung lässt sich die Fahrt manuell pausieren und fortsetzen – direkt über den neuen Pause-Button in der Aufzeichnungs-Ansicht.</li>
+      <li><span class="badge-new">NEU</span> <strong>Statistik – Wochentags-Verteilung:</strong> Neues Balkendiagramm zeigt, an welchen Wochentagen am meisten gefahren wird.</li>
+      <li><span class="badge-new">NEU</span> <strong>Statistik – Jahresvergleich:</strong> Der Monats-Chart zeigt jetzt aktuelles Jahr und Vorjahr als Doppelbalken nebeneinander.</li>
+      <li><span class="badge-new">NEU</span> <strong>Statistik – Ø km/Fahrt:</strong> Viertes Kachel in der Jahres-Zusammenfassung mit der durchschnittlichen Fahrtlänge.</li>
+      <li><span class="badge-new">NEU</span> <strong>Suche – Bereichsfilter:</strong> Fahrten und Einträge lassen sich nach km-Bereich und Betrag filtern.</li>
+      <li><span class="badge-new">NEU</span> <strong>Suche – Ortsvorschläge:</strong> Im leeren Suchfeld erscheinen die häufigsten eigenen Orte als antippbare Chips.</li>
+      <li><span class="badge-new">NEU</span> <strong>Suche – Gefilterter Export:</strong> Suchergebnisse lassen sich direkt als PDF exportieren, mit automatischer Zusammenfassung (Fahrten · km · €).</li>
+      <li><span class="badge-new">NEU</span> <strong>Lock Screen Widget:</strong> Drei neue Widget-Größen für den Sperrbildschirm (Circular, Rectangular, Inline) zeigen die Monatserstattung auf einen Blick.</li>
+      <li><span class="badge-new">NEU</span> <strong>GPS-Probe:</strong> Nicht-Pro-Nutzer können GPS einmalig kostenlos ausprobieren, bevor Pro freigeschaltet wird.</li>
+      <li><span class="badge-change">VERBESSERUNG</span> <strong>Pro-Kaufscreen:</strong> Neues Rendite-Argument direkt oben – Ø-Jahreserstattung vs. Einmalpreis.</li>
+      <li><span class="badge-change">VERBESSERUNG</span> <strong>Backup:</strong> Spritvorgaben (Kraftstoffart, Preise, Verbrauch) und Heimatadresse werden jetzt im Backup gesichert und beim Wiederherstellen automatisch eingetragen.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.39 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.39
       </div>
       <div class="preview-text">PDF-Export überarbeitet · Profil · Tag/Monat/Jahr-Auswahl</div>
     </div>

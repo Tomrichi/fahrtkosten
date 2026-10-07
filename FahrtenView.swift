@@ -159,6 +159,8 @@ struct FahrtenView: View {
         case alle   = "Alle"
     }
     @AppStorage("fahrten.selectedFilter") private var selectedFilter: TripFilter = .alle
+    @AppStorage("gps.trialUsed") private var gpsTrialUsed: Bool = false
+    @State private var showGPSTrial = false
     @AppStorage("defaultFuelType")              private var defaultFuelTypeKey: String = "e10"
     @AppStorage("defaultFuelPrice.e5")          private var defaultPriceE5: String = ""
     @AppStorage("defaultFuelPrice.e10")         private var defaultPriceE10: String = ""
@@ -227,7 +229,9 @@ struct FahrtenView: View {
         if autoStopped {
             // CarPlay getrennt → Sheet öffnen, User prüft Daten selbst
             if isRunningOnMac { showGPSMacAlert = true }
-            else if proMgr.isPro { showGPSSheet = true } else { showProUpgrade = true }
+            else if proMgr.isPro { showGPSSheet = true }
+            else if !gpsTrialUsed { showGPSTrial = true }
+            else { showProUpgrade = true }
         }
         // Manueller Stop per CarPlay-Button: CarPlaySceneDelegate stoppt und speichert
         // die Fahrt bereits direkt über LocationTracker.shared/CarPlayDataAccess –
@@ -245,7 +249,9 @@ struct FahrtenView: View {
                         Button {
                             AppLogger.shared.logTap("GPS-Aufzeichnung starten")
                             if isRunningOnMac { showGPSMacAlert = true }
-            else if proMgr.isPro { showGPSSheet = true } else { showProUpgrade = true }
+                            else if proMgr.isPro { showGPSSheet = true }
+                            else if !gpsTrialUsed { showGPSTrial = true }
+                            else { showProUpgrade = true }
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: "location.circle.fill")
@@ -465,7 +471,9 @@ struct FahrtenView: View {
                         Button {
                             AppLogger.shared.logTap("GPS-Aufzeichnung (Menü)")
                             if isRunningOnMac { showGPSMacAlert = true }
-            else if proMgr.isPro { showGPSSheet = true } else { showProUpgrade = true }
+                            else if proMgr.isPro { showGPSSheet = true }
+                            else if !gpsTrialUsed { showGPSTrial = true }
+                            else { showProUpgrade = true }
                         } label: {
                             Label(lm.t("trips.gps.menu"), systemImage: "location.circle.fill")
                         }
@@ -494,6 +502,9 @@ struct FahrtenView: View {
             // Pro-Upgrade Sheet
             .sheet(isPresented: $showProUpgrade) {
                 ProUpgradeView().environmentObject(proMgr)
+            }
+            .sheet(isPresented: $showGPSTrial) {
+                gpsTrialSheetContent
             }
             .alert("GPS nicht verfügbar", isPresented: $showGPSMacAlert) {
                 Button("OK", role: .cancel) {}
@@ -577,6 +588,20 @@ struct FahrtenView: View {
                 handleCarPlayStopGPS()
             }
         }
+    }
+
+    @ViewBuilder
+    private var gpsTrialSheetContent: some View {
+        GPSTrialSheet {
+            showGPSTrial = false
+            gpsTrialUsed = true
+            showGPSSheet = true
+        } onUpgrade: {
+            showGPSTrial = false
+            showProUpgrade = true
+        }
+        .environmentObject(proMgr)
+        .environmentObject(lm)
     }
 }
 
@@ -745,27 +770,43 @@ struct GPSTripSheet: View {
 
             Spacer(minLength: 8).fixedSize()
 
-            // ── Stop-Button ──
-            Button {
-                let elapsed = tracker.elapsedSeconds
-                let startDate = tracker.tripStartDate
-                let endDate = Date()
-                tracker.stopAndGeocode { from, to, km in
-                    onResult(from, to, km, elapsed, startDate, endDate)
+            // ── Pause + Stop ──
+            HStack(spacing: 12) {
+                Button { tracker.pauseTracking() } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "pause.circle.fill")
+                            .font(.system(size: 22))
+                        Text(lm.t("trips.gps.pause"))
+                            .fontWeight(.regular)
+                    }
+                    .font(.subheadline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(Color.orange)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 }
-            } label: {
-                HStack(spacing: 12) {
-                    Image(systemName: "stop.circle.fill")
-                        .font(.system(size: 22))
-                    Text(lm.t("trips.gps.stop"))
-                        .fontWeight(.regular)
+                Button {
+                    let elapsed = tracker.elapsedSeconds
+                    let startDate = tracker.tripStartDate
+                    let endDate = Date()
+                    tracker.stopAndGeocode { from, to, km in
+                        onResult(from, to, km, elapsed, startDate, endDate)
+                    }
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "stop.circle.fill")
+                            .font(.system(size: 22))
+                        Text(lm.t("trips.gps.stop"))
+                            .fontWeight(.regular)
+                    }
+                    .font(.subheadline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(Color.blue)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 }
-                .font(.subheadline)
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .background(Color.blue)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 28)
@@ -892,7 +933,6 @@ struct GPSTripSheet: View {
         return (f.string(from: NSNumber(value: truncated)) ?? "0,0") + " km"
     }
 
-    // ── Fehler-Banner ──
     private func errorBanner(_ message: String) -> some View {
         HStack(spacing: 10) {
             Image(systemName: "exclamationmark.triangle.fill")

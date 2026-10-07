@@ -365,7 +365,8 @@ struct FahrtkostenWidget: Widget {
         }
         .configurationDisplayName("Fahrtkosten")
         .description("Zeigt die Fahrtkosten-Erstattung des aktuellen Monats.")
-        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge,
+                            .accessoryCircular, .accessoryRectangular, .accessoryInline])
     }
 }
 
@@ -376,11 +377,64 @@ struct FahrtkostenWidgetEntryView: View {
 
     var body: some View {
         switch family {
-        case .systemSmall:  SmallWidgetView(entry: entry)
-        case .systemMedium: MediumWidgetView(entry: entry)
-        case .systemLarge:  LargeWidgetView(entry: entry)
-        default:            SmallWidgetView(entry: entry)
+        case .systemSmall:          SmallWidgetView(entry: entry)
+        case .systemMedium:         MediumWidgetView(entry: entry)
+        case .systemLarge:          LargeWidgetView(entry: entry)
+        case .accessoryCircular:    LockCircularView(entry: entry)
+        case .accessoryRectangular: LockRectangularView(entry: entry)
+        case .accessoryInline:      LockInlineView(entry: entry)
+        default:                    SmallWidgetView(entry: entry)
         }
+    }
+}
+
+// MARK: - Lock Screen: Circular
+struct LockCircularView: View {
+    let entry: WidgetEntry
+    var body: some View {
+        ZStack {
+            AccessoryWidgetBackground()
+            VStack(spacing: 1) {
+                Image(systemName: "car.fill")
+                    .font(.system(size: 11, weight: .semibold))
+                Text(euroFormatted(entry.monthEuro))
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .minimumScaleFactor(0.6)
+                    .lineLimit(1)
+            }
+        }
+        .widgetURL(URL(string: "fahrtkosten://open"))
+    }
+}
+
+// MARK: - Lock Screen: Rectangular
+struct LockRectangularView: View {
+    let entry: WidgetEntry
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "car.fill")
+                .font(.system(size: 18, weight: .semibold))
+            VStack(alignment: .leading, spacing: 1) {
+                Text(euroFormatted(entry.monthEuro))
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .minimumScaleFactor(0.7)
+                    .lineLimit(1)
+                Text("\(Int(entry.monthKm)) km · \(entry.tripCount) Fahrten")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .widgetURL(URL(string: "fahrtkosten://open"))
+    }
+}
+
+// MARK: - Lock Screen: Inline
+struct LockInlineView: View {
+    let entry: WidgetEntry
+    var body: some View {
+        Label(euroFormatted(entry.monthEuro), systemImage: "car.fill")
+            .widgetURL(URL(string: "fahrtkosten://open"))
     }
 }
 

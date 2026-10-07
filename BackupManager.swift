@@ -26,8 +26,21 @@ struct AppBackup: Codable {
     let abroadMeal6plus: Double
     let hotelFlat: Double
     let breakfastFlat: Double
+    // Version 3: Einstellungen
+    let homeAddress: String?
+    let defaultFuelType: String?
+    let defaultFuelPriceE5: String?
+    let defaultFuelPriceE10: String?
+    let defaultFuelPriceDiesel: String?
+    let defaultFuelPriceElektro: String?
+    let defaultFuelPriceHybrid: String?
+    let defaultConsumptionE5: String?
+    let defaultConsumptionE10: String?
+    let defaultConsumptionDiesel: String?
+    let defaultConsumptionElektro: String?
+    let defaultConsumptionHybrid: String?
 
-    static let currentVersion = 2
+    static let currentVersion = 3
 
     var totalEntries: Int {
         trips.count + meals.count + hotels.count + vehicleCosts.count + reiseSpesen.count + privateExpenses.count
@@ -69,6 +82,7 @@ class BackupManager: ObservableObject {
 
     // MARK: - Backup JSON erstellen
     func createBackupData(from store: DataStore) -> Data? {
+        let ud = UserDefaults.standard
         let backup = AppBackup(
             version: AppBackup.currentVersion,
             exportedAt: Date(),
@@ -90,7 +104,19 @@ class BackupManager: ObservableObject {
             abroadMeal3to6: store.abroadMeal3to6,
             abroadMeal6plus: store.abroadMeal6plus,
             hotelFlat: store.hotelFlat,
-            breakfastFlat: store.breakfastFlat
+            breakfastFlat: store.breakfastFlat,
+            homeAddress: ud.string(forKey: "homeAddress"),
+            defaultFuelType: ud.string(forKey: "defaultFuelType"),
+            defaultFuelPriceE5: ud.string(forKey: "defaultFuelPrice.e5"),
+            defaultFuelPriceE10: ud.string(forKey: "defaultFuelPrice.e10"),
+            defaultFuelPriceDiesel: ud.string(forKey: "defaultFuelPrice.diesel"),
+            defaultFuelPriceElektro: ud.string(forKey: "defaultFuelPrice.elektro"),
+            defaultFuelPriceHybrid: ud.string(forKey: "defaultFuelPrice.hybrid"),
+            defaultConsumptionE5: ud.string(forKey: "defaultConsumption.e5"),
+            defaultConsumptionE10: ud.string(forKey: "defaultConsumption.e10"),
+            defaultConsumptionDiesel: ud.string(forKey: "defaultConsumption.diesel"),
+            defaultConsumptionElektro: ud.string(forKey: "defaultConsumption.elektro"),
+            defaultConsumptionHybrid: ud.string(forKey: "defaultConsumption.hybrid")
         )
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
@@ -201,6 +227,20 @@ class BackupManager: ObservableObject {
             store.abroadMeal6plus = backup.abroadMeal6plus
             store.hotelFlat = backup.hotelFlat
             store.breakfastFlat = backup.breakfastFlat
+            // Version 3: Einstellungen wiederherstellen
+            let ud = UserDefaults.standard
+            if let v = backup.homeAddress        { ud.set(v, forKey: "homeAddress") }
+            if let v = backup.defaultFuelType    { ud.set(v, forKey: "defaultFuelType") }
+            if let v = backup.defaultFuelPriceE5       { ud.set(v, forKey: "defaultFuelPrice.e5") }
+            if let v = backup.defaultFuelPriceE10      { ud.set(v, forKey: "defaultFuelPrice.e10") }
+            if let v = backup.defaultFuelPriceDiesel   { ud.set(v, forKey: "defaultFuelPrice.diesel") }
+            if let v = backup.defaultFuelPriceElektro  { ud.set(v, forKey: "defaultFuelPrice.elektro") }
+            if let v = backup.defaultFuelPriceHybrid   { ud.set(v, forKey: "defaultFuelPrice.hybrid") }
+            if let v = backup.defaultConsumptionE5     { ud.set(v, forKey: "defaultConsumption.e5") }
+            if let v = backup.defaultConsumptionE10    { ud.set(v, forKey: "defaultConsumption.e10") }
+            if let v = backup.defaultConsumptionDiesel { ud.set(v, forKey: "defaultConsumption.diesel") }
+            if let v = backup.defaultConsumptionElektro{ ud.set(v, forKey: "defaultConsumption.elektro") }
+            if let v = backup.defaultConsumptionHybrid { ud.set(v, forKey: "defaultConsumption.hybrid") }
             let dateStr = backup.exportedAt.formatted(date: .abbreviated, time: .shortened)
             lastSuccess = "Backup vom \(dateStr) wiederhergestellt (\(backup.totalEntries) Einträge)"
             return true

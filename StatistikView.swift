@@ -75,14 +75,22 @@ struct StatistikView: View {
 
     // MARK: - Jahres-Zusammenfassung
     private var jahresSummary: some View {
-        let trips = tripsForYear
-        let km    = trips.reduce(0) { $0 + $1.km }
-        let euro  = km * store.kmRate
+        let trips  = tripsForYear
+        let km     = trips.reduce(0) { $0 + $1.km }
+        let euro   = km * store.kmRate
+        let avgKm  = trips.isEmpty ? 0.0 : km / Double(trips.count)
 
-        return HStack(spacing: 12) {
-            summaryTile(icon: "car.fill",          color: .orange,  value: "\(trips.count)",                 label: lm.t("stat.trips.label"))
-            summaryTile(icon: "road.lanes",        color: .blue,    value: "\(Int(km)) km",                  label: lm.t("stat.km.label"))
-            summaryTile(icon: "eurosign.circle",   color: .green,   value: euro.euroFormatted,               label: lm.t("stat.reimbursement.label"))
+        return VStack(spacing: 12) {
+            HStack(spacing: 12) {
+                summaryTile(icon: "car.fill",        color: .orange, value: "\(trips.count)",   label: lm.t("stat.trips.label"))
+                summaryTile(icon: "road.lanes",      color: .blue,   value: "\(Int(km)) km",    label: lm.t("stat.km.label"))
+            }
+            HStack(spacing: 12) {
+                summaryTile(icon: "eurosign.circle", color: .green,  value: euro.euroFormatted, label: lm.t("stat.reimbursement.label"))
+                summaryTile(icon: "arrow.left.and.right", color: .purple,
+                            value: trips.isEmpty ? "–" : String(format: "%.1f km", avgKm).replacingOccurrences(of: ".", with: ","),
+                            label: "Ø km/Fahrt")
+            }
         }
     }
 
@@ -147,35 +155,54 @@ struct StatistikView: View {
 
     // MARK: - Monats-Chart
     private var monatsChart: some View {
-        let data = monthlyData
+        let data     = monthlyData
+        let prevData = monthlyDataForYear(selectedYear - 1)
+        let hasPrev  = prevData.contains { $0.euro > 0 }
 
         return VStack(alignment: .leading, spacing: 16) {
-            Text(lm.t("stat.reimbursement.per.month"))
-                .font(.headline)
+            HStack {
+                Text(lm.t("stat.reimbursement.per.month"))
+                    .font(.headline)
+                Spacer()
+                if hasPrev {
+                    HStack(spacing: 8) {
+                        legendDot(color: .orange.opacity(0.45), label: String(selectedYear))
+                        legendDot(color: .blue.opacity(0.35),   label: String(selectedYear - 1))
+                    }
+                }
+            }
 
             if data.allSatisfy({ $0.euro == 0 }) {
                 emptyState(icon: "chart.bar.xaxis", text: "Keine Fahrten in \(selectedYear)")
             } else {
-                Chart(data) { item in
-                    BarMark(
-                        x: .value("Monat", item.shortMonth),
-                        y: .value("Euro", item.euro)
-                    )
-                    .foregroundStyle(item.isCurrentMonth ? Color.orange : Color.orange.opacity(0.45))
-                    .cornerRadius(5)
-                    .annotation(position: .top) {
-                        if item.euro > 0 {
-                            Text(item.euro > 99 ? "\(Int(item.euro))€" : item.euro.euroFormatted)
-                                .font(.system(size: 9, weight: .medium))
-                                .foregroundColor(.secondary)
+                Chart {
+                    ForEach(data) { item in
+                        BarMark(
+                            x: .value("Monat", item.shortMonth),
+                            y: .value("Euro", item.euro),
+                            width: hasPrev ? .ratio(0.45) : .automatic
+                        )
+                        .foregroundStyle(item.isCurrentMonth ? Color.orange : Color.orange.opacity(0.55))
+                        .cornerRadius(4)
+                        .position(by: .value("Jahr", "aktuell"))
+                    }
+                    if hasPrev {
+                        ForEach(prevData) { item in
+                            BarMark(
+                                x: .value("Monat", item.shortMonth),
+                                y: .value("Euro", item.euro),
+                                width: .ratio(0.45)
+                            )
+                            .foregroundStyle(Color.blue.opacity(0.35))
+                            .cornerRadius(4)
+                            .position(by: .value("Jahr", "vorjahr"))
                         }
                     }
                 }
                 .frame(height: 200)
                 .chartXAxis {
                     AxisMarks(values: .automatic) { _ in
-                        AxisValueLabel()
-                            .font(.system(size: 10))
+                        AxisValueLabel().font(.system(size: 10))
                     }
                 }
                 .chartYAxis {
@@ -204,10 +231,54 @@ struct StatistikView: View {
                     .accessibilityElement(children: .combine)
                 }
             }
+
+            // ── Wochentags-Verteilung ──────────────────────────────────
+            weekdayChart
         }
         .padding(16)
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func legendDot(color: Color, label: String) -> some View {
+        HStack(spacing: 4) {
+            Circle().fill(color).frame(width: 8, height: 8)
+            Text(label).font(.caption).foregroundColor(.secondary)
+        }
+    }
+
+    // MARK: - Wochentags-Chart
+    private var weekdayChart: some View {
+        let data = weekdayData
+        guard data.contains(where: { $0.count > 0 }) else { return AnyView(EmptyView()) }
+        let maxCount = data.map(\.count).max() ?? 1
+
+        return AnyView(VStack(alignment: .leading, spacing: 10) {
+            Divider()
+            Text("Fahrten nach Wochentag")
+                .font(.subheadline.bold())
+
+            Chart(data) { item in
+                BarMark(
+                    x: .value("Tag", item.shortDay),
+                    y: .value("Fahrten", item.count)
+                )
+                .foregroundStyle(item.count == maxCount ? Color.orange : Color.orange.opacity(0.4))
+                .cornerRadius(4)
+                .annotation(position: .top) {
+                    if item.count > 0 {
+                        Text("\(item.count)").font(.system(size: 9, weight: .medium)).foregroundColor(.secondary)
+                    }
+                }
+            }
+            .frame(height: 110)
+            .chartXAxis {
+                AxisMarks(values: .automatic) { _ in
+                    AxisValueLabel().font(.system(size: 11))
+                }
+            }
+            .chartYAxis(.hidden)
+        })
     }
 
     // MARK: - Häufigste Strecken
@@ -384,18 +455,21 @@ struct StatistikView: View {
         store.trips.filter { Calendar.current.component(.year, from: $0.date) == selectedYear }
     }
 
-    private var monthlyData: [MonthData] {
+    private var monthlyData: [MonthData] { monthlyDataForYear(selectedYear) }
+
+    private func monthlyDataForYear(_ year: Int) -> [MonthData] {
         let cal = Calendar.current
         let now = Date()
         let currentMonth = cal.component(.month, from: now)
         let currentYear  = cal.component(.year, from: now)
+        let trips = store.trips.filter { cal.component(.year, from: $0.date) == year }
 
         return (1...12).map { month in
-            let trips = tripsForYear.filter { cal.component(.month, from: $0.date) == month }
-            let euro  = trips.reduce(0) { $0 + $1.km * store.kmRate }
+            let monthTrips = trips.filter { cal.component(.month, from: $0.date) == month }
+            let euro  = monthTrips.reduce(0) { $0 + $1.km * store.kmRate }
             let formatter = DateFormatter()
             formatter.locale = Locale(identifier: "de_DE")
-            var comps = DateComponents(); comps.month = month; comps.year = selectedYear
+            var comps = DateComponents(); comps.month = month; comps.year = year
             let date = cal.date(from: comps) ?? Date()
             formatter.dateFormat = "MMM"
             let short = formatter.string(from: date)
@@ -405,9 +479,23 @@ struct StatistikView: View {
                 month: full,
                 shortMonth: short,
                 euro: euro,
-                isCurrentMonth: month == currentMonth && selectedYear == currentYear
+                isCurrentMonth: month == currentMonth && year == currentYear
             )
         }
+    }
+
+    private var weekdayData: [WeekdayData] {
+        let cal = Calendar.current
+        // Mo=1…So=7 (ISO-Reihenfolge)
+        let names = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
+        var counts = Array(repeating: 0, count: 7)
+        for trip in tripsForYear {
+            // weekday: 1=So,2=Mo,…7=Sa → ISO-Index: (weekday+5)%7
+            let wd = cal.component(.weekday, from: trip.date)
+            let idx = (wd + 5) % 7
+            counts[idx] += 1
+        }
+        return (0..<7).map { WeekdayData(shortDay: names[$0], count: counts[$0]) }
     }
 
     private var topRoutes: [RouteData] {
@@ -456,6 +544,12 @@ struct RouteData {
     let count: Int
     let totalKm: Double
     let avgKm: Double
+}
+
+struct WeekdayData: Identifiable {
+    let id = UUID()
+    let shortDay: String
+    let count: Int
 }
 
 // MARK: - Preview

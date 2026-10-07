@@ -2,6 +2,22 @@
 
 ---
 
+## Version 1.17.43 (7. Oktober 2026)
+
+- **Neu: GPS-Pause** – Während der GPS-Aufzeichnung lässt sich die Fahrt jetzt manuell pausieren und fortsetzen – direkt über den neuen Pause-Button in der Aufzeichnungs-Ansicht. Die automatische Pause bei längerem Stillstand bleibt weiterhin aktiv.
+- **Neu: Statistik – Wochentags-Verteilung** – Ein neues Balkendiagramm zeigt, an welchen Wochentagen am meisten gefahren wird.
+- **Neu: Statistik – Jahresvergleich** – Der Monats-Chart zeigt jetzt aktuelles Jahr und Vorjahr als Doppelbalken nebeneinander.
+- **Neu: Statistik – Ø km/Fahrt** – Viertes Kachel in der Jahres-Zusammenfassung mit der durchschnittlichen Fahrtlänge.
+- **Neu: Suche – Bereichsfilter** – Fahrten und Einträge lassen sich jetzt nach km-Bereich und Betrag filtern.
+- **Neu: Suche – Ortsvorschläge** – Im leeren Suchfeld erscheinen die häufigsten eigenen Orte als antippbare Chips.
+- **Neu: Suche – Gefilterter Export** – Suchergebnisse lassen sich direkt als PDF exportieren, mit automatischer Zusammenfassung (Fahrten · km · €).
+- **Neu: Lock Screen Widget** – Drei neue Widget-Größen für den Sperrbildschirm (Circular, Rectangular, Inline) zeigen die Monatserstattung auf einen Blick.
+- **Neu: GPS-Probe** – Nicht-Pro-Nutzer können GPS einmalig kostenlos ausprobieren, bevor Pro freigeschaltet wird.
+- **Verbesserung: Pro-Kaufscreen** – Neues Rendite-Argument direkt oben: Ø-Jahreserstattung vs. Einmalpreis.
+- **Verbesserung: Backup** – Spritvorgaben (Kraftstoffart, Preise, Verbrauch) und Heimatadresse werden jetzt im Backup gesichert und beim Wiederherstellen automatisch eingetragen.
+
+---
+
 ## Version 1.16.11 (18. Juni 2026)
 
 - **Neu: Privat & Geschäftlich** – Jede Fahrt lässt sich jetzt als privat oder geschäftlich markieren. Die Übersicht trennt Zeiten für Arbeit und Privatfahrten sauber voneinander – die zugehörigen Berechnungen wurden überarbeitet und korrigiert.
