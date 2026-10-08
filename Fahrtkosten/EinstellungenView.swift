@@ -19,6 +19,8 @@ struct EinstellungenView: View {
     @State private var abroadMeal1to3Str  = ""
     @State private var abroadMeal3to6Str  = ""
     @State private var abroadMeal6plusStr = ""
+    @State private var legalAbroadDayStr     = ""
+    @State private var legalAbroadFullDayStr = ""
     @State private var hotelFlatStr       = ""
     @State private var breakfastFlatStr   = ""
     @State private var monteurszulageInlandStr  = ""
@@ -308,9 +310,29 @@ struct EinstellungenView: View {
                                 .buttonStyle(.plain).foregroundStyle(.blue)
                         }
                         Divider().padding(.vertical, 6)
-                        Text("Ausland (aus BMF-Tabelle eintragen)").font(.caption).foregroundStyle(.secondary).padding(.bottom, 4)
-                        mealRow(label: "ab 8 h / An- & Abreisetag", icon: "2.circle.fill", color: .orange, binding: $abroadMeal3to6Str)
-                        mealRow(label: "voller Tag (24 h)",          icon: "3.circle.fill", color: .green,  binding: $abroadMeal6plusStr)
+                        Text("Ausland (BMF-Tabelle \(BmfAuslandData.year))").font(.caption).foregroundStyle(.secondary).padding(.bottom, 4)
+                        Menu {
+                            ForEach(BmfAuslandData.sorted) { entry in
+                                Button(entry.name) {
+                                    store.abroadCountryName  = entry.name
+                                    store.legalAbroadDay     = entry.day
+                                    store.legalAbroadFullDay = entry.fullDay
+                                    func fmt(_ v: Double) -> String { String(format: "%.2f", v).replacingOccurrences(of: ".", with: ",") }
+                                    legalAbroadDayStr     = fmt(entry.day)
+                                    legalAbroadFullDayStr = fmt(entry.fullDay)
+                                }
+                            }
+                        } label: {
+                            HStack {
+                                Label(store.abroadCountryName, systemImage: "globe.europe.africa.fill")
+                                    .foregroundStyle(.primary)
+                                Spacer()
+                                Image(systemName: "chevron.up.chevron.down").foregroundStyle(.secondary).font(.caption)
+                            }
+                        }
+                        .padding(.bottom, 4)
+                        mealRow(label: "ab 8 h / An- & Abreisetag", icon: "2.circle.fill", color: .orange, binding: $legalAbroadDayStr)
+                        mealRow(label: "voller Tag (24 h)",          icon: "3.circle.fill", color: .green,  binding: $legalAbroadFullDayStr)
                     } else {
                         // ── Eigene Stufen ──
                         Text(lm.t("settings.region.inland")).font(.caption).foregroundStyle(.secondary)
@@ -1075,7 +1097,6 @@ struct EinstellungenView: View {
     }
 
     // MARK: - Helper Row
-    @ViewBuilder
     @ViewBuilder private func legalMealRow(label: String, value: String, color: Color) -> some View {
         HStack {
             Circle().fill(color).frame(width: 8, height: 8)
@@ -1115,6 +1136,8 @@ struct EinstellungenView: View {
         abroadMeal1to3Str  = fmt(store.abroadMeal1to3)
         abroadMeal3to6Str  = fmt(store.abroadMeal3to6)
         abroadMeal6plusStr = fmt(store.abroadMeal6plus)
+        legalAbroadDayStr     = fmt(store.legalAbroadDay)
+        legalAbroadFullDayStr = fmt(store.legalAbroadFullDay)
         hotelFlatStr       = fmt(store.hotelFlat)
         breakfastFlatStr   = fmt(store.breakfastFlat)
         monteurszulageInlandStr  = fmt(store.monteurszulageInland)
@@ -1138,6 +1161,8 @@ struct EinstellungenView: View {
         store.abroadMeal1to3  = parseCurrency(abroadMeal1to3Str)
         store.abroadMeal3to6  = parseCurrency(abroadMeal3to6Str)
         store.abroadMeal6plus = parseCurrency(abroadMeal6plusStr)
+        store.legalAbroadDay     = parseCurrency(legalAbroadDayStr)
+        store.legalAbroadFullDay = parseCurrency(legalAbroadFullDayStr)
         store.hotelFlat       = parseCurrency(hotelFlatStr)
         store.breakfastFlat   = parseCurrency(breakfastFlatStr)
         store.monteurszulageInland  = parseCurrency(monteurszulageInlandStr)

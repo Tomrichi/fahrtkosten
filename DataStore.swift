@@ -72,9 +72,10 @@ class DataStore: ObservableObject {
     // Gesetzliche Tagessätze Schweiz (CHF)
     @Published var legalSwissDay:     Double { didSet { local.set(legalSwissDay,     forKey: "legalSwissDay") } }
     @Published var legalSwissFullDay: Double { didSet { local.set(legalSwissFullDay, forKey: "legalSwissFullDay") } }
-    // Gesetzliche Tagessätze Ausland (€) – vom Nutzer aus BMF-Tabelle einzutragen
+    // Gesetzliche Tagessätze Ausland (€) – aus BMF-Tabelle
     @Published var legalAbroadDay:     Double { didSet { local.set(legalAbroadDay,     forKey: "legalAbroadDay") } }
     @Published var legalAbroadFullDay: Double { didSet { local.set(legalAbroadFullDay, forKey: "legalAbroadFullDay") } }
+    @Published var abroadCountryName:  String { didSet { local.set(abroadCountryName,  forKey: "abroadCountryName") } }
 
     // MARK: - Profil
     @Published var profilName:       String { didSet { local.set(profilName,       forKey: "profilName") } }
@@ -119,8 +120,9 @@ class DataStore: ObservableObject {
         legalInlandFullDay = local.double(forKey: "legalInlandFullDay").ifZero(28.0)
         legalSwissDay      = local.double(forKey: "legalSwissDay").ifZero(47.0)
         legalSwissFullDay  = local.double(forKey: "legalSwissFullDay").ifZero(70.0)
-        legalAbroadDay     = local.double(forKey: "legalAbroadDay").ifZeroAllowed(0)
-        legalAbroadFullDay = local.double(forKey: "legalAbroadFullDay").ifZeroAllowed(0)
+        legalAbroadDay     = local.double(forKey: "legalAbroadDay").ifZeroAllowed(BmfAuslandData.fallbackDay)
+        legalAbroadFullDay = local.double(forKey: "legalAbroadFullDay").ifZeroAllowed(BmfAuslandData.fallbackFullDay)
+        abroadCountryName  = local.string(forKey: "abroadCountryName") ?? BmfAuslandData.fallbackName
 
         // SCHRITT 1: Migration einmalig ausführen (Standard → App Group)
         migrateFromStandardToAppGroup()

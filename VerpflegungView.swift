@@ -635,7 +635,28 @@ struct MealFormView: View {
 
                 // ── Gestellte Mahlzeiten (Gesetzlich) ──
                 if store.mealMode == .gesetzlich {
+                    let (_, fullR) = store.legalRates(for: region)
                     Section {
+                        // Land (nur Ausland)
+                        if region == .ausland {
+                            Menu {
+                                ForEach(BmfAuslandData.sorted) { entry in
+                                    Button(entry.name) {
+                                        store.abroadCountryName  = entry.name
+                                        store.legalAbroadDay     = entry.day
+                                        store.legalAbroadFullDay = entry.fullDay
+                                    }
+                                }
+                            } label: {
+                                HStack {
+                                    Label("Land", systemImage: "globe.europe.africa.fill")
+                                    Spacer()
+                                    Text(store.abroadCountryName)
+                                        .foregroundStyle(.secondary).font(.subheadline)
+                                    Image(systemName: "chevron.up.chevron.down").foregroundStyle(.secondary).font(.caption)
+                                }
+                            }
+                        }
                         // Tagesart
                         Picker("Reisetag", selection: $dayType) {
                             ForEach(DayType.allCases, id: \.self) { dt in
@@ -645,7 +666,6 @@ struct MealFormView: View {
                         .pickerStyle(.menu)
 
                         // Gestellte Mahlzeiten
-                        let (_, fullR) = store.legalRates(for: region)
                         Toggle(isOn: $providedBreakfast) {
                             HStack {
                                 Label("Frühstück gestellt", systemImage: "cup.and.saucer.fill")
