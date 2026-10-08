@@ -62,7 +62,7 @@ struct PDFExportService {
 
         // Berechnungen
         let tripTotal    = trips.reduce(0.0)  { $0 + $1.km * store.kmRate }
-        let mealTotal    = meals.reduce(0.0)  { $0 + $1.allowance(rates: store.mealRates(for: $1.region)) }
+        let mealTotal    = meals.reduce(0.0)  { $0 + store.effectiveAllowance(for: $1) }
         let hotelTotal   = hotels.reduce(0.0) { $0 + $1.amount(flat: store.hotelFlat) }
         let spesenTotal  = reiseSpesen.reduce(0.0) { $0 + $1.amount }
         let vehicleTotal = vehicleCosts.reduce(0.0) { $0 + $1.amount }
@@ -317,7 +317,7 @@ struct PDFExportService {
             if !meals.isEmpty {
                 drawSectionHeader(title: "Verpflegung  (\(meals.count) Einträge)", subtotal: mealTotal)
                 for meal in meals.sorted(by: { $0.date > $1.date }) {
-                    let allowance = meal.allowance(rates: store.mealRates(for: meal.region))
+                    let allowance = store.effectiveAllowance(for: meal)
                     let h = String(format: "%.1f h", meal.hours)
                     let detail = "\(meal.region.localizedName)  ·  \(h)"
                     drawRow(
@@ -516,7 +516,7 @@ struct CSVExportService {
 
         // Verpflegung
         for meal in meals.sorted(by: { $0.date > $1.date }) {
-            let amt = meal.allowance(rates: store.mealRates(for: meal.region))
+            let amt = store.effectiveAllowance(for: meal)
             let date = meal.date.formatted(date: .numeric, time: .omitted)
             csv += "\(date);Verpflegung;\(meal.region.localizedName);;;;;;;;\(String(format: "%.2f", amt));\(meal.note)\n"
         }

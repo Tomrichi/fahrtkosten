@@ -39,8 +39,16 @@ struct AppBackup: Codable {
     let defaultConsumptionDiesel: String?
     let defaultConsumptionElektro: String?
     let defaultConsumptionHybrid: String?
+    // Version 4: Gesetzlicher Modus
+    let mealMode: String?
+    let legalInlandDay: Double?
+    let legalInlandFullDay: Double?
+    let legalSwissDay: Double?
+    let legalSwissFullDay: Double?
+    let legalAbroadDay: Double?
+    let legalAbroadFullDay: Double?
 
-    static let currentVersion = 3
+    static let currentVersion = 4
 
     var totalEntries: Int {
         trips.count + meals.count + hotels.count + vehicleCosts.count + reiseSpesen.count + privateExpenses.count
@@ -116,7 +124,14 @@ class BackupManager: ObservableObject {
             defaultConsumptionE10: ud.string(forKey: "defaultConsumption.e10"),
             defaultConsumptionDiesel: ud.string(forKey: "defaultConsumption.diesel"),
             defaultConsumptionElektro: ud.string(forKey: "defaultConsumption.elektro"),
-            defaultConsumptionHybrid: ud.string(forKey: "defaultConsumption.hybrid")
+            defaultConsumptionHybrid: ud.string(forKey: "defaultConsumption.hybrid"),
+            mealMode: store.mealMode.rawValue,
+            legalInlandDay: store.legalInlandDay,
+            legalInlandFullDay: store.legalInlandFullDay,
+            legalSwissDay: store.legalSwissDay,
+            legalSwissFullDay: store.legalSwissFullDay,
+            legalAbroadDay: store.legalAbroadDay,
+            legalAbroadFullDay: store.legalAbroadFullDay
         )
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
@@ -241,6 +256,14 @@ class BackupManager: ObservableObject {
             if let v = backup.defaultConsumptionDiesel { ud.set(v, forKey: "defaultConsumption.diesel") }
             if let v = backup.defaultConsumptionElektro{ ud.set(v, forKey: "defaultConsumption.elektro") }
             if let v = backup.defaultConsumptionHybrid { ud.set(v, forKey: "defaultConsumption.hybrid") }
+            // Version 4: Gesetzlicher Modus
+            if let m = backup.mealMode.flatMap({ MealMode(rawValue: $0) }) { store.mealMode = m }
+            if let v = backup.legalInlandDay     { store.legalInlandDay = v }
+            if let v = backup.legalInlandFullDay { store.legalInlandFullDay = v }
+            if let v = backup.legalSwissDay      { store.legalSwissDay = v }
+            if let v = backup.legalSwissFullDay  { store.legalSwissFullDay = v }
+            if let v = backup.legalAbroadDay     { store.legalAbroadDay = v }
+            if let v = backup.legalAbroadFullDay { store.legalAbroadFullDay = v }
             let dateStr = backup.exportedAt.formatted(date: .abbreviated, time: .shortened)
             lastSuccess = "Backup vom \(dateStr) wiederhergestellt (\(backup.totalEntries) Einträge)"
             return true

@@ -341,7 +341,7 @@ struct StatistikView: View {
         let euro    = km * store.kmRate
         let meals   = store.meals.filter { Calendar.current.component(.year, from: $0.date) == selectedYear }
         let hotels  = store.hotels.filter { Calendar.current.component(.year, from: $0.date) == selectedYear }
-        let mealSum = meals.reduce(0.0) { $0 + $1.allowance(rates: store.mealRates(for: $1.region)) }
+        let mealSum = meals.reduce(0.0) { $0 + store.effectiveAllowance(for: $1) }
         let hotelSum = hotels.reduce(0.0) { $0 + $1.amount(flat: store.hotelFlat) }
         let monteurszulageSum = store.totalMonteurszulage(meals)
         let gesamt  = euro + mealSum + hotelSum

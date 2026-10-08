@@ -225,7 +225,7 @@ struct UebersichtView: View {
 
     private var filteredTotal: Double {
         let tripTotal   = filteredTrips.reduce(0)  { $0 + ($1.km * store.kmRate) }
-        let mealTotal   = filteredMeals.reduce(0)  { acc, m in acc + store.effectiveMealAllowance(for: m) }
+        let mealTotal   = filteredMeals.reduce(0)  { acc, m in acc + store.effectiveAllowance(for: m) }
         let hotelTotal  = filteredHotels.reduce(0) { $0 + $1.amount(flat: store.hotelFlat) }
         return tripTotal + mealTotal + hotelTotal
     }
@@ -305,7 +305,7 @@ struct UebersichtView: View {
 
                 // ── Aufklappbare Kacheln ──
                 let tripAmount     = filteredTrips.reduce(0.0)          { $0 + ($1.km * store.kmRate) }
-                let mealAmount     = filteredMeals.reduce(0.0)          { acc, m in acc + store.effectiveMealAllowance(for: m) }
+                let mealAmount     = filteredMeals.reduce(0.0)          { acc, m in acc + store.effectiveAllowance(for: m) }
                 let hotelAmount    = filteredHotels.reduce(0.0)         { $0 + $1.amount(flat: store.hotelFlat) }
                 let vehicleAmount  = filteredVehicleCosts.reduce(0.0)    { $0 + $1.amount }
                 let privateAmount  = filteredPrivateExpenses.reduce(0.0) { $0 + $1.amount }
@@ -338,7 +338,7 @@ struct UebersichtView: View {
                     isExpanded: $expandMeals
                 ) {
                     ForEach(filteredMeals.sorted(by: { $0.date > $1.date })) { meal in
-                        let a = store.effectiveMealAllowance(for: meal)
+                        let a = store.effectiveAllowance(for: meal)
                         expandRow(
                             icon: "fork.knife", color: .green,
                             title: meal.date.weekdayShortDate,

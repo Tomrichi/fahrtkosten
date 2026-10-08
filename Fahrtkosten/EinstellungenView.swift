@@ -268,46 +268,83 @@ struct EinstellungenView: View {
     @ViewBuilder private var collapsibleMeals: some View {
         Section {
             DisclosureGroup(isExpanded: $expandMeals) {
+                // ── Umschalter Gesetzlich / Eigene Stufen ──
+                Picker("Rechenmodus", selection: Binding(
+                    get: { store.mealMode },
+                    set: { store.mealMode = $0 }
+                )) {
+                    ForEach(MealMode.allCases, id: \.self) { m in Text(m.localizedName).tag(m) }
+                }
+                .pickerStyle(.segmented)
+                .padding(.vertical, 4)
+
                 VStack(alignment: .leading, spacing: 0) {
-                    Text(lm.t("settings.region.inland")).font(.caption).foregroundStyle(.secondary)
-                        .padding(.top, 8).padding(.bottom, 4)
-                    mealRow(label: "< 3 Stunden",   icon: "1.circle.fill", color: .gray,   binding: $inlandMeal1to3Str)
-                    mealRow(label: "3 - 6 Stunden", icon: "2.circle.fill", color: .orange, binding: $inlandMeal3to6Str)
-                    mealRow(label: "ab 6 Stunden",  icon: "3.circle.fill", color: .green,  binding: $inlandMeal6plusStr)
-                    Divider().padding(.vertical, 6)
-                    Text(lm.t("settings.region.schweiz")).font(.caption).foregroundStyle(.secondary)
-                        .padding(.bottom, 4)
-                    mealRow(label: "< 3 Stunden",   icon: "1.circle.fill", color: .gray,   binding: $swissMeal1to3Str,  currency: "CHF")
-                    mealRow(label: "3 - 6 Stunden", icon: "2.circle.fill", color: .orange, binding: $swissMeal3to6Str,  currency: "CHF")
-                    mealRow(label: "ab 6 Stunden",  icon: "3.circle.fill", color: .green,  binding: $swissMeal6plusStr, currency: "CHF")
-                    HStack {
-                        Label("Kurs (EUR = … CHF)", systemImage: "arrow.left.arrow.right")
-                        Spacer()
-                        TextField("0,93", text: $eurChfRateStr)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 80)
-                        Text("CHF").foregroundStyle(.secondary).font(.subheadline)
-                    }
-                    HStack {
-                        Spacer()
-                        Text(chfRateStatusText)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                        Button {
-                            Task { await store.refreshEurChfRateIfNeeded(force: true) }
-                        } label: {
-                            Image(systemName: "arrow.clockwise")
+                    if store.mealMode == .gesetzlich {
+                        // ── Gesetzliche Sätze ──
+                        Text("Inland (§ 9 Abs. 4a EStG)").font(.caption).foregroundStyle(.secondary)
+                            .padding(.top, 8).padding(.bottom, 4)
+                        legalMealRow(label: "bis 8 h (kein Anspruch)", value: "0 €", color: .gray)
+                        legalMealRow(label: "ab 8 h / An- & Abreisetag", value: String(format: "%.0f €", store.legalInlandDay), color: .orange)
+                        legalMealRow(label: "voller Tag (24 h)", value: String(format: "%.0f €", store.legalInlandFullDay), color: .green)
+                        Divider().padding(.vertical, 6)
+                        Text("Schweiz").font(.caption).foregroundStyle(.secondary).padding(.bottom, 4)
+                        legalMealRow(label: "bis 8 h", value: "0 CHF", color: .gray)
+                        legalMealRow(label: "ab 8 h / An- & Abreisetag", value: String(format: "%.0f CHF", store.legalSwissDay), color: .orange)
+                        legalMealRow(label: "voller Tag (24 h)", value: String(format: "%.0f CHF", store.legalSwissFullDay), color: .green)
+                        HStack {
+                            Label("Kurs (EUR = … CHF)", systemImage: "arrow.left.arrow.right")
+                            Spacer()
+                            TextField("0,93", text: $eurChfRateStr)
+                                .keyboardType(.decimalPad)
+                                .multilineTextAlignment(.trailing)
+                                .frame(width: 80)
+                            Text("CHF").foregroundStyle(.secondary).font(.subheadline)
                         }
-                        .buttonStyle(.plain)
-                        .foregroundStyle(.blue)
+                        HStack {
+                            Spacer()
+                            Text(chfRateStatusText).font(.caption2).foregroundStyle(.secondary)
+                            Button { Task { await store.refreshEurChfRateIfNeeded(force: true) } }
+                                label: { Image(systemName: "arrow.clockwise") }
+                                .buttonStyle(.plain).foregroundStyle(.blue)
+                        }
+                        Divider().padding(.vertical, 6)
+                        Text("Ausland (aus BMF-Tabelle eintragen)").font(.caption).foregroundStyle(.secondary).padding(.bottom, 4)
+                        mealRow(label: "ab 8 h / An- & Abreisetag", icon: "2.circle.fill", color: .orange, binding: $abroadMeal3to6Str)
+                        mealRow(label: "voller Tag (24 h)",          icon: "3.circle.fill", color: .green,  binding: $abroadMeal6plusStr)
+                    } else {
+                        // ── Eigene Stufen ──
+                        Text(lm.t("settings.region.inland")).font(.caption).foregroundStyle(.secondary)
+                            .padding(.top, 8).padding(.bottom, 4)
+                        mealRow(label: "< 3 Stunden",   icon: "1.circle.fill", color: .gray,   binding: $inlandMeal1to3Str)
+                        mealRow(label: "3 - 6 Stunden", icon: "2.circle.fill", color: .orange, binding: $inlandMeal3to6Str)
+                        mealRow(label: "ab 6 Stunden",  icon: "3.circle.fill", color: .green,  binding: $inlandMeal6plusStr)
+                        Divider().padding(.vertical, 6)
+                        Text(lm.t("settings.region.schweiz")).font(.caption).foregroundStyle(.secondary).padding(.bottom, 4)
+                        mealRow(label: "< 3 Stunden",   icon: "1.circle.fill", color: .gray,   binding: $swissMeal1to3Str,  currency: "CHF")
+                        mealRow(label: "3 - 6 Stunden", icon: "2.circle.fill", color: .orange, binding: $swissMeal3to6Str,  currency: "CHF")
+                        mealRow(label: "ab 6 Stunden",  icon: "3.circle.fill", color: .green,  binding: $swissMeal6plusStr, currency: "CHF")
+                        HStack {
+                            Label("Kurs (EUR = … CHF)", systemImage: "arrow.left.arrow.right")
+                            Spacer()
+                            TextField("0,93", text: $eurChfRateStr)
+                                .keyboardType(.decimalPad)
+                                .multilineTextAlignment(.trailing)
+                                .frame(width: 80)
+                            Text("CHF").foregroundStyle(.secondary).font(.subheadline)
+                        }
+                        HStack {
+                            Spacer()
+                            Text(chfRateStatusText).font(.caption2).foregroundStyle(.secondary)
+                            Button { Task { await store.refreshEurChfRateIfNeeded(force: true) } }
+                                label: { Image(systemName: "arrow.clockwise") }
+                                .buttonStyle(.plain).foregroundStyle(.blue)
+                        }
+                        Divider().padding(.vertical, 6)
+                        Text(lm.t("settings.region.ausland")).font(.caption).foregroundStyle(.secondary).padding(.bottom, 4)
+                        mealRow(label: "< 3 Stunden",   icon: "1.circle.fill", color: .gray,   binding: $abroadMeal1to3Str)
+                        mealRow(label: "3 - 6 Stunden", icon: "2.circle.fill", color: .orange, binding: $abroadMeal3to6Str)
+                        mealRow(label: "ab 6 Stunden",  icon: "3.circle.fill", color: .green,  binding: $abroadMeal6plusStr)
                     }
-                    Divider().padding(.vertical, 6)
-                    Text(lm.t("settings.region.ausland")).font(.caption).foregroundStyle(.secondary)
-                        .padding(.bottom, 4)
-                    mealRow(label: "< 3 Stunden",   icon: "1.circle.fill", color: .gray,   binding: $abroadMeal1to3Str)
-                    mealRow(label: "3 - 6 Stunden", icon: "2.circle.fill", color: .orange, binding: $abroadMeal3to6Str)
-                    mealRow(label: "ab 6 Stunden",  icon: "3.circle.fill", color: .green,  binding: $abroadMeal6plusStr)
                 }
             } label: {
                 Label(lm.t("settings.meals.title"), systemImage: "fork.knife")
@@ -1039,6 +1076,15 @@ struct EinstellungenView: View {
 
     // MARK: - Helper Row
     @ViewBuilder
+    @ViewBuilder private func legalMealRow(label: String, value: String, color: Color) -> some View {
+        HStack {
+            Circle().fill(color).frame(width: 8, height: 8)
+            Text(label).font(.subheadline).foregroundStyle(.secondary)
+            Spacer()
+            Text(value).font(.subheadline).foregroundStyle(color).fontWeight(.medium)
+        }
+    }
+
     private func mealRow(label: String, icon: String, color: Color, binding: Binding<String>, currency: String = "€") -> some View {
         HStack {
             Label(label, systemImage: icon).foregroundStyle(color)

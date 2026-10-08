@@ -62,6 +62,20 @@ class DataStore: ObservableObject {
     @Published var wochenendzulageSchweiz: Double { didSet { local.set(wochenendzulageSchweiz, forKey: "wochenendzulageSchweiz") } }
     @Published var wochenendzulageAusland: Double { didSet { local.set(wochenendzulageAusland, forKey: "wochenendzulageAusland") } }
 
+    // MARK: - Verpflegungsmodus (v1.18)
+    @Published var mealMode: MealMode {
+        didSet { local.set(mealMode.rawValue, forKey: "mealMode") }
+    }
+    // Gesetzliche Tagessätze Inland (€)
+    @Published var legalInlandDay:     Double { didSet { local.set(legalInlandDay,     forKey: "legalInlandDay") } }
+    @Published var legalInlandFullDay: Double { didSet { local.set(legalInlandFullDay, forKey: "legalInlandFullDay") } }
+    // Gesetzliche Tagessätze Schweiz (CHF)
+    @Published var legalSwissDay:     Double { didSet { local.set(legalSwissDay,     forKey: "legalSwissDay") } }
+    @Published var legalSwissFullDay: Double { didSet { local.set(legalSwissFullDay, forKey: "legalSwissFullDay") } }
+    // Gesetzliche Tagessätze Ausland (€) – vom Nutzer aus BMF-Tabelle einzutragen
+    @Published var legalAbroadDay:     Double { didSet { local.set(legalAbroadDay,     forKey: "legalAbroadDay") } }
+    @Published var legalAbroadFullDay: Double { didSet { local.set(legalAbroadFullDay, forKey: "legalAbroadFullDay") } }
+
     // MARK: - Profil
     @Published var profilName:       String { didSet { local.set(profilName,       forKey: "profilName") } }
     @Published var profilAdresse:    String { didSet { local.set(profilAdresse,    forKey: "profilAdresse") } }
@@ -99,6 +113,14 @@ class DataStore: ObservableObject {
         profilName        = local.string(forKey: "profilName")        ?? ""
         profilAdresse     = local.string(forKey: "profilAdresse")     ?? ""
         profilKennzeichen = local.string(forKey: "profilKennzeichen") ?? ""
+        // v1.18 – Gesetzlicher Modus
+        mealMode = MealMode(rawValue: local.string(forKey: "mealMode") ?? "") ?? .gesetzlich
+        legalInlandDay     = local.double(forKey: "legalInlandDay").ifZero(14.0)
+        legalInlandFullDay = local.double(forKey: "legalInlandFullDay").ifZero(28.0)
+        legalSwissDay      = local.double(forKey: "legalSwissDay").ifZero(47.0)
+        legalSwissFullDay  = local.double(forKey: "legalSwissFullDay").ifZero(70.0)
+        legalAbroadDay     = local.double(forKey: "legalAbroadDay").ifZeroAllowed(0)
+        legalAbroadFullDay = local.double(forKey: "legalAbroadFullDay").ifZeroAllowed(0)
 
         // SCHRITT 1: Migration einmalig ausführen (Standard → App Group)
         migrateFromStandardToAppGroup()
@@ -298,13 +320,78 @@ class DataStore: ObservableObject {
     }
 
     // MARK: - Meal Rates
-    // Schweiz-Sätze sind in CHF hinterlegt und werden hier in € umgerechnet, damit alle
-    // nachgelagerten Summen (Erstattung, Export) einheitlich in € rechnen können.
     func mealRates(for region: TravelRegion) -> MealRates {
         switch region {
         case .inland:  return MealRates(rate1to3: inlandMeal1to3,  rate3to6: inlandMeal3to6,  rate6plus: inlandMeal6plus)
         case .schweiz: return MealRates(rate1to3: swissMeal1to3 / eurChfRate, rate3to6: swissMeal3to6 / eurChfRate, rate6plus: swissMeal6plus / eurChfRate)
         case .ausland: return MealRates(rate1to3: abroadMeal1to3,  rate3to6: abroadMeal3to6,  rate6plus: abroadMeal6plus)
+        }
+    }
+
+    // MARK: - Gesetzlicher Modus (v1.18)
+
+    /// Gesetzliche Tagessätze in €: (dayRate, fullDayRate).
+    /// Schweiz-Sätze sind in CHF hinterlegt → Umrechnung via eurChfRate.
+    func legalRates(for region: TravelRegion, workedAtPlant: Bool = false) -> (day: Double, full: Double) {
+        switch region {
+        case .inland:  return (legalInlandDay, legalInlandFullDay)
+        case .schweiz: return (legalSwissDay / eurChfRate, legalSwissFullDay / eurChfRate)
+        case .ausland: return workedAtPlant
+            ? (legalSwissDay / eurChfRate, legalSwissFullDay / eurChfRate)
+            : (legalAbroadDay, legalAbroadFullDay)
+        }
+    }
+
+    /// Ermittelt die Tagesart automatisch aus den vorhandenen Hoteleinträgen.
+    func resolvedDayType(for meal: MealEntry) -> DayType {
+        guard meal.dayType == .automatisch else { return meal.dayType }
+        let cal = Calendar.current
+        let hasCheckIn  = hotels.contains { cal.isDate($0.date,         inSameDayAs: meal.date) }
+        let hasCheckOut = hotels.contains {
+            if let co = $0.checkOutDate { return cal.isDate(co, inSameDayAs: meal.date) }
+            // fallback: checkIn + numberOfNights
+            if let co = cal.date(byAdding: .day, value: $0.numberOfNights, to: $0.date) {
+                return cal.isDate(co, inSameDayAs: meal.date)
+            }
+            return false
+        }
+        switch (hasCheckIn, hasCheckOut) {
+        case (true, true):  return .vollerTag
+        case (true, false): return .anreisetag
+        case (false, true): return .abreisetag
+        default:            return .eintaegig
+        }
+    }
+
+    /// Einheitliche Erstattungsberechnung – wählt automatisch den richtigen Modus.
+    func effectiveAllowance(for meal: MealEntry) -> Double {
+        switch mealMode {
+        case .eigeneStufen:
+            return meal.allowance(rates: mealRates(for: meal.region))
+        case .gesetzlich:
+            let dt = resolvedDayType(for: meal)
+            let (dayR, fullR) = legalRates(for: meal.region, workedAtPlant: meal.workedAtPlant)
+            var result = meal.legalAllowance(resolvedDayType: dt, dayRate: dayR, fullDayRate: fullR)
+            // Hotel-Frühstück auto: Tag nach Übernachtung (nicht am Anreisetag)
+            if !meal.providedBreakfast && dt != .anreisetag {
+                let cal = Calendar.current
+                let hasHotelBreakfast = hotels.contains {
+                    guard $0.breakfastIncluded else { return false }
+                    let co = $0.checkOutDate ?? cal.date(byAdding: .day, value: $0.numberOfNights, to: $0.date)
+                    return co.map { cal.isDate($0, inSameDayAs: meal.date) } ?? false
+                }
+                if hasHotelBreakfast { result = max(0, result - fullR * 0.20) }
+            }
+            return result + meal.ownBreakfastAmount
+        }
+    }
+
+    func effectiveAllowanceLabel(for meal: MealEntry) -> String {
+        switch mealMode {
+        case .eigeneStufen:
+            return meal.allowanceLabel(rates: mealRates(for: meal.region))
+        case .gesetzlich:
+            return meal.legalAllowanceLabel(resolvedDayType: resolvedDayType(for: meal))
         }
     }
 
@@ -366,18 +453,7 @@ class DataStore: ObservableObject {
     var totalKmAmount:    Double { trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km * kmRate } }
     var totalKm:          Double { trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km } }
     /// Verpflegungspauschale für einen Eintrag unter Berücksichtigung des Hotel-Frühstücks (20 % Abzug)
-    func effectiveMealAllowance(for meal: MealEntry) -> Double {
-        let base = meal.allowance(rates: mealRates(for: meal.region))
-        let cal = Calendar.current
-        let hasHotelBreakfast = hotels.contains { h in
-            h.breakfastIncluded && cal.isDate(h.date, inSameDayAs: meal.date)
-        }
-        guard hasHotelBreakfast else { return base }
-        let deduction = meal.mealAllowance(rates: mealRates(for: meal.region)) * 0.2
-        return max(0, base - deduction)
-    }
-
-    var totalMeal:        Double { meals.reduce(0)           { $0 + effectiveMealAllowance(for: $1) } }
+    var totalMeal: Double { meals.reduce(0) { $0 + effectiveAllowance(for: $1) } }
     var totalHotel:       Double { hotels.reduce(0)          { $0 + $1.amount(flat: hotelFlat) } }
     var totalVehicle:     Double { vehicleCosts.reduce(0)    { $0 + $1.amount } }
     var totalReiseSpesen: Double { reiseSpesen.reduce(0)     { $0 + $1.amount } }
@@ -512,10 +588,15 @@ extension DataStore {
     func mealAllowanceForTripsOnly(_ dayTrips: [Trip]) -> Double {
         guard let refDate = dayTrips.first?.date else { return 0 }
         let cal = Calendar.current
-        // Alle Trips des Tages frisch aus dem Store – identisch zu adjustedMealAllowance
         let allDayTrips = trips.filter { cal.isDate($0.date, inSameDayAs: refDate) && $0.art == .geschaeftlich }
         let totalH = totalWorkHoursForTripsOnly(allDayTrips)
         guard totalH > 0 else { return 0 }
+
+        if mealMode == .gesetzlich {
+            let (dayR, _) = legalRates(for: .inland)
+            return totalH > 8 ? dayR : 0
+        }
+
         let rates = mealRates(for: .inland)
         let homeAddress = local.string(forKey: "homeAddress")
             ?? UserDefaults.standard.string(forKey: "homeAddress") ?? ""

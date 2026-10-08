@@ -33,6 +33,32 @@ struct Constants {
     static let wochenendzulageAusland: Double = 72.0
 }
 
+// MARK: - Verpflegungsmodus
+enum MealMode: String, Codable, CaseIterable {
+    case gesetzlich   = "Gesetzlich"
+    case eigeneStufen = "Eigene Stufen"
+    var localizedName: String { rawValue }
+}
+
+// MARK: - Tagesart (Mehrtägige Reise)
+enum DayType: String, Codable, CaseIterable {
+    case automatisch = "Automatisch"
+    case eintaegig   = "Eintägig"
+    case anreisetag  = "Anreisetag"
+    case abreisetag  = "Abreisetag"
+    case vollerTag   = "Voller Tag"
+    var localizedName: String { rawValue }
+    var shortLabel: String {
+        switch self {
+        case .automatisch: return "Auto"
+        case .eintaegig:   return "Eintägig"
+        case .anreisetag:  return "Anreisetag"
+        case .abreisetag:  return "Abreisetag"
+        case .vollerTag:   return "Voller Tag"
+        }
+    }
+}
+
 // MARK: - Reiseregion
 enum TravelRegion: String, Codable, CaseIterable {
     case inland   = "Inland"
@@ -188,30 +214,37 @@ struct MealEntry: Identifiable, Codable {
     var ownBreakfastAmount: Double = 0.0
     var pauseMinutes: Int = 0
     var excludeTrips: Bool = false
-    /// Am Werk (Heimatbetrieb) gearbeitet – auch bei Region Schweiz/Ausland gilt dann die Inlands-Zulage
     var workedAtPlant: Bool = false
-    /// Manuell markierter Feiertag (löst zusammen mit Sa/So die Wochenendzulage aus)
     var isHoliday: Bool = false
-    /// Weiterbildung/Schulung – schließt die Wochenend-/Feiertagszulage aus
     var isTraining: Bool = false
-    /// An einem Wochenend-/Feiertag nur unterwegs/nicht zuhause gewesen, aber nicht gearbeitet –
-    /// Verpflegungspauschale gilt trotzdem, aber KEINE Wochenendzulage (die ist an tatsächliche Arbeit gebunden)
     var weekendAwayOnly: Bool = false
+    // v1.18 – Gesetzlicher Modus
+    var dayType: DayType = .automatisch
+    var providedBreakfast: Bool = false
+    var providedLunch:     Bool = false
+    var providedDinner:    Bool = false
 
     enum CodingKeys: String, CodingKey {
-        case id, date, startTime, endTime, note, region, breakfastAmount, ownBreakfastAmount, pauseMinutes, excludeTrips, workedAtPlant, isHoliday, isTraining, weekendAwayOnly
+        case id, date, startTime, endTime, note, region, breakfastAmount, ownBreakfastAmount
+        case pauseMinutes, excludeTrips, workedAtPlant, isHoliday, isTraining, weekendAwayOnly
+        case dayType, providedBreakfast, providedLunch, providedDinner
     }
     init(id: UUID = UUID(), date: Date, startTime: Date, endTime: Date, note: String,
          region: TravelRegion = .inland, breakfastAmount: Double = 0.0,
          ownBreakfastAmount: Double = 0.0, pauseMinutes: Int = 0, excludeTrips: Bool = false,
          workedAtPlant: Bool = false, isHoliday: Bool = false, isTraining: Bool = false,
-         weekendAwayOnly: Bool = false) {
+         weekendAwayOnly: Bool = false,
+         dayType: DayType = .automatisch,
+         providedBreakfast: Bool = false, providedLunch: Bool = false, providedDinner: Bool = false) {
         self.id = id; self.date = date; self.startTime = startTime; self.endTime = endTime
         self.note = note; self.region = region; self.breakfastAmount = breakfastAmount
         self.ownBreakfastAmount = ownBreakfastAmount; self.pauseMinutes = pauseMinutes
         self.excludeTrips = excludeTrips; self.workedAtPlant = workedAtPlant
         self.isHoliday = isHoliday; self.isTraining = isTraining
         self.weekendAwayOnly = weekendAwayOnly
+        self.dayType = dayType
+        self.providedBreakfast = providedBreakfast; self.providedLunch = providedLunch
+        self.providedDinner = providedDinner
     }
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -229,10 +262,27 @@ struct MealEntry: Identifiable, Codable {
         isHoliday = try c.decodeIfPresent(Bool.self, forKey: .isHoliday) ?? false
         isTraining = try c.decodeIfPresent(Bool.self, forKey: .isTraining) ?? false
         weekendAwayOnly = try c.decodeIfPresent(Bool.self, forKey: .weekendAwayOnly) ?? false
+        dayType = try c.decodeIfPresent(DayType.self, forKey: .dayType) ?? .automatisch
+        providedBreakfast = try c.decodeIfPresent(Bool.self, forKey: .providedBreakfast) ?? false
+        providedLunch     = try c.decodeIfPresent(Bool.self, forKey: .providedLunch)     ?? false
+        providedDinner    = try c.decodeIfPresent(Bool.self, forKey: .providedDinner)    ?? false
     }
-    var hours: Double { max(0, endTime.timeIntervalSince(startTime) / 3600 - Double(pauseMinutes) / 60) }
-    /// Bei "Wochenende" (unterwegs/nicht zuhause, nicht gearbeitet) gilt immer die volle
-    /// Tagespauschale (ab 6 Std.), unabhängig von der (ausgeblendeten) Arbeitszeit.
+
+    // Stunden ohne Pausenabzug (gesetzlicher Modus: Pausen zählen zur Abwesenheit)
+    var rawHours: Double {
+        var h = endTime.timeIntervalSince(startTime) / 3600
+        if h < 0 { h += 24 } // Nachtschicht (z.B. 22:00–06:00)
+        return max(0, h)
+    }
+    // Stunden mit Pausenabzug (eigene Stufen)
+    var hours: Double {
+        var h = endTime.timeIntervalSince(startTime) / 3600
+        if h < 0 { h += 24 }
+        return max(0, h - Double(pauseMinutes) / 60)
+    }
+    var isNightShift: Bool { endTime.timeIntervalSince(startTime) / 3600 < 0 }
+
+    // Eigene-Stufen-Berechnung (unverändert)
     func mealAllowance(rates: MealRates) -> Double {
         if weekendAwayOnly { return rates.rate6plus }
         switch hours { case ..<3: return rates.rate1to3; case ..<6: return rates.rate3to6; default: return rates.rate6plus }
@@ -241,6 +291,34 @@ struct MealEntry: Identifiable, Codable {
     func allowanceLabel(rates: MealRates) -> String {
         if weekendAwayOnly { return L("meals.level.3") }
         switch hours { case ..<3: return L("meals.level.none"); case ..<6: return L("meals.level.2"); default: return L("meals.level.3") }
+    }
+
+    // Gesetzliche Berechnung nach § 9 Abs. 4a EStG
+    func legalAllowance(resolvedDayType: DayType, dayRate: Double, fullDayRate: Double) -> Double {
+        let base: Double
+        if weekendAwayOnly {
+            base = fullDayRate
+        } else {
+            switch resolvedDayType {
+            case .anreisetag, .abreisetag: base = dayRate
+            case .vollerTag:               base = fullDayRate
+            case .eintaegig, .automatisch: base = rawHours > 8 ? dayRate : 0
+            }
+        }
+        let deduction = (providedBreakfast ? fullDayRate * 0.20 : 0)
+                      + (providedLunch     ? fullDayRate * 0.40 : 0)
+                      + (providedDinner    ? fullDayRate * 0.40 : 0)
+        return max(0, base - deduction)
+    }
+    func legalAllowanceLabel(resolvedDayType: DayType) -> String {
+        if weekendAwayOnly { return "Voller Tag" }
+        switch resolvedDayType {
+        case .anreisetag:  return "Anreisetag"
+        case .abreisetag:  return "Abreisetag"
+        case .vollerTag:   return "Voller Tag"
+        case .eintaegig, .automatisch:
+            return rawHours > 8 ? "ab 8 h" : "bis 8 h"
+        }
     }
 }
 

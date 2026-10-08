@@ -46,7 +46,7 @@ struct VerpflegungView: View {
     }
 
     private var filteredTotal: Double {
-        filteredMeals.reduce(0) { $0 + $1.allowance(rates: store.mealRates(for: $1.region)) }
+        filteredMeals.reduce(0) { $0 + store.effectiveAllowance(for: $1) }
     }
 
     private var filterLabel: String {
@@ -285,13 +285,7 @@ struct MealRow: View {
 
     private var monteurszulage: Double { store.monteurszulage(for: meal) }
     private var wochenendzulage: Double { store.wochenendzulage(for: meal) }
-    private var allowance: Double { store.effectiveMealAllowance(for: meal) }
-    private var hotelBreakfastDeduction: Double {
-        let base = meal.mealAllowance(rates: rates)
-        let eff  = store.effectiveMealAllowance(for: meal)
-        let raw  = meal.allowance(rates: rates)
-        return eff < raw ? base * 0.2 : 0
-    }
+    private var allowance: Double { store.effectiveAllowance(for: meal) }
 
     var body: some View {
         HStack(spacing: 14) {
@@ -329,17 +323,8 @@ struct MealRow: View {
                     .font(.system(size: 15, weight: .regular, design: .monospaced))
                     .foregroundColor(allowanceColor)
                 HStack(spacing: 4) {
-                    if meal.breakfastAmount > 0 {
-                        Text("Verpfl. Dritte −\(meal.breakfastAmount.euroFormatted)")
-                            .font(.system(size: 9, weight: .regular))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 5)
-                            .padding(.vertical, 2)
-                            .background(Color.red.opacity(0.75))
-                            .clipShape(Capsule())
-                    }
-                    if hotelBreakfastDeduction > 0 {
-                        Text("☕ Hotel −\(hotelBreakfastDeduction.euroFormatted)")
+                    if meal.breakfastAmount > 0 || meal.providedBreakfast || meal.providedLunch || meal.providedDinner {
+                        Text("Kürzung")
                             .font(.system(size: 9, weight: .regular))
                             .foregroundColor(.white)
                             .padding(.horizontal, 5)
@@ -388,12 +373,7 @@ struct MealRow: View {
     }
 
     private var allowanceColor: Color {
-        switch meal.hours {
-        case ..<1:  return Color(.systemGray2)
-        case ..<3:  return .iosOrange.opacity(0.7)
-        case ..<6:  return .iosOrange
-        default:    return .iosGreen
-        }
+        allowance == 0 ? Color(.systemGray2) : .iosGreen
     }
 
     private var regionColor: Color {
@@ -405,12 +385,7 @@ struct MealRow: View {
     }
 
     private var stufeBadge: String {
-        switch meal.hours {
-        case ..<1:  return "Keine"
-        case ..<3:  return "1–3 h"
-        case ..<6:  return "3–6 h"
-        default:    return "ab 6 h"
-        }
+        store.effectiveAllowanceLabel(for: meal)
     }
 }
 
@@ -440,9 +415,14 @@ struct MealFormView: View {
     @State private var pauseMinutes: Int = 0
     @State private var includeTodaysTrips: Bool = true
     @State private var workedAtPlant: Bool = false  // Am Werk (Heimatbetrieb) gearbeitet
-    @State private var isHoliday: Bool = false       // Feiertag (löst mit Sa/So die Wochenendzulage aus)
-    @State private var isTraining: Bool = false      // Weiterbildung/Schulung (schließt Wochenendzulage aus)
-    @State private var weekendReason: WeekendReason = .none // Schutz gegen versehentliche Wochenend-Einträge
+    @State private var isHoliday: Bool = false
+    @State private var isTraining: Bool = false
+    @State private var weekendReason: WeekendReason = .none
+    // v1.18 – Gesetzlicher Modus
+    @State private var dayType: DayType = .automatisch
+    @State private var providedBreakfast: Bool = false
+    @State private var providedLunch:     Bool = false
+    @State private var providedDinner:    Bool = false
 
     private var isEdit: Bool { if case .edit = mode { return true }; return false }
     private var editingMeal: MealEntry? { if case .edit(let m) = mode { return m }; return nil }
@@ -464,10 +444,12 @@ struct MealFormView: View {
                   pauseMinutes: pauseMinutes,
                   excludeTrips: !includeTodaysTrips,
                   workedAtPlant: workedAtPlant, isHoliday: isHoliday, isTraining: isTraining,
-                  weekendAwayOnly: weekendReason == .awayOnly)
+                  weekendAwayOnly: weekendReason == .awayOnly,
+                  dayType: dayType,
+                  providedBreakfast: providedBreakfast, providedLunch: providedLunch, providedDinner: providedDinner)
     }
-    private var currentAllowance: Double { currentMeal.allowance(rates: rates) }
-    private var currentLabel: String { currentMeal.allowanceLabel(rates: rates) }
+    private var currentAllowance: Double { store.effectiveAllowance(for: currentMeal) }
+    private var currentLabel: String { store.effectiveAllowanceLabel(for: currentMeal) }
     private var currentMonteurszulage: Double { store.monteurszulage(for: currentMeal) }
     private var currentWochenendzulage: Double { store.wochenendzulage(for: currentMeal) }
     private var isWeekend: Bool {
@@ -583,6 +565,12 @@ struct MealFormView: View {
                     if weekendReason != .awayOnly {
                         DatePicker(lm.t("meals.begin"),  selection: $startTime, displayedComponents: .hourAndMinute)
                         DatePicker(lm.t("meals.end"),    selection: $endTime,   displayedComponents: .hourAndMinute)
+                        if anchoredToFormDate(endTime) < anchoredToFormDate(startTime) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "moon.stars.fill").foregroundColor(.purple).font(.caption)
+                                Text("Ende am Folgetag").font(.caption).foregroundColor(.purple)
+                            }
+                        }
                         HStack {
                             Label("Pause (Minuten)", systemImage: "pause.circle.fill")
                                 .foregroundColor(.orange)
@@ -645,39 +633,111 @@ struct MealFormView: View {
                     }
                 }
 
-                // ── Frühstück ──
-                Section {
-                    Toggle(isOn: $breakfastChecked) {
-                        HStack(spacing: 8) {
-                            Label("Verpflegung von Dritten bezahlt", systemImage: "cup.and.saucer.fill")
-                            if breakfastChecked {
-                                Text("−\(store.breakfastFlat.euroFormatted)")
-                                    .font(.caption)
-                                    .foregroundColor(.red)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(Color.red.opacity(0.12))
-                                    .clipShape(Capsule())
+                // ── Gestellte Mahlzeiten (Gesetzlich) ──
+                if store.mealMode == .gesetzlich {
+                    Section {
+                        // Tagesart
+                        Picker("Reisetag", selection: $dayType) {
+                            ForEach(DayType.allCases, id: \.self) { dt in
+                                Text(dt.localizedName).tag(dt)
                             }
                         }
-                    }
-                    .tint(.red)
+                        .pickerStyle(.menu)
 
-                    HStack {
-                        Label("Eigenes Frühstück", systemImage: "sunrise.fill")
-                            .foregroundColor(.orange)
-                        Spacer()
-                        TextField("0,00", text: $ownBreakfastStr)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 80)
-                        Text("€").foregroundColor(.secondary)
+                        // Gestellte Mahlzeiten
+                        let (_, fullR) = store.legalRates(for: region)
+                        Toggle(isOn: $providedBreakfast) {
+                            HStack {
+                                Label("Frühstück gestellt", systemImage: "cup.and.saucer.fill")
+                                Spacer()
+                                if providedBreakfast {
+                                    Text("−\(String(format: "%.2f", fullR * 0.20).replacingOccurrences(of: ".", with: ",")) €")
+                                        .font(.caption).foregroundColor(.red)
+                                }
+                            }
+                        }.tint(.red)
+                        Toggle(isOn: $providedLunch) {
+                            HStack {
+                                Label("Mittagessen gestellt", systemImage: "fork.knife")
+                                Spacer()
+                                if providedLunch {
+                                    Text("−\(String(format: "%.2f", fullR * 0.40).replacingOccurrences(of: ".", with: ",")) €")
+                                        .font(.caption).foregroundColor(.red)
+                                }
+                            }
+                        }.tint(.red)
+                        Toggle(isOn: $providedDinner) {
+                            HStack {
+                                Label("Abendessen gestellt", systemImage: "moon.stars.fill")
+                                Spacer()
+                                if providedDinner {
+                                    Text("−\(String(format: "%.2f", fullR * 0.40).replacingOccurrences(of: ".", with: ",")) €")
+                                        .font(.caption).foregroundColor(.red)
+                                }
+                            }
+                        }.tint(.red)
+                    } header: {
+                        Text("Mehrtägige Reise & Mahlzeiten")
+                    } footer: {
+                        Text("Kürzungen berechnen sich immer auf Basis des vollen 24-Stunden-Satzes (\(String(format: "%.0f €", fullR))). Frühstück = 20 %, Mittag/Abend je 40 %.")
+                            .font(.caption)
                     }
-                } header: {
-                    Text("Frühstück")
-                } footer: {
-                    Text("Verpflegung von Dritten: Pauschale (\(store.breakfastFlat.euroFormatted)) wird abgezogen. Eigenes Frühstück: selbst bezahlter Betrag wird zur Erstattung addiert.")
-                        .font(.caption)
+                }
+
+                // ── Frühstück (Eigene Stufen) ──
+                if store.mealMode == .eigeneStufen {
+                    Section {
+                        Toggle(isOn: $breakfastChecked) {
+                            HStack(spacing: 8) {
+                                Label("Verpflegung von Dritten bezahlt", systemImage: "cup.and.saucer.fill")
+                                if breakfastChecked {
+                                    Text("−\(store.breakfastFlat.euroFormatted)")
+                                        .font(.caption)
+                                        .foregroundColor(.red)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color.red.opacity(0.12))
+                                        .clipShape(Capsule())
+                                }
+                            }
+                        }
+                        .tint(.red)
+
+                        HStack {
+                            Label("Eigenes Frühstück", systemImage: "sunrise.fill")
+                                .foregroundColor(.orange)
+                            Spacer()
+                            TextField("0,00", text: $ownBreakfastStr)
+                                .keyboardType(.decimalPad)
+                                .multilineTextAlignment(.trailing)
+                                .frame(width: 80)
+                            Text("€").foregroundColor(.secondary)
+                        }
+                    } header: {
+                        Text("Frühstück")
+                    } footer: {
+                        Text("Verpflegung von Dritten: Pauschale (\(store.breakfastFlat.euroFormatted)) wird abgezogen. Eigenes Frühstück: selbst bezahlter Betrag wird zur Erstattung addiert.")
+                            .font(.caption)
+                    }
+                }
+
+                // ── Eigenes Frühstück (immer im Gesetzlich-Modus) ──
+                if store.mealMode == .gesetzlich {
+                    Section {
+                        HStack {
+                            Label("Eigenes Frühstück", systemImage: "sunrise.fill")
+                                .foregroundColor(.orange)
+                            Spacer()
+                            TextField("0,00", text: $ownBreakfastStr)
+                                .keyboardType(.decimalPad)
+                                .multilineTextAlignment(.trailing)
+                                .frame(width: 80)
+                            Text("€").foregroundColor(.secondary)
+                        }
+                    } footer: {
+                        Text("Selbst bezahltes Frühstück wird zur Erstattung addiert.")
+                            .font(.caption)
+                    }
                 }
 
                 // ── Ergebnis ──
@@ -745,60 +805,21 @@ struct MealFormView: View {
                         pauseMinutes: pauseMinutes,
                         excludeTrips: !includeTodaysTrips,
                         workedAtPlant: workedAtPlant,
-                        weekendAwayOnly: weekendReason == .awayOnly
+                        weekendAwayOnly: weekendReason == .awayOnly,
+                        dayType: dayType,
+                        providedBreakfast: providedBreakfast, providedLunch: providedLunch, providedDinner: providedDinner
                     )
-                    let effectiveAllowance = effectiveMeal.allowance(rates: rates)
+                    let effectiveAmt = store.effectiveAllowance(for: effectiveMeal)
+                    let effectiveLabel = store.effectiveAllowanceLabel(for: effectiveMeal)
                     LabeledRow(label: lm.t("meals.level"),
-                               value: effectiveMeal.allowanceLabel(rates: rates),
+                               value: effectiveLabel,
                                valueColor: progressColor)
-
-                    // Verpflegungspauschale
-                    HStack {
-                        Text("Verpflegungspauschale").foregroundColor(.secondary)
-                        Spacer()
-                        Text(effectiveMeal.mealAllowance(rates: rates).euroFormatted)
-                            .font(.system(size: 15, weight: .regular, design: .monospaced))
-                            .foregroundColor(.secondary)
-                    }
-
-                    // Verpflegung von Dritten (nur anzeigen wenn Häkchen gesetzt)
-                    if breakfastChecked && store.breakfastFlat > 0 {
-                        HStack {
-                            Label("Verpflegung von Dritten", systemImage: "cup.and.saucer.fill")
-                                .foregroundColor(.red)
-                            Spacer()
-                            Text("−\(store.breakfastFlat.euroFormatted)")
-                                .font(.system(size: 15, weight: .regular, design: .monospaced))
-                                .foregroundColor(.red)
-                        }
-                    }
-
-                    // Eigenes Frühstück (nur anzeigen wenn Betrag > 0)
-                    if ownBreakfastAmt > 0 {
-                        HStack {
-                            Label("Eigenes Frühstück", systemImage: "sunrise.fill")
-                                .foregroundColor(.orange)
-                            Spacer()
-                            Text("+\(ownBreakfastAmt.euroFormatted)")
-                                .font(.system(size: 15, weight: .regular, design: .monospaced))
-                                .foregroundColor(.orange)
-                        }
-                    }
-
-                    // Netto Verpflegung
-                    HStack {
-                        Text("Netto Verpflegung").foregroundColor(.secondary)
-                        Spacer()
-                        Text(effectiveAllowance.euroFormatted)
-                            .font(.system(size: 15, weight: .regular, design: .monospaced))
-                            .foregroundColor(.secondary)
-                    }
 
                     // Gesamt
                     HStack {
                         Text(lm.t("meals.allowance")).fontWeight(.regular)
                         Spacer()
-                        Text(effectiveAllowance.euroFormatted)
+                        Text(effectiveAmt.euroFormatted)
                             .font(.system(size: 18, weight: .regular, design: .monospaced))
                             .foregroundColor(.iosGreen)
                     }
@@ -839,16 +860,23 @@ struct MealFormView: View {
                 // ── Info-Tabelle ──
                 Section {
                     VStack(alignment: .leading, spacing: 4) {
-                        stufenRow("< 1 h",   "0,00 €")
-                        stufenRow("1 – 3 h", rates.rate1to3.euroFormatted)
-                        stufenRow("3 – 6 h", rates.rate3to6.euroFormatted)
-                        stufenRow("ab 6 h",  rates.rate6plus.euroFormatted)
+                        if store.mealMode == .gesetzlich {
+                            let (dayR, fullR) = store.legalRates(for: region)
+                            stufenRow("bis 8 h (eintägig)", "0,00 €")
+                            stufenRow("ab 8 h / An- & Abreisetag", String(format: "%.2f €", dayR).replacingOccurrences(of: ".", with: ","))
+                            stufenRow("voller Tag (24 h)", String(format: "%.2f €", fullR).replacingOccurrences(of: ".", with: ","))
+                        } else {
+                            stufenRow("< 1 h",   "0,00 €")
+                            stufenRow("1 – 3 h", rates.rate1to3.euroFormatted)
+                            stufenRow("3 – 6 h", rates.rate3to6.euroFormatted)
+                            stufenRow("ab 6 h",  rates.rate6plus.euroFormatted)
+                        }
                     }
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .padding(.vertical, 4)
                 } header: {
-                    Text("\(lm.t("meals.allowance")) (\(region.localizedName))")
+                    Text("\(lm.t("meals.allowance")) (\(region.localizedName)) · \(store.mealMode.localizedName)")
                 }
             }
             .navigationTitle(isEdit ? lm.t("meals.form.edit") : lm.t("meals.form.new"))
@@ -897,6 +925,10 @@ struct MealFormView: View {
             isTraining          = m.isTraining
             // bestehender Eintrag: keine erneute Bestätigung nötig – Grund aus dem Eintrag übernehmen
             weekendReason       = m.weekendAwayOnly ? .awayOnly : .worked
+            dayType             = m.dayType
+            providedBreakfast   = m.providedBreakfast
+            providedLunch       = m.providedLunch
+            providedDinner      = m.providedDinner
             if m.ownBreakfastAmount > 0 {
                 ownBreakfastStr = String(format: "%.2f", m.ownBreakfastAmount).replacingOccurrences(of: ".", with: ",")
             }
@@ -934,7 +966,9 @@ struct MealFormView: View {
                              pauseMinutes: pauseMinutes,
                              excludeTrips: !includeTodaysTrips,
                              workedAtPlant: workedAtPlant, isHoliday: isHoliday, isTraining: isTraining,
-                             weekendAwayOnly: weekendReason == .awayOnly)
+                             weekendAwayOnly: weekendReason == .awayOnly,
+                             dayType: dayType,
+                             providedBreakfast: providedBreakfast, providedLunch: providedLunch, providedDinner: providedDinner)
         if isEdit {
             store.updateMeal(meal)
             AppLogger.shared.log("Verpflegung aktualisiert: \(meal.date.shortDate), \(meal.startTime.timeOnly)–\(meal.endTime.timeOnly)", level: .store)
