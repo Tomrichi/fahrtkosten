@@ -142,9 +142,10 @@ struct FahrtenView: View {
     @EnvironmentObject var settingsCtrl: SettingsController
     @EnvironmentObject var proMgr: ProManager
 
-    @State private var showAdd           = false
+    @State private var showAdd                  = false
     @State private var editTrip: Trip?
-    @State private var showGPSSheet      = false
+    @State private var showGPSSheet             = false
+    @State private var showRecurringManager     = false
     @State private var showProUpgrade    = false
     @State private var showGPSMacAlert   = false
     private var isRunningOnMac: Bool { ProcessInfo.processInfo.isiOSAppOnMac || ProcessInfo.processInfo.isMacCatalystApp }
@@ -479,6 +480,13 @@ struct FahrtenView: View {
                         }
                         Divider()
                         Button {
+                            AppLogger.shared.logTap("Wiederkehrende Fahrten (Menü)")
+                            showRecurringManager = true
+                        } label: {
+                            Label("Wiederkehrende Fahrten", systemImage: "repeat.circle")
+                        }
+                        Divider()
+                        Button {
                             AppLogger.shared.logTap("Einstellungen (Menü)")
                             settingsCtrl.showSettings = true
                         } label: {
@@ -498,6 +506,12 @@ struct FahrtenView: View {
             // Bearbeiten
             .sheet(item: $editTrip) { trip in
                 TripFormView(mode: .edit(trip))
+            }
+            // Wiederkehrende Fahrten
+            .sheet(isPresented: $showRecurringManager) {
+                RecurringTripManagerView()
+                    .environmentObject(store)
+                    .environmentObject(lm)
             }
             // Pro-Upgrade Sheet
             .sheet(isPresented: $showProUpgrade) {
