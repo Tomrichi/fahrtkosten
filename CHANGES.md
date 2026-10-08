@@ -2,6 +2,16 @@
 
 ---
 
+## Version 1.17.43 Build 75 (Oktober 2026)
+
+- **Neu: Verpflegungspauschalen nach Steuerrecht (§ 9 Abs. 4a EStG)** – Neuer Modus „Gesetzlich" ergänzt den bisherigen Modus „Eigene Stufen". Inland 14 €/28 €, Schweiz 47/70 CHF, Ausland nach BMF-Tabelle.
+- **Neu: Tagtypen** – Eintägig, Anreisetag, Abreisetag und Voller Tag (oder Automatisch nach Stunden). Hotel-Buchungen erkennen An-/Abreisetage automatisch.
+- **Neu: Gestellte Mahlzeiten** – Frühstück (−20 %), Mittag und Abend (je −40 %) werden vom Tagessatz abgezogen.
+- **Neu: Länderpicker Ausland** – 20 europäische Länder aus der BMF-Tabelle 2026 direkt im Formular und in den Einstellungen wählbar. Tages- und Volltag-Satz werden automatisch eingetragen. Nicht gelistete Länder → Luxemburg-Fallback (31 €/47 €).
+- **Verbesserung: Nachtschicht** – Arbeitszeit über Mitternacht wird korrekt berechnet.
+
+---
+
 ## Version 1.17.43 (7. Oktober 2026)
 
 - **Neu: GPS-Pause** – Während der GPS-Aufzeichnung lässt sich die Fahrt jetzt manuell pausieren und fortsetzen – direkt über den neuen Pause-Button in der Aufzeichnungs-Ansicht. Die automatische Pause bei längerem Stillstand bleibt weiterhin aktiv.

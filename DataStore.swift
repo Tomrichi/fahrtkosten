@@ -634,6 +634,7 @@ extension DataStore {
     }
 
     func adjustedMealAllowance(for meal: MealEntry) -> Double {
+        if mealMode == .gesetzlich { return effectiveAllowance(for: meal) }
         let totalH = totalWorkHours(for: meal)
         let rates = mealRates(for: meal.region)
 
