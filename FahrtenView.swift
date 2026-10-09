@@ -1155,6 +1155,8 @@ struct TripFormView: View {
     @State private var showFuelSheet     = false
     @State private var showLocationConfirm   = false
     @State private var showRecurringManager = false
+    @State private var editingFavorite: FavoriteTrip?
+    @State private var favoriteJustSaved = false
     @AppStorage("homeAddress")            private var homeAddress: String = ""
     @AppStorage("defaultFuelType")       private var defaultFuelTypeKey: String = "e10"
     @AppStorage("defaultFuelPrice.e5")      private var defaultPriceE5: String = ""
@@ -1254,12 +1256,12 @@ struct TripFormView: View {
 
                 // ── Favoriten ──
                 if !isEdit && !isGPS && !store.favorites.isEmpty {
-                    Section("Favoriten") {
+                    Section {
                         ForEach(store.favorites) { fav in
                             Button {
                                 from     = fav.from
                                 to       = fav.to
-                                kmString = String(Int(fav.km.rounded()))
+                                kmString = fav.km.kmInputString
                             } label: {
                                 HStack(spacing: 8) {
                                     Image(systemName: "star.fill")
@@ -1273,7 +1275,7 @@ struct TripFormView: View {
                                     Text(fav.to)
                                         .lineLimit(1)
                                     Spacer()
-                                    Text(fav.km.kmFormatted)
+                                    Text(fav.km.kmInputString + " km")
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                 }
@@ -1286,7 +1288,31 @@ struct TripFormView: View {
                                     Label("Entfernen", systemImage: "star.slash")
                                 }
                             }
+                            .swipeActions(edge: .leading) {
+                                Button {
+                                    editingFavorite = fav
+                                } label: {
+                                    Label("Bearbeiten", systemImage: "pencil")
+                                }
+                                .tint(.blue)
+                            }
+                            .contextMenu {
+                                Button {
+                                    editingFavorite = fav
+                                } label: {
+                                    Label("Bearbeiten", systemImage: "pencil")
+                                }
+                                Button(role: .destructive) {
+                                    store.deleteFavorite(fav.id)
+                                } label: {
+                                    Label("Entfernen", systemImage: "star.slash")
+                                }
+                            }
                         }
+                    } header: {
+                        Text("Favoriten")
+                    } footer: {
+                        Text("Nach rechts wischen oder lange drücken zum Bearbeiten, nach links wischen zum Entfernen.")
                     }
                 }
 
@@ -1431,6 +1457,24 @@ struct TripFormView: View {
                     DatePicker("Ankunft", selection: $fahrzeitEnd, displayedComponents: .hourAndMinute)
                         .foregroundColor(.purple)
                         .onChange(of: fahrzeitEnd) { _, _ in updateFahrzeitFromPicker() }
+                }
+
+                // ── Als Favorit speichern ──
+                if !isEdit && !isGPS {
+                    Section {
+                        Button {
+                            store.addFavorite(from: from, to: to, km: (kmValue * 10).rounded() / 10)
+                            favoriteJustSaved = true
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { favoriteJustSaved = false }
+                        } label: {
+                            Label(favoriteJustSaved ? "Als Favorit gespeichert" : "Als Favorit speichern",
+                                  systemImage: favoriteJustSaved ? "checkmark.circle.fill" : "star")
+                                .foregroundColor(favoriteJustSaved ? Color.green : nil)
+                        }
+                        .disabled(from.trimmingCharacters(in: .whitespaces).isEmpty
+                                  || to.trimmingCharacters(in: .whitespaces).isEmpty)
+                    }
                 }
 
                 // ── Maps-Integration (nur wenn NICHT GPS-Modus) ──
@@ -1650,6 +1694,10 @@ struct TripFormView: View {
                 RecurringTripManagerView()
                     .environmentObject(store)
                     .environmentObject(lm)
+            }
+            .sheet(item: $editingFavorite) { fav in
+                FavoriteEditSheet(favorite: fav)
+                    .environmentObject(store)
             }
             .onAppear { prefill() }
             .task {
@@ -2245,5 +2293,75 @@ struct LiveMapCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .shadow(color: .black.opacity(0.07), radius: 8, x: 0, y: 3)
         .padding(.horizontal, 20)
+    }
+}
+
+
+// MARK: - Favorit bearbeiten
+struct FavoriteEditSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var store: DataStore
+    let favorite: FavoriteTrip
+
+    @State private var from: String
+    @State private var to: String
+    @State private var kmString: String
+
+    init(favorite: FavoriteTrip) {
+        self.favorite = favorite
+        _from     = State(initialValue: favorite.from)
+        _to       = State(initialValue: favorite.to)
+        _kmString = State(initialValue: favorite.km.kmInputString)
+    }
+
+    private var kmValue: Double { (parseCurrency(kmString) * 10).rounded() / 10 }
+    private var isValid: Bool {
+        !from.trimmingCharacters(in: .whitespaces).isEmpty
+            && !to.trimmingCharacters(in: .whitespaces).isEmpty
+            && kmValue > 0
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    HStack {
+                        Label("Von", systemImage: "location.fill").foregroundColor(.green)
+                        TextField("Start", text: $from).multilineTextAlignment(.trailing)
+                    }
+                    HStack {
+                        Label("Nach", systemImage: "flag.fill").foregroundColor(.blue)
+                        TextField("Ziel", text: $to).multilineTextAlignment(.trailing)
+                    }
+                    HStack {
+                        Label("Kilometer", systemImage: "road.lanes")
+                        Spacer()
+                        TextField("0,0", text: $kmString)
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: 80)
+                    }
+                }
+            }
+            .navigationTitle("Favorit bearbeiten")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Abbrechen") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Sichern") {
+                        var updated = favorite
+                        updated.from = from.trimmingCharacters(in: .whitespaces)
+                        updated.to   = to.trimmingCharacters(in: .whitespaces)
+                        updated.km   = kmValue
+                        store.updateFavorite(updated)
+                        dismiss()
+                    }
+                    .disabled(!isValid)
+                }
+            }
+        }
+        .presentationDetents([.medium])
     }
 }

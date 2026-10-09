@@ -516,6 +516,24 @@ class DataStore: ObservableObject {
         favorites.append(FavoriteTrip(from: trip.from, to: trip.to, km: trip.km))
         AppLogger.shared.logData("Favorit gespeichert: \(trip.from) → \(trip.to)")
     }
+    /// Legt einen Favoriten direkt aus dem Formular an. Existiert bereits einer mit
+    /// gleichem Von/Nach, wird nur dessen Kilometerwert aktualisiert.
+    func addFavorite(from: String, to: String, km: Double) {
+        let f = from.trimmingCharacters(in: .whitespaces)
+        let t = to.trimmingCharacters(in: .whitespaces)
+        guard !f.isEmpty, !t.isEmpty else { return }
+        if let i = favorites.firstIndex(where: { $0.from == f && $0.to == t }) {
+            favorites[i].km = km
+        } else {
+            favorites.append(FavoriteTrip(from: f, to: t, km: km))
+        }
+        AppLogger.shared.logData("Favorit gespeichert: \(f) → \(t)")
+    }
+    func updateFavorite(_ fav: FavoriteTrip) {
+        guard let i = favorites.firstIndex(where: { $0.id == fav.id }) else { return }
+        favorites[i] = fav
+        AppLogger.shared.logData("Favorit bearbeitet: \(fav.from) → \(fav.to)")
+    }
     func deleteFavorite(_ id: UUID) {
         favorites.removeAll { $0.id == id }
         AppLogger.shared.logData("Favorit gelöscht")

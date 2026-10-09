@@ -86,6 +86,16 @@ func withOptionalAnimation<R>(_ animation: Animation? = .default, _ body: () thr
     }
 }
 
+// MARK: - Kilometer-Eingabe (max. 1 Nachkommastelle, Komma)
+extension Double {
+    /// z. B. 45.5 → "45,5", 46.0 → "46"
+    var kmInputString: String {
+        let r = (self * 10).rounded() / 10
+        if r == r.rounded() { return String(Int(r)) }
+        return String(format: "%.1f", r).replacingOccurrences(of: ".", with: ",")
+    }
+}
+
 // MARK: - Currency input helper
 func parseCurrency(_ s: String) -> Double {
     let clean = s.replacingOccurrences(of: ",", with: ".").filter { $0.isNumber || $0 == "." }
