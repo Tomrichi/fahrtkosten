@@ -9,6 +9,7 @@
 - **Verbesserung: Favoriten** – Wird dieselbe Strecke erneut als Favorit gespeichert, aktualisiert die App nur den Kilometerwert, statt einen zweiten Favoriten anzulegen.
 - **Fehlerbehebung: iCloud-Abgleich (Pro)** – Gelöschte Fahrten, Mahlzeiten/Arbeitszeiten, Übernachtungen, Fahrzeugkosten, Reisespesen und private Ausgaben kamen nach dem Abgleich mit einem anderen Gerät wieder zurück, und Änderungen an einem Eintrag (z. B. korrigierte Kilometer) kamen dort nicht an. Beides ist behoben: Löschungen und Änderungen gelten jetzt auf allen Geräten. Favoriten und Wiederkehrende Fahrten werden zusätzlich laufend abgeglichen (bisher nur einmalig hochgeladen); dieselbe Strecke auf mehreren Geräten wird zu einem Favoriten zusammengeführt. Beim Wiederherstellen eines Backups erhalten früher gelöschte Einträge neue IDs, damit sie erhalten bleiben.
 - **Verbesserung: Backup** – Favoriten und Wiederkehrende Fahrten sind jetzt im Backup enthalten und werden beim Wiederherstellen zurückgespielt. Die Android-App übernimmt die Favoriten aus einem iPhone-Backup.
+- **Neu: Android-Backup einspielen** – Eine Sicherung aus der Android-App lässt sich jetzt auch auf dem iPhone wiederherstellen (Gerätewechsel). Fahrten, Mahlzeiten, Übernachtungen, Kosten, Favoriten, Wiederkehrende Fahrten und Einstellungen werden übernommen.
 
 ---
 

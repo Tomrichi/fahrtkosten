@@ -11,6 +11,7 @@ Live ist 1.17.42, Build 78 von 1.17.43 ist in Prüfung. Der „Was ist neu“-Te
 • Neu: Wiederkehrende Fahrten sind direkt im ⋯-Menü der Fahrtenliste erreichbar
 • Verbesserung: iCloud-Abgleich (Pro) – Löschungen und Änderungen an Fahrten, Arbeitszeiten, Übernachtungen, Kosten, Favoriten und Wiederkehrenden Fahrten erscheinen jetzt auf allen deinen Geräten. Bitte auf allen Geräten aktualisieren, damit der Abgleich korrekt arbeitet
 • Verbesserung: Das Backup enthält jetzt auch Favoriten und Wiederkehrende Fahrten
+• Neu: Eine Sicherung aus der Android-App lässt sich jetzt auch auf dem iPhone wiederherstellen (Gerätewechsel)
 
 ---
 
