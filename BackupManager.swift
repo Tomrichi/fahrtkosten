@@ -47,8 +47,11 @@ struct AppBackup: Codable {
     let legalSwissFullDay: Double?
     let legalAbroadDay: Double?
     let legalAbroadFullDay: Double?
+    // Version 5: Favoriten & Wiederkehrende Fahrten
+    let favorites: [FavoriteTrip]?
+    let recurringTrips: [RecurringTrip]?
 
-    static let currentVersion = 4
+    static let currentVersion = 5
 
     var totalEntries: Int {
         trips.count + meals.count + hotels.count + vehicleCosts.count + reiseSpesen.count + privateExpenses.count
@@ -131,7 +134,9 @@ class BackupManager: ObservableObject {
             legalSwissDay: store.legalSwissDay,
             legalSwissFullDay: store.legalSwissFullDay,
             legalAbroadDay: store.legalAbroadDay,
-            legalAbroadFullDay: store.legalAbroadFullDay
+            legalAbroadFullDay: store.legalAbroadFullDay,
+            favorites: store.favorites,
+            recurringTrips: store.recurringTrips
         )
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
@@ -223,12 +228,14 @@ class BackupManager: ObservableObject {
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .iso8601
             let backup = try decoder.decode(AppBackup.self, from: data)
-            store.trips = backup.trips
-            store.meals = backup.meals
-            store.hotels = backup.hotels
-            store.vehicleCosts = backup.vehicleCosts
-            store.reiseSpesen = backup.reiseSpesen
-            store.privateExpenses = backup.privateExpenses
+            // Früher gelöschte Einträge bekommen neue IDs, damit der iCloud-Abgleich sie nicht
+            // wieder als „gelöscht“ entfernt.
+            store.trips = backup.trips.map { var e = $0; if store.isDeleted(e.id, key: "trips") { e.id = UUID() }; return e }
+            store.meals = backup.meals.map { var e = $0; if store.isDeleted(e.id, key: "meals") { e.id = UUID() }; return e }
+            store.hotels = backup.hotels.map { var e = $0; if store.isDeleted(e.id, key: "hotels") { e.id = UUID() }; return e }
+            store.vehicleCosts = backup.vehicleCosts.map { var e = $0; if store.isDeleted(e.id, key: "vehicleCosts") { e.id = UUID() }; return e }
+            store.reiseSpesen = backup.reiseSpesen.map { var e = $0; if store.isDeleted(e.id, key: "reiseSpesen") { e.id = UUID() }; return e }
+            store.privateExpenses = backup.privateExpenses.map { var e = $0; if store.isDeleted(e.id, key: "privateExpenses") { e.id = UUID() }; return e }
             store.kmRate = backup.kmRate
             store.defaultFuelConsumption = backup.defaultFuelConsumption
             store.inlandMeal1to3 = backup.inlandMeal1to3
@@ -264,6 +271,9 @@ class BackupManager: ObservableObject {
             if let v = backup.legalSwissFullDay  { store.legalSwissFullDay = v }
             if let v = backup.legalAbroadDay     { store.legalAbroadDay = v }
             if let v = backup.legalAbroadFullDay { store.legalAbroadFullDay = v }
+            // Version 5: Favoriten & Wiederkehrende Fahrten (ältere Backups enthalten sie nicht → bestehende bleiben)
+            if let v = backup.favorites      { store.favorites = v }
+            if let v = backup.recurringTrips { store.recurringTrips = v }
             let dateStr = backup.exportedAt.formatted(date: .abbreviated, time: .shortened)
             lastSuccess = "Backup vom \(dateStr) wiederhergestellt (\(backup.totalEntries) Einträge)"
             return true

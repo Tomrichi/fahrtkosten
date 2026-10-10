@@ -8,6 +8,31 @@ private struct FrankfurterRateResponse: Decodable {
     let rate: Double
 }
 
+// MARK: - Abgleich-Logik (Löschungen & Änderungen zwischen Geräten)
+/// Führt die lokale Liste mit der iCloud-Liste zusammen:
+/// • IDs in `deleted` bleiben gelöscht (auf allen Geräten)
+/// • Einträge, die nur auf einer Seite existieren, bleiben erhalten – nichts geht ohne Löschung verloren
+/// • bei gleicher ID gilt der iCloud-Stand (das andere Gerät hat zuletzt geändert)
+func mergeSyncedEntries<E: Identifiable>(local: [E], remote: [E], deleted: Set<UUID>) -> [E] where E.ID == UUID {
+    var result: [E] = []
+    var indexByID: [UUID: Int] = [:]
+    for item in local where !deleted.contains(item.id) {
+        if indexByID[item.id] == nil {
+            indexByID[item.id] = result.count
+            result.append(item)
+        }
+    }
+    for item in remote where !deleted.contains(item.id) {
+        if let i = indexByID[item.id] {
+            result[i] = item
+        } else {
+            indexByID[item.id] = result.count
+            result.append(item)
+        }
+    }
+    return result
+}
+
 class DataStore: ObservableObject {
 
     // MARK: - Storage
@@ -20,14 +45,23 @@ class DataStore: ObservableObject {
     private(set) var isSyncEnabled = false
 
     // MARK: - Data (gespeichert in iCloud + lokalem UserDefaults als Backup)
-    @Published var trips:           [Trip]           = [] { didSet { save(trips,           key: "trips") } }
-    @Published var meals:           [MealEntry]      = [] { didSet { save(meals,           key: "meals") } }
-    @Published var hotels:          [HotelEntry]     = [] { didSet { save(hotels,          key: "hotels") } }
-    @Published var vehicleCosts:    [VehicleCost]    = [] { didSet { save(vehicleCosts,    key: "vehicleCosts") } }
-    @Published var reiseSpesen:     [ReiseSpese]     = [] { didSet { save(reiseSpesen,     key: "reiseSpesen") } }
-    @Published var privateExpenses: [PrivateExpense] = [] { didSet { save(privateExpenses, key: "privateExpenses") } }
+    @Published var trips:           [Trip]           = [] { didSet { save(trips, old: oldValue, key: "trips") } }
+    @Published var meals:           [MealEntry]      = [] { didSet { save(meals, old: oldValue, key: "meals") } }
+    @Published var hotels:          [HotelEntry]     = [] { didSet { save(hotels, old: oldValue, key: "hotels") } }
+    @Published var vehicleCosts:    [VehicleCost]    = [] { didSet { save(vehicleCosts, old: oldValue, key: "vehicleCosts") } }
+    @Published var reiseSpesen:     [ReiseSpese]     = [] { didSet { save(reiseSpesen, old: oldValue, key: "reiseSpesen") } }
+    @Published var privateExpenses: [PrivateExpense] = [] { didSet { save(privateExpenses, old: oldValue, key: "privateExpenses") } }
     @Published var favorites:       [FavoriteTrip]   = [] { didSet { saveFavorites() } }
-    @Published var recurringTrips:  [RecurringTrip]  = [] { didSet { save(recurringTrips, key: "recurringTrips") } }
+    @Published var recurringTrips:  [RecurringTrip]  = [] { didSet { saveRecurringTrips() } }
+    /// IDs gelöschter Favoriten / Wiederkehrender Fahrten – damit ein Löschen auf einem
+    /// Gerät beim iCloud-Abgleich auf den anderen nicht wieder zurückkommt.
+    private var deletedFavoriteIDs      = Set<UUID>()
+    private var deletedRecurringTripIDs = Set<UUID>()
+    /// Pro Liste (trips, meals, …): IDs gelöschter Einträge. Wächst nur, wird nie zurückgenommen –
+    /// wiederhergestellte Einträge bekommen deshalb neue IDs (siehe BackupManager.restore).
+    private var deletedIDs: [String: Set<UUID>] = [:]
+    private static let syncedListKeys = ["trips", "meals", "hotels", "vehicleCosts", "reiseSpesen", "privateExpenses"]
+    private static func deletedKey(_ key: String) -> String { "deleted.\(key)" }
 
     // MARK: - Einstellungen (lokal in UserDefaults)
     @Published var kmRate: Double { didSet { local.set(kmRate, forKey: "kmRate") } }
@@ -131,6 +165,11 @@ class DataStore: ObservableObject {
         loadFromLocal()
         favorites      = loadLocal(key: "favorites")      ?? []
         recurringTrips = loadLocal(key: "recurringTrips") ?? []
+        for key in Self.syncedListKeys {
+            deletedIDs[key] = Set(loadLocal(key: Self.deletedKey(key)) ?? [UUID]())
+        }
+        deletedFavoriteIDs      = Set(loadLocal(key: Self.deletedFavoritesKey)      ?? [UUID]())
+        deletedRecurringTripIDs = Set(loadLocal(key: Self.deletedRecurringTripsKey) ?? [UUID]())
         
         // TEMPORÄR DEBUG
         let ag = UserDefaults(suiteName: "group.de.tommwagner.fahrtkosten")
@@ -254,61 +293,110 @@ class DataStore: ObservableObject {
     // MARK: - iCloud-Daten zusammenführen (nach 2 Sek. beim Start, nur wenn Pro)
     private func mergeFromiCloud() {
         guard isSyncEnabled else { return }
-        // Lokale Daten zu iCloud hochladen falls iCloud leer
-        let keys = ["trips", "meals", "hotels", "vehicleCosts", "reiseSpesen", "privateExpenses"]
-        for key in keys {
-            if icloud.data(forKey: key) == nil, let localData = local.data(forKey: key) {
-                icloud.set(localData, forKey: key)
-                AppLogger.shared.logData("Upload zu iCloud: \(key)")
-            }
-        }
         icloud.synchronize()
+        for key in Self.syncedListKeys { mergeList(key) }
+        mergeFavoritesFromiCloud()
+        mergeRecurringTripsFromiCloud()
 
-        // iCloud-Daten mit lokalen zusammenführen (alle eindeutigen IDs behalten)
-        if let remote: [Trip]           = loadiCloud(key: "trips"),           !remote.isEmpty { trips           = merge(local: trips,           remote: remote) }
-        if let remote: [MealEntry]      = loadiCloud(key: "meals"),           !remote.isEmpty { meals           = merge(local: meals,           remote: remote) }
-        if let remote: [HotelEntry]     = loadiCloud(key: "hotels"),          !remote.isEmpty { hotels          = merge(local: hotels,          remote: remote) }
-        if let remote: [VehicleCost]    = loadiCloud(key: "vehicleCosts"),    !remote.isEmpty { vehicleCosts    = merge(local: vehicleCosts,    remote: remote) }
-        if let remote: [ReiseSpese]     = loadiCloud(key: "reiseSpesen"),     !remote.isEmpty { reiseSpesen     = merge(local: reiseSpesen,     remote: remote) }
-        if let remote: [PrivateExpense] = loadiCloud(key: "privateExpenses"), !remote.isEmpty { privateExpenses = merge(local: privateExpenses, remote: remote) }
-
-        AppLogger.shared.logData("iCloud-Merge abgeschlossen: \(trips.count) Fahrten")
+        AppLogger.shared.logData("iCloud-Merge abgeschlossen: \(trips.count) Fahrten, gelöscht vermerkt: \(deletedIDs["trips"]?.count ?? 0)")
     }
 
-    /// Zusammenführen: alle eindeutigen IDs aus beiden Listen behalten
-    private func merge<T: Identifiable & Codable>(local: [T], remote: [T]) -> [T] {
-        var seen = Set<String>()
-        var result: [T] = []
-        for item in (local + remote) {
-            if seen.insert("\(item.id)").inserted {
-                result.append(item)
-            }
+    /// Gleicht eine der sechs Hauptlisten mit iCloud ab (neue Einträge, Änderungen und Löschungen).
+    private func mergeList(_ key: String) {
+        switch key {
+        case "trips":           if let m = syncedList(trips,           key: key) { trips           = m }
+        case "meals":           if let m = syncedList(meals,           key: key) { meals           = m }
+        case "hotels":          if let m = syncedList(hotels,          key: key) { hotels          = m }
+        case "vehicleCosts":    if let m = syncedList(vehicleCosts,    key: key) { vehicleCosts    = m }
+        case "reiseSpesen":     if let m = syncedList(reiseSpesen,     key: key) { reiseSpesen     = m }
+        case "privateExpenses": if let m = syncedList(privateExpenses, key: key) { privateExpenses = m }
+        default: break
         }
-        return result
+    }
+
+    /// Gibt die neue lokale Liste zurück, falls sie sich durch den Abgleich ändert (das Setzen
+    /// speichert und pusht dann). Ändert sich lokal nichts, wird bei Bedarf nur iCloud aktualisiert.
+    private func syncedList<E: Identifiable & Codable>(_ list: [E], key: String) -> [E]? where E.ID == UUID {
+        absorbRemoteDeletions(key: key)
+        let remote: [E]? = loadiCloud(key: key)
+        let merged = mergeSyncedEntries(local: list, remote: remote ?? [], deleted: deletedIDs[key] ?? [])
+        AppLogger.shared.logData("iCloud-Abgleich \(key): lokal \(list.count), iCloud \(remote.map { String($0.count) } ?? "leer"), Ergebnis \(merged.count)")
+        if !sameEntries(merged, list) { return merged }
+        if let remote {
+            if !sameEntries(merged, remote), let data = try? JSONEncoder().encode(merged) { pushListData(data, key: key) }
+        } else if !merged.isEmpty, let data = try? JSONEncoder().encode(merged) {
+            pushListData(data, key: key)   // iCloud noch leer: lokalen Stand hochladen
+        }
+        return nil
+    }
+
+    /// Gleicher Inhalt unabhängig von der Reihenfolge.
+    private func sameEntries<E: Identifiable & Codable>(_ a: [E], _ b: [E]) -> Bool where E.ID == UUID {
+        guard a.count == b.count else { return false }
+        let enc = JSONEncoder()
+        enc.outputFormatting = .sortedKeys
+        var blobs: [UUID: Data] = [:]
+        for x in b { blobs[x.id] = try? enc.encode(x) }
+        for x in a {
+            guard let d = blobs[x.id], let mine = try? enc.encode(x), d == mine else { return false }
+        }
+        return true
+    }
+
+    /// Übernimmt die in iCloud vermerkten Löschungen anderer Geräte.
+    private func absorbRemoteDeletions(key: String) {
+        guard let data = icloud.data(forKey: Self.deletedKey(key)),
+              let ids = try? JSONDecoder().decode([UUID].self, from: data) else { return }
+        let before = deletedIDs[key]?.count ?? 0
+        deletedIDs[key, default: []].formUnion(ids)
+        if (deletedIDs[key]?.count ?? 0) != before {
+            persistIDs(deletedIDs[key] ?? [], key: Self.deletedKey(key))
+        }
+    }
+
+    /// Merkt Einträge vor, die aus der Liste verschwunden sind (= vom Nutzer gelöscht).
+    private func noteRemovals<E: Identifiable>(old: [E], new: [E], key: String) where E.ID == UUID {
+        let newIDs = Set(new.map(\.id))
+        let removed = old.map(\.id).filter { !newIDs.contains($0) }
+        guard !removed.isEmpty else { return }
+        deletedIDs[key, default: []].formUnion(removed)
+        persistIDs(deletedIDs[key] ?? [], key: Self.deletedKey(key))
+    }
+
+    func isDeleted(_ id: UUID, key: String) -> Bool { deletedIDs[key]?.contains(id) ?? false }
+
+    private func pushListData(_ data: Data, key: String) {
+        absorbRemoteDeletions(key: key)   // fremde Löschungen nicht überschreiben
+        AppLogger.shared.logData("iCloud gesendet: \(key) (\(data.count / 1024) KB, \(deletedIDs[key]?.count ?? 0) gelöscht vermerkt)")
+        icloud.set(data, forKey: key)
+        if let ids = try? JSONEncoder().encode(Array(deletedIDs[key] ?? [])) {
+            icloud.set(ids, forKey: Self.deletedKey(key))
+        }
+        icloud.synchronize()
     }
 
     // MARK: - iCloud Observer (andere Geräte haben etwas geändert)
     @objc private func icloudDidChange(_ notification: Notification) {
+        let keys = notification.userInfo?[NSUbiquitousKeyValueStoreChangedKeysKey] as? [String] ?? []
+        AppLogger.shared.logData("iCloud-Änderung empfangen: \(keys.joined(separator: ", ")) – Sync aktiv: \(isSyncEnabled ? "ja" : "nein (kein Pro?)")")
         guard isSyncEnabled else { return }
-        guard let keys = notification.userInfo?[NSUbiquitousKeyValueStoreChangedKeysKey] as? [String] else { return }
         DispatchQueue.main.async {
-            if keys.contains("trips"),           let r: [Trip]           = self.loadiCloud(key: "trips")           { self.trips           = self.merge(local: self.trips,           remote: r) }
-            if keys.contains("meals"),           let r: [MealEntry]      = self.loadiCloud(key: "meals")           { self.meals           = self.merge(local: self.meals,           remote: r) }
-            if keys.contains("hotels"),          let r: [HotelEntry]     = self.loadiCloud(key: "hotels")          { self.hotels          = self.merge(local: self.hotels,          remote: r) }
-            if keys.contains("vehicleCosts"),    let r: [VehicleCost]    = self.loadiCloud(key: "vehicleCosts")    { self.vehicleCosts    = self.merge(local: self.vehicleCosts,    remote: r) }
-            if keys.contains("reiseSpesen"),     let r: [ReiseSpese]     = self.loadiCloud(key: "reiseSpesen")     { self.reiseSpesen     = self.merge(local: self.reiseSpesen,     remote: r) }
-            if keys.contains("privateExpenses"), let r: [PrivateExpense] = self.loadiCloud(key: "privateExpenses") { self.privateExpenses = self.merge(local: self.privateExpenses, remote: r) }
+            for key in Self.syncedListKeys where keys.contains(key) || keys.contains(Self.deletedKey(key)) {
+                self.mergeList(key)
+            }
+            if keys.contains(Self.favoritesSyncKey)      { self.mergeFavoritesFromiCloud() }
+            if keys.contains(Self.recurringTripsSyncKey) { self.mergeRecurringTripsFromiCloud() }
         }
     }
 
     // MARK: - Speichern (lokal immer, iCloud nur wenn Pro)
-    private func save<T: Codable>(_ value: T, key: String) {
-        guard let data = try? JSONEncoder().encode(value) else { return }
+    private func save<E: Identifiable & Codable>(_ items: [E], old: [E], key: String) where E.ID == UUID {
+        noteRemovals(old: old, new: items, key: key)
+        guard let data = try? JSONEncoder().encode(items) else { return }
         local.set(data, forKey: key)
         if key == "trips" { WidgetCenter.shared.reloadAllTimelines() }
         guard isSyncEnabled else { return }
-        icloud.set(data, forKey: key)
-        icloud.synchronize()
+        pushListData(data, key: key)
     }
 
     private func loadiCloud<T: Codable>(key: String) -> T? {
@@ -535,12 +623,16 @@ class DataStore: ObservableObject {
         AppLogger.shared.logData("Favorit bearbeitet: \(fav.from) → \(fav.to)")
     }
     func deleteFavorite(_ id: UUID) {
+        // Zuerst vormerken, damit der iCloud-Stand beim Speichern die Löschung schon enthält
+        deletedFavoriteIDs.insert(id)
+        persistIDs(deletedFavoriteIDs, key: Self.deletedFavoritesKey)
         favorites.removeAll { $0.id == id }
         AppLogger.shared.logData("Favorit gelöscht")
     }
     private func saveFavorites() {
         guard let data = try? JSONEncoder().encode(favorites) else { return }
-        local.set(data, forKey: "favorites")
+        local.set(data, forKey: "favorites")   // App Group: auch die Watch liest hier
+        pushToiCloud(favorites, deleted: deletedFavoriteIDs, key: Self.favoritesSyncKey)
     }
 
     // MARK: - Wiederkehrende Fahrten
@@ -554,7 +646,14 @@ class DataStore: ObservableObject {
         }
     }
     func deleteRecurringTrip(_ id: UUID) {
+        deletedRecurringTripIDs.insert(id)
+        persistIDs(deletedRecurringTripIDs, key: Self.deletedRecurringTripsKey)
         recurringTrips.removeAll { $0.id == id }
+    }
+    private func saveRecurringTrips() {
+        guard let data = try? JSONEncoder().encode(recurringTrips) else { return }
+        local.set(data, forKey: "recurringTrips")
+        pushToiCloud(recurringTrips, deleted: deletedRecurringTripIDs, key: Self.recurringTripsSyncKey)
     }
     func toggleRecurringTrip(_ id: UUID) {
         if let i = recurringTrips.firstIndex(where: { $0.id == id }) {
@@ -574,20 +673,109 @@ class DataStore: ObservableObject {
         AppLogger.shared.logData("Pauschalsätze auf Standardwerte zurückgesetzt")
     }
 
+    // MARK: - iCloud-Abgleich: Favoriten & Wiederkehrende Fahrten
+    /// Liste samt IDs gelöschter Einträge in einem Wert – so kommt ein Löschen immer
+    /// zusammen mit dem neuen Listenstand auf dem anderen Gerät an.
+    private struct SyncedList<T: Codable>: Codable {
+        var items: [T]
+        var deleted: [UUID]
+    }
+    private static let favoritesSyncKey          = "favoritesSync"
+    private static let recurringTripsSyncKey     = "recurringTripsSync"
+    private static let deletedFavoritesKey       = "deletedFavoriteIDs"
+    private static let deletedRecurringTripsKey  = "deletedRecurringTripIDs"
+
+    private func persistIDs(_ ids: Set<UUID>, key: String) {
+        guard let data = try? JSONEncoder().encode(Array(ids)) else { return }
+        local.set(data, forKey: key)
+    }
+
+    private func pushToiCloud<T: Codable>(_ items: [T], deleted: Set<UUID>, key: String) {
+        guard isSyncEnabled,
+              let data = try? JSONEncoder().encode(SyncedList(items: items, deleted: Array(deleted))) else { return }
+        icloud.set(data, forKey: key)
+        icloud.synchronize()
+    }
+
+    /// Führt die lokale Liste mit dem iCloud-Stand zusammen: neue Einträge beider Seiten
+    /// bleiben erhalten, geänderte Einträge übernehmen den iCloud-Stand, gelöschte bleiben gelöscht.
+    /// `routeKey`: gleiche Strecke auf mehreren Geräten angelegt → ein Eintrag (kleinste ID gewinnt).
+    /// Gibt nil zurück, wenn in iCloud noch kein Stand liegt.
+    private func mergedSyncedList<T: Identifiable & Codable & Equatable>(
+        local: [T], deleted: inout Set<UUID>, key: String, routeKey: ((T) -> String)? = nil
+    ) -> [T]? where T.ID == UUID {
+        guard let data = icloud.data(forKey: key),
+              let remote = try? JSONDecoder().decode(SyncedList<T>.self, from: data) else { return nil }
+        deleted.formUnion(remote.deleted)
+        var merged = local.filter { !deleted.contains($0.id) }
+        for item in remote.items where !deleted.contains(item.id) {
+            if let i = merged.firstIndex(where: { $0.id == item.id }) {
+                merged[i] = item
+            } else {
+                merged.append(item)
+            }
+        }
+        if let routeKey {
+            var winners: [String: T] = [:]
+            for item in merged {
+                let k = routeKey(item)
+                if let w = winners[k] {
+                    if item.id.uuidString < w.id.uuidString {
+                        deleted.insert(w.id)
+                        winners[k] = item
+                    } else {
+                        deleted.insert(item.id)
+                    }
+                } else {
+                    winners[k] = item
+                }
+            }
+            merged = merged.filter { winners[routeKey($0)]?.id == $0.id }
+        }
+        return merged
+    }
+
+    /// Gleicher Inhalt unabhängig von der Reihenfolge – verhindert endloses Hin-und-her-Speichern.
+    private func sameItems<T: Identifiable & Equatable>(_ a: [T], _ b: [T]) -> Bool where T.ID == UUID {
+        guard a.count == b.count else { return false }
+        let byID = Dictionary(b.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        return a.allSatisfy { byID[$0.id] == $0 }
+    }
+
+    private func mergeFavoritesFromiCloud() {
+        guard isSyncEnabled else { return }
+        guard let merged = mergedSyncedList(
+            local: favorites, deleted: &deletedFavoriteIDs, key: Self.favoritesSyncKey,
+            routeKey: { "\($0.from.trimmingCharacters(in: .whitespaces).lowercased())→\($0.to.trimmingCharacters(in: .whitespaces).lowercased())" }
+        ) else {
+            pushToiCloud(favorites, deleted: deletedFavoriteIDs, key: Self.favoritesSyncKey)   // iCloud noch leer
+            return
+        }
+        persistIDs(deletedFavoriteIDs, key: Self.deletedFavoritesKey)
+        if !sameItems(merged, favorites) { favorites = merged }   // didSet speichert & pusht
+    }
+
+    private func mergeRecurringTripsFromiCloud() {
+        guard isSyncEnabled else { return }
+        guard let merged = mergedSyncedList(
+            local: recurringTrips, deleted: &deletedRecurringTripIDs, key: Self.recurringTripsSyncKey
+        ) else {
+            pushToiCloud(recurringTrips, deleted: deletedRecurringTripIDs, key: Self.recurringTripsSyncKey)
+            return
+        }
+        persistIDs(deletedRecurringTripIDs, key: Self.deletedRecurringTripsKey)
+        if !sameItems(merged, recurringTrips) { recurringTrips = merged }
+    }
+
     // MARK: - iCloud-Sync aktivieren (Pro-Feature)
     /// Wird aufgerufen sobald isPro = true wird. Aktiviert iCloud-Sync und führt
     /// einen initialen Merge durch, damit alle Geräte den gleichen Datenstand haben.
     func enableSync() {
         guard !isSyncEnabled else { return }
         isSyncEnabled = true
-        AppLogger.shared.logData("iCloud-Sync aktiviert (Pro)")
-        // Aktuell lokale Daten zu iCloud hochladen (andere Geräte bekommen sie so)
-        let syncKeys = ["trips", "meals", "hotels", "vehicleCosts", "reiseSpesen", "privateExpenses", "recurringTrips", "favorites"]
-        for key in syncKeys {
-            if let data = local.data(forKey: key) {
-                icloud.set(data, forKey: key)
-            }
-        }
+        AppLogger.shared.logData("iCloud-Sync aktiviert (Pro) – Abgleich v2: Löschungen & Änderungen")
+        // Kein blindes Hochladen: der Abgleich unten führt erst iCloud und lokal zusammen
+        // und lädt danach nur das hoch, was iCloud noch fehlt.
         icloud.synchronize()
         // Nach kurzer Verzögerung iCloud-Daten zusammenführen
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {

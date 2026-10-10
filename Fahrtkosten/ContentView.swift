@@ -118,12 +118,14 @@ struct ContentView: View {
                 .environmentObject(lm)
         }
         .onAppear {
+            AppLogger.shared.logData("Pro-Status beim Start: \(proMgr.isPro ? "Pro" : "nicht Pro – iCloud-Abgleich aus")")
             if proMgr.isPro { store.enableSync() }
             guard !kmRateHinweisGezeigt else { return }
             kmRateHinweisGezeigt = true
             showKmRateHinweis = true
         }
         .onChange(of: proMgr.isPro) { _, isPro in
+            AppLogger.shared.logData("Pro-Status geändert: \(isPro ? "Pro" : "nicht Pro")")
             if isPro { store.enableSync() }
         }
         .alert("Kilometerpauschale angehoben", isPresented: $showKmRateHinweis) {

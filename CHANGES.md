@@ -2,6 +2,16 @@
 
 ---
 
+## Version 1.17.43 Build 79 (Oktober 2026)
+
+- **Neu: Wiederkehrende Fahrten im Fahrtenlisten-Menü** – Wiederkehrende Fahrten sind jetzt direkt im ⋯-Menü der Fahrtenliste erreichbar.
+- **Neu: Favoriten bearbeiten und entfernen** – In „Neue Fahrt" einen Favoriten nach rechts wischen oder lange drücken und „Bearbeiten" wählen (Von, Nach, Kilometer). Zum Entfernen nach links wischen oder lange drücken und „Entfernen" wählen.
+- **Verbesserung: Favoriten** – Wird dieselbe Strecke erneut als Favorit gespeichert, aktualisiert die App nur den Kilometerwert, statt einen zweiten Favoriten anzulegen.
+- **Fehlerbehebung: iCloud-Abgleich (Pro)** – Gelöschte Fahrten, Mahlzeiten/Arbeitszeiten, Übernachtungen, Fahrzeugkosten, Reisespesen und private Ausgaben kamen nach dem Abgleich mit einem anderen Gerät wieder zurück, und Änderungen an einem Eintrag (z. B. korrigierte Kilometer) kamen dort nicht an. Beides ist behoben: Löschungen und Änderungen gelten jetzt auf allen Geräten. Favoriten und Wiederkehrende Fahrten werden zusätzlich laufend abgeglichen (bisher nur einmalig hochgeladen); dieselbe Strecke auf mehreren Geräten wird zu einem Favoriten zusammengeführt. Beim Wiederherstellen eines Backups erhalten früher gelöschte Einträge neue IDs, damit sie erhalten bleiben.
+- **Verbesserung: Backup** – Favoriten und Wiederkehrende Fahrten sind jetzt im Backup enthalten und werden beim Wiederherstellen zurückgespielt. Die Android-App übernimmt die Favoriten aus einem iPhone-Backup.
+
+---
+
 ## Version 1.17.43 Build 75 (Oktober 2026)
 
 - **Neu: Verpflegungspauschalen nach Steuerrecht (§ 9 Abs. 4a EStG)** – Neuer Modus „Gesetzlich" ergänzt den bisherigen Modus „Eigene Stufen". Inland 14 €/28 €, Schweiz 47/70 CHF, Ausland nach BMF-Tabelle.

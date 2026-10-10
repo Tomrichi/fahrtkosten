@@ -172,7 +172,7 @@ struct Trip: Identifiable, Codable {
 }
 
 // MARK: - Favorit-Fahrt
-struct FavoriteTrip: Identifiable, Codable {
+struct FavoriteTrip: Identifiable, Codable, Equatable {
     var id   = UUID()
     var from : String
     var to   : String
@@ -180,7 +180,7 @@ struct FavoriteTrip: Identifiable, Codable {
 }
 
 // MARK: - Wiederkehrende Fahrt
-struct RecurringTrip: Identifiable, Codable {
+struct RecurringTrip: Identifiable, Codable, Equatable {
     var id       = UUID()
     var from     : String
     var to       : String

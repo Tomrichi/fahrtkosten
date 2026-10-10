@@ -39,6 +39,9 @@ class ProManager: ObservableObject {
         if UserDefaults.standard.bool(forKey: Self.legacyKey) {
             self.isPro = true
         }
+        #if DEBUG
+        if Self.debugForcePro { self.isPro = true }
+        #endif
         updates = listenForTransactions()
         Task { await refreshStatus() }
     }
@@ -46,7 +49,16 @@ class ProManager: ObservableObject {
     deinit { updates?.cancel() }
 
     // ── Kaufstatus laden ─────────────────────────────────────────────────────
+    #if DEBUG
+    /// Nur Entwicklungs-Builds: Start-Argument `-debugForcePro YES` (Xcode: Scheme → Run → Arguments)
+    /// schaltet Pro an, ohne Kauf – z. B. um den iCloud-Abgleich auf Testgeräten zu prüfen.
+    private static var debugForcePro: Bool { UserDefaults.standard.bool(forKey: "debugForcePro") }
+    #endif
+
     func refreshStatus() async {
+        #if DEBUG
+        if Self.debugForcePro { isPro = true; return }
+        #endif
         // 1. Bestandskäufer über App-Store-Kaufbeleg erkennen
         if await checkLegacyPurchase() {
             isPro = true
