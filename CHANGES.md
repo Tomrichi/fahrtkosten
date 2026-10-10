@@ -2,8 +2,9 @@
 
 ---
 
-## Version 1.17.43 Build 79 (Oktober 2026)
+## Version 1.17.43 Build 80 (Oktober 2026)
 
+- **Fehlerbehebung: Auslandspauschalen korrigiert** – Gegen das BMF-Schreiben vom 5. Dezember 2025 geprüft: Luxemburg (und damit der Satz für alle nicht gelisteten Länder) gilt jetzt 42 € / 63 € statt 31 € / 47 €, Schweiz – Genf 47 € / 70 € statt 44 € / 70 €, Weißrussland 14 € / 21 € statt 13 € / 20 €. Bereits gewählte Länder mit dem alten Satz werden einmalig angepasst; selbst geänderte Beträge bleiben unverändert.
 - **Neu: Wiederkehrende Fahrten im Fahrtenlisten-Menü** – Wiederkehrende Fahrten sind jetzt direkt im ⋯-Menü der Fahrtenliste erreichbar.
 - **Neu: Favoriten bearbeiten und entfernen** – In „Neue Fahrt" einen Favoriten nach rechts wischen oder lange drücken und „Bearbeiten" wählen (Von, Nach, Kilometer). Zum Entfernen nach links wischen oder lange drücken und „Entfernen" wählen.
 - **Verbesserung: Favoriten** – Wird dieselbe Strecke erneut als Favorit gespeichert, aktualisiert die App nur den Kilometerwert, statt einen zweiten Favoriten anzulegen.

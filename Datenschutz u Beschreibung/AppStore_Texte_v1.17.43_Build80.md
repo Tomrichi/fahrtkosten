@@ -1,24 +1,25 @@
 # Fahrtkosten – App Store Texte
-Version 1.17.43 · Build 79 · Thomas Wagner · 10. Oktober 2026
+Version 1.17.43 · Build 80 · Thomas Wagner · 10. Oktober 2026
 
-Live ist 1.17.42, Build 78 von 1.17.43 ist in Prüfung. Der „Was ist neu“-Text gilt für die Version 1.17.43 insgesamt: Die Punkte unten zu dem bereits eingereichten Text von Build 78 **hinzufügen**.
+Live ist 1.17.42, Build 78 von 1.17.43 ist in Prüfung, Build 79 liegt als Archiv vom 10.10. vor (ohne Android-Backup-Import und BMF-Korrektur). Der „Was ist neu“-Text gilt für die Version 1.17.43 insgesamt: Die Punkte unten zu dem bereits eingereichten Text von Build 78 **hinzufügen**.
 
 ---
 
-## Was ist neu – Zusatz für Build 79
+## Was ist neu – Zusatz für Build 80
 
 • Neu: Favoriten lassen sich bearbeiten und entfernen – in „Neue Fahrt“ einen Favoriten nach rechts wischen oder lange drücken
 • Neu: Wiederkehrende Fahrten sind direkt im ⋯-Menü der Fahrtenliste erreichbar
 • Verbesserung: iCloud-Abgleich (Pro) – Löschungen und Änderungen an Fahrten, Arbeitszeiten, Übernachtungen, Kosten, Favoriten und Wiederkehrenden Fahrten erscheinen jetzt auf allen deinen Geräten. Bitte auf allen Geräten aktualisieren, damit der Abgleich korrekt arbeitet
 • Verbesserung: Das Backup enthält jetzt auch Favoriten und Wiederkehrende Fahrten
 • Neu: Eine Sicherung aus der Android-App lässt sich jetzt auch auf dem iPhone wiederherstellen (Gerätewechsel)
+• Fehlerbehebung: Auslandspauschalen laut BMF-Schreiben korrigiert – Luxemburg und alle nicht gelisteten Länder 42 € / 63 €, Schweiz (Genf) 47 € / 70 €, Weißrussland 14 € / 21 €
 
 ---
 
-## TestFlight – „Was zu testen“ (Build 79)
+## TestFlight – „Was zu testen“ (Build 80)
 
 ```
-Bitte auf BEIDEN Geräten (iPhone und iPad) Build 79 installieren, sonst ist der Test nicht aussagekräftig.
+Bitte auf BEIDEN Geräten (iPhone und iPad) Build 80 installieren, sonst ist der Test nicht aussagekräftig.
 1) Fahrt anlegen → am anderen Gerät prüfen.
 2) Fahrt ändern (z. B. Kilometer) → am anderen Gerät prüfen.
 3) Fahrt löschen → darf am anderen Gerät nicht zurückkommen.
@@ -40,6 +41,6 @@ Favoriten bearbeiten und entfernen, iCloud-Abgleich mit Löschungen und Änderun
 
 ## Hinweise
 
-- Die Build-Nummer erhöht der Release-Archive-Lauf automatisch (aus 78 wird 79). Nicht von Hand ändern.
+- Die Build-Nummer erhöht der Release-Archive-Lauf automatisch (aus 79 wird 80). Nicht von Hand ändern.
 - Der iCloud-Abgleich ist ein Pro-Feature, die Texte nennen das.
 - Homepage-Texte zu Favoriten und iCloud erst live schalten, wenn diese Version im Store ist.

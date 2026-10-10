@@ -157,6 +157,7 @@ class DataStore: ObservableObject {
         legalAbroadDay     = local.double(forKey: "legalAbroadDay").ifZeroAllowed(BmfAuslandData.fallbackDay)
         legalAbroadFullDay = local.double(forKey: "legalAbroadFullDay").ifZeroAllowed(BmfAuslandData.fallbackFullDay)
         abroadCountryName  = local.string(forKey: "abroadCountryName") ?? BmfAuslandData.fallbackName
+        migrateBmfAuslandSaetze()
 
         // SCHRITT 1: Migration einmalig ausführen (Standard → App Group)
         migrateFromStandardToAppGroup()
@@ -220,6 +221,26 @@ class DataStore: ObservableObject {
             AppLogger.shared.log("EUR/CHF-Kurs aktualisiert: 1 EUR = \(decoded.rate) CHF", level: .store)
         } catch {
             AppLogger.shared.logError("EUR/CHF-Kurs konnte nicht aktualisiert werden: \(error.localizedDescription)")
+        }
+    }
+
+    // MARK: - Korrektur der BMF-Auslandssätze 2026 (einmalig)
+    /// Die Tabelle enthielt für Luxemburg (und damit den Fallback), Genf und Weißrussland falsche Werte.
+    /// Wer eines dieser Länder gewählt und den Satz nicht selbst geändert hat, bekommt den richtigen Wert.
+    private func migrateBmfAuslandSaetze() {
+        let key = "bmf2026_auslandssaetze_korrigiert_v1"
+        guard !local.bool(forKey: key) else { return }
+        defer { local.set(true, forKey: key) }
+        let korrekturen: [(name: String, alt: (Double, Double), neu: (Double, Double))] = [
+            ("Luxemburg (Fallback)", (31, 47), (42, 63)),
+            ("Luxemburg",            (31, 47), (42, 63)),
+            ("Schweiz – Genf",       (44, 70), (47, 70)),
+            ("Weißrussland",         (13, 20), (14, 21)),
+        ]
+        for k in korrekturen where abroadCountryName == k.name
+            && legalAbroadDay == k.alt.0 && legalAbroadFullDay == k.alt.1 {
+            legalAbroadDay = k.neu.0
+            legalAbroadFullDay = k.neu.1
         }
     }
 
