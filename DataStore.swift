@@ -470,7 +470,19 @@ class DataStore: ObservableObject {
         case (true, true):  return .vollerTag
         case (true, false): return .anreisetag
         case (false, true): return .abreisetag
-        default:            return .eintaegig
+        default:
+            // Zwischentag: Datum liegt strikt zwischen Check-in und Check-out einer Übernachtung
+            let isMiddleDay = hotels.contains { hotel in
+                let co: Date?
+                if let explicit = hotel.checkOutDate { co = explicit }
+                else { co = cal.date(byAdding: .day, value: hotel.numberOfNights, to: hotel.date) }
+                guard let checkout = co else { return false }
+                return !cal.isDate(meal.date, inSameDayAs: hotel.date)
+                    && !cal.isDate(meal.date, inSameDayAs: checkout)
+                    && meal.date > hotel.date
+                    && meal.date < checkout
+            }
+            return isMiddleDay ? .vollerTag : .eintaegig
         }
     }
 
