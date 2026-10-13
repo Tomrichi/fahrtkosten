@@ -153,7 +153,7 @@ enum AndroidBackupConverter {
         "kfzVersicherung": "KFZ-Versicherung", "verpflegung": "Verpflegung", "sonstiges": "Sonstiges",
     ]
     /// Android: 1 = Mo … 7 = So  →  iOS: 1 = So, 2 = Mo … 7 = Sa
-    static func iosWeekday(fromAndroid d: Int) -> Int { (d % 7) + 1 }
+    nonisolated static func iosWeekday(fromAndroid d: Int) -> Int { (d % 7) + 1 }
 
     // ── Umwandlung ──────────────────────────────────────────────────────────
     static func convert(_ a: [String: Any]) -> [String: Any] {
@@ -210,6 +210,7 @@ enum AndroidBackupConverter {
                 "actualCost": double(h["actual_cost"]),
                 "numberOfNights": max(1, int(h["number_of_nights"], 1)),
                 "breakfastIncluded": bool(h["breakfast_included"]),
+                "paidByEmployer": bool(h["paid_by_employer"]),
             ]
             if let out = iso(h["check_out_date"]) { o["checkOutDate"] = out }
             return o
