@@ -318,8 +318,10 @@ struct PDFExportService {
                 drawSectionHeader(title: "Verpflegung  (\(meals.count) Einträge)", subtotal: mealTotal)
                 for meal in meals.sorted(by: { $0.date > $1.date }) {
                     let allowance = store.effectiveAllowance(for: meal)
-                    let h = String(format: "%.1f h", meal.hours)
-                    let detail = "\(meal.region.localizedName)  ·  \(h)"
+                    let totalH = store.totalWorkHours(for: meal)
+                    let h = String(format: "%.1f h", totalH)
+                    let label = store.effectiveAllowanceLabel(for: meal)
+                    let detail = "\(meal.region.localizedName)  ·  \(h)  ·  \(label)"
                     drawRow(
                         date: meal.date.formatted(date: .numeric, time: .omitted),
                         desc: "Verpflegungspauschale",

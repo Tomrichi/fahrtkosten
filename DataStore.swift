@@ -494,7 +494,8 @@ class DataStore: ObservableObject {
         case .gesetzlich:
             let dt = resolvedDayType(for: meal)
             let (dayR, fullR) = legalRates(for: meal.region, workedAtPlant: meal.workedAtPlant)
-            var result = meal.legalAllowance(resolvedDayType: dt, dayRate: dayR, fullDayRate: fullR)
+            let totalH = totalWorkHours(for: meal) // inkl. Fahrtzeiten des gleichen Tages
+            var result = meal.legalAllowance(resolvedDayType: dt, dayRate: dayR, fullDayRate: fullR, totalHours: totalH)
             // Hotel-Frühstück auto: Tag nach Übernachtung (nicht am Anreisetag)
             if !meal.providedBreakfast && dt != .anreisetag {
                 let cal = Calendar.current
@@ -514,7 +515,7 @@ class DataStore: ObservableObject {
         case .eigeneStufen:
             return meal.allowanceLabel(rates: mealRates(for: meal.region))
         case .gesetzlich:
-            return meal.legalAllowanceLabel(resolvedDayType: resolvedDayType(for: meal))
+            return meal.legalAllowanceLabel(resolvedDayType: resolvedDayType(for: meal), totalHours: totalWorkHours(for: meal))
         }
     }
 

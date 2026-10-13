@@ -294,7 +294,8 @@ struct MealEntry: Identifiable, Codable {
     }
 
     // Gesetzliche Berechnung nach § 9 Abs. 4a EStG
-    func legalAllowance(resolvedDayType: DayType, dayRate: Double, fullDayRate: Double) -> Double {
+    func legalAllowance(resolvedDayType: DayType, dayRate: Double, fullDayRate: Double, totalHours: Double? = nil) -> Double {
+        let h = totalHours ?? rawHours
         let base: Double
         if weekendAwayOnly {
             base = fullDayRate
@@ -302,7 +303,7 @@ struct MealEntry: Identifiable, Codable {
             switch resolvedDayType {
             case .anreisetag, .abreisetag: base = dayRate
             case .vollerTag:               base = fullDayRate
-            case .eintaegig, .automatisch: base = rawHours > 8 ? dayRate : 0
+            case .eintaegig, .automatisch: base = h > 8 ? dayRate : 0
             }
         }
         let deduction = (providedBreakfast ? fullDayRate * 0.20 : 0)
@@ -310,14 +311,15 @@ struct MealEntry: Identifiable, Codable {
                       + (providedDinner    ? fullDayRate * 0.40 : 0)
         return max(0, base - deduction)
     }
-    func legalAllowanceLabel(resolvedDayType: DayType) -> String {
+    func legalAllowanceLabel(resolvedDayType: DayType, totalHours: Double? = nil) -> String {
+        let h = totalHours ?? rawHours
         if weekendAwayOnly { return "Voller Tag" }
         switch resolvedDayType {
         case .anreisetag:  return "Anreisetag"
         case .abreisetag:  return "Abreisetag"
         case .vollerTag:   return "Voller Tag"
         case .eintaegig, .automatisch:
-            return rawHours > 8 ? "ab 8 h" : "bis 8 h"
+            return h > 8 ? "ab 8 h" : "bis 8 h"
         }
     }
 }
