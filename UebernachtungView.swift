@@ -288,6 +288,13 @@ struct HotelRow: View {
                         .padding(.horizontal, 6).padding(.vertical, 2)
                         .background(Color.red.opacity(0.7)).clipShape(Capsule())
                 }
+                if hotel.paidByEmployer {
+                    Text("AG bezahlt")
+                        .font(.system(size: 10, weight: .regular))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 6).padding(.vertical, 2)
+                        .background(Color.orange.opacity(0.8)).clipShape(Capsule())
+                }
             }
         }
         .padding(.vertical, 5)
@@ -313,6 +320,7 @@ struct HotelFormView: View {
     @State private var showScanner       = false
     @State private var showDateRange     = false
     @State private var breakfastIncluded = false
+    @State private var paidByEmployer    = false
 
     private var isEdit: Bool { if case .edit = mode { return true }; return false }
     private var editingHotel: HotelEntry? { if case .edit(let h) = mode { return h }; return nil }
@@ -460,6 +468,29 @@ struct HotelFormView: View {
                     }
                 }
 
+                // ── Kostenübernahme ──
+                Section {
+                    Toggle(isOn: $paidByEmployer) {
+                        HStack(spacing: 8) {
+                            Label("Vom Arbeitgeber bezahlt", systemImage: "building.2.fill")
+                            if paidByEmployer {
+                                Text("Nicht absetzbar")
+                                    .font(.caption)
+                                    .foregroundColor(.orange)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.orange.opacity(0.12))
+                                    .clipShape(Capsule())
+                            }
+                        }
+                    }
+                    .tint(.orange)
+                } footer: {
+                    Text(paidByEmployer
+                        ? "Der Arbeitgeber erstattet die Übernachtungskosten steuerfrei – sie können nicht zusätzlich als Werbungskosten geltend gemacht werden und fließen nicht in die Gesamterstattung ein."
+                        : "Selbst bezahlt: Die Kosten fließen in die steuerliche Erstattung ein und können in Anlage N als Werbungskosten angesetzt werden.")
+                }
+
                 // ── Frühstück ──
                 Section {
                     Toggle(isOn: $breakfastIncluded) {
@@ -534,6 +565,7 @@ struct HotelFormView: View {
             costString = String(format: "%.2f", h.actualCost).replacingOccurrences(of: ".", with: ",")
         }
         breakfastIncluded = h.breakfastIncluded
+        paidByEmployer    = h.paidByEmployer
     }
 
     private func save() {
@@ -545,7 +577,8 @@ struct HotelFormView: View {
             mode: hotelMode,
             actualCost: actualCost,
             numberOfNights: numberOfNights,
-            breakfastIncluded: breakfastIncluded
+            breakfastIncluded: breakfastIncluded,
+            paidByEmployer: paidByEmployer
         )
         if isEdit { store.updateHotel(entry) } else { store.addHotel(entry) }
         dismiss()

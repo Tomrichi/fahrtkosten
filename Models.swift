@@ -344,17 +344,21 @@ struct HotelEntry: Identifiable, Codable {
     var numberOfNights       : Int     // Anzahl Nächte (NEU)
     /// Frühstück im Hotelpreis inbegriffen → 20 % der Tagespauschale werden abgezogen
     var breakfastIncluded    : Bool = false
+    /// Kosten vom Arbeitgeber erstattet → nicht in die steuerliche Erstattung einrechnen
+    var paidByEmployer       : Bool = false
 
     enum CodingKeys: String, CodingKey {
-        case id, date, checkOutDate, city, hotelName, mode, actualCost, numberOfNights, breakfastIncluded
+        case id, date, checkOutDate, city, hotelName, mode, actualCost, numberOfNights, breakfastIncluded, paidByEmployer
     }
     init(id: UUID = UUID(), date: Date, checkOutDate: Date? = nil,
          city: String, hotelName: String, mode: HotelMode,
-         actualCost: Double, numberOfNights: Int = 1, breakfastIncluded: Bool = false) {
+         actualCost: Double, numberOfNights: Int = 1, breakfastIncluded: Bool = false,
+         paidByEmployer: Bool = false) {
         self.id = id; self.date = date; self.checkOutDate = checkOutDate
         self.city = city; self.hotelName = hotelName; self.mode = mode
         self.actualCost = actualCost; self.numberOfNights = max(1, numberOfNights)
         self.breakfastIncluded = breakfastIncluded
+        self.paidByEmployer = paidByEmployer
     }
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -367,8 +371,15 @@ struct HotelEntry: Identifiable, Codable {
         actualCost = try c.decode(Double.self, forKey: .actualCost)
         numberOfNights = try c.decodeIfPresent(Int.self, forKey: .numberOfNights) ?? 1
         breakfastIncluded = try c.decodeIfPresent(Bool.self, forKey: .breakfastIncluded) ?? false
+        paidByEmployer = try c.decodeIfPresent(Bool.self, forKey: .paidByEmployer) ?? false
     }
+    /// Erstattungsfähiger Betrag: 0 wenn AG die Kosten trägt.
     func amount(flat: Double) -> Double {
+        if paidByEmployer { return 0 }
+        switch mode { case .flat: return flat * Double(numberOfNights); case .actual: return actualCost }
+    }
+    /// Tatsächliche Kosten unabhängig von der Kostenübernahme (für Anzeige/PDF).
+    func rawAmount(flat: Double) -> Double {
         switch mode { case .flat: return flat * Double(numberOfNights); case .actual: return actualCost }
     }
     func amountPerNight(flat: Double) -> Double {

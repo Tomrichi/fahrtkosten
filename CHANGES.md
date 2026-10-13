@@ -14,6 +14,15 @@
 
 ---
 
+## Version 1.17.43 Build 77 (Oktober 2026)
+
+- **Neu: Hotel – Vom Arbeitgeber bezahlt** – Übernachtungen können als „AG bezahlt" markiert werden. Diese fließen nicht in die steuerliche Erstattung ein und werden im PDF entsprechend gekennzeichnet. Selbst bezahlte Kosten bleiben als Werbungskosten ansetzbar (Anlage N).
+- **Fehlerbehebung: Gesetzliche Pauschale** – Arbeitszeit und Hin-/Rückfahrt werden jetzt korrekt für die 8h-Schwelle zusammengezählt. PDF zeigt Gesamtstunden und Tagtyp je Eintrag.
+- **Fehlerbehebung: Zwischentage** – Tage zwischen An- und Abreise erhalten jetzt korrekt 28 € (voller Tag).
+- **Fehlerbehebung: Wiederkehrende Fahrten** – Eintrag ist jetzt direkt im ⋯-Menü der Fahrtenliste erreichbar.
+
+---
+
 ## Version 1.17.43 Build 75 (Oktober 2026)
 
 - **Neu: Verpflegungspauschalen nach Steuerrecht (§ 9 Abs. 4a EStG)** – Neuer Modus „Gesetzlich" ergänzt den bisherigen Modus „Eigene Stufen". Inland 14 €/28 €, Schweiz 47/70 CHF, Ausland nach BMF-Tabelle.

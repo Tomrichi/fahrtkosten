@@ -339,12 +339,14 @@ struct PDFExportService {
                 for hotel in hotels.sorted(by: { $0.date > $1.date }) {
                     let amt = hotel.amount(flat: store.hotelFlat)
                     let desc = [hotel.hotelName, hotel.city].filter { !$0.isEmpty }.joined(separator: ", ")
-                    let detail = "\(hotel.numberOfNights) Nacht/Nächte  ·  \(String(format: "%.2f €/N", hotel.amountPerNight(flat: store.hotelFlat)))"
+                    let agHinweis = hotel.paidByEmployer ? "  ·  AG bezahlt – nicht absetzbar" : ""
+                    let detail = "\(hotel.numberOfNights) Nacht/Nächte  ·  \(String(format: "%.2f €/N", hotel.amountPerNight(flat: store.hotelFlat)))\(agHinweis)"
                     drawRow(
                         date: hotel.date.formatted(date: .numeric, time: .omitted),
                         desc: desc.isEmpty ? "Hotel" : desc,
                         detail: detail,
-                        betrag: amt
+                        betrag: amt,
+                        highlight: hotel.paidByEmployer
                     )
                 }
                 y += 6
