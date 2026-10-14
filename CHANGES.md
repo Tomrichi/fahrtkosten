@@ -2,7 +2,7 @@
 
 ---
 
-## Version 1.17.43 Build 81 (Oktober 2026)
+## Version 1.17.46 Build 84 (Oktober 2026)
 
 - **Fehlerbehebung: GPS-Fahrt nach Pause-Timeout nicht gespeichert** – Wird eine pausierte GPS-Fahrt nicht innerhalb von 15 Minuten fortgesetzt, beendet die App die Aufzeichnung automatisch. Die Fahrt wurde bisher verworfen und nicht in die Liste übernommen. Ab sofort wird sie automatisch gespeichert (mit Vermerk „GPS-Fahrt (auto)").
 
