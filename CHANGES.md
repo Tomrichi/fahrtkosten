@@ -2,6 +2,12 @@
 
 ---
 
+## Version 1.17.43 Build 81 (Oktober 2026)
+
+- **Fehlerbehebung: GPS-Fahrt nach Pause-Timeout nicht gespeichert** – Wird eine pausierte GPS-Fahrt nicht innerhalb von 15 Minuten fortgesetzt, beendet die App die Aufzeichnung automatisch. Die Fahrt wurde bisher verworfen und nicht in die Liste übernommen. Ab sofort wird sie automatisch gespeichert (mit Vermerk „GPS-Fahrt (auto)").
+
+---
+
 ## Version 1.17.43 Build 80 (Oktober 2026)
 
 - **Fehlerbehebung: Auslandspauschalen korrigiert** – Gegen das BMF-Schreiben vom 5. Dezember 2025 geprüft: Luxemburg (und damit der Satz für alle nicht gelisteten Länder) gilt jetzt 42 € / 63 € statt 31 € / 47 €, Schweiz – Genf 47 € / 70 € statt 44 € / 70 €, Weißrussland 14 € / 21 € statt 13 € / 20 €. Bereits gewählte Länder mit dem alten Satz werden einmalig angepasst; selbst geänderte Beträge bleiben unverändert.

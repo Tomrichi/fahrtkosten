@@ -329,7 +329,21 @@ extension LocationTracker: CLLocationManagerDelegate {
         // Auto-Stop nach 15 Minuten Pause (Fahrt vermutlich beendet)
         DispatchQueue.main.asyncAfter(deadline: .now() + 900) { [weak self] in
             guard let self, self.isPaused else { return }
-            self.stopAndGeocode { _, _, _ in }
+            let autoStartDate = self.startedAt
+            let autoElapsed   = self.elapsedSeconds
+            let autoEndDate   = Date()
+            self.stopAndGeocode { from, to, km in
+                var info: [AnyHashable: Any] = [
+                    "km": km,
+                    "elapsed": autoElapsed,
+                    "endDate": autoEndDate,
+                ]
+                if !from.isEmpty { info["from"] = from }
+                if !to.isEmpty   { info["to"]   = to   }
+                if let sd = autoStartDate { info["startDate"] = sd }
+                NotificationCenter.default.post(name: .gpsTrackingAutoStopped, object: nil, userInfo: info)
+                AppLogger.shared.log("GPS-Fahrt auto-gestoppt und gespeichert: \(from) → \(to), \(String(format: "%.1f", km)) km", level: .gps)
+            }
         }
         stationaryTimer?.invalidate()
         stationaryTimer = nil
@@ -357,4 +371,5 @@ extension Notification.Name {
     static let gpsTrackingStatusChanged = Notification.Name("gpsTrackingStatusChanged")
     static let gpsTrackingPaused        = Notification.Name("gpsTrackingPaused")
     static let gpsTrackingResumed       = Notification.Name("gpsTrackingResumed")
+    static let gpsTrackingAutoStopped   = Notification.Name("gpsTrackingAutoStopped")
 }

@@ -601,6 +601,61 @@ struct FahrtenView: View {
             .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("carPlayStopGPS"))) { _ in
                 handleCarPlayStopGPS()
             }
+            .onReceive(NotificationCenter.default.publisher(for: .gpsTrackingAutoStopped)) { note in
+                guard let info = note.userInfo else { return }
+                let from      = info["from"]      as? String ?? ""
+                let to        = info["to"]        as? String ?? from
+                let km        = info["km"]        as? Double ?? 0
+                let elapsed   = info["elapsed"]   as? Int    ?? 0
+                let startDate = info["startDate"] as? Date
+                let endDate   = info["endDate"]   as? Date   ?? Date()
+                let h = elapsed / 3600
+                let m = (elapsed % 3600) / 60
+                let fahrzeitText: String
+                if h > 0      { fahrzeitText = String(format: "%dh %02dmin", h, m) }
+                else if m > 0 { fahrzeitText = String(format: "%dmin", m) }
+                else          { fahrzeitText = "" }
+                let start = startDate ?? endDate
+                var trip = Trip(
+                    from: from.isEmpty ? "Unbekannt" : from,
+                    to: to.isEmpty ? (from.isEmpty ? "Unbekannt" : from) : to,
+                    date: start,
+                    km: km,
+                    note: "GPS-Fahrt (auto)",
+                    startTime: start,
+                    endTime: endDate
+                )
+                trip.fahrzeitText = fahrzeitText.isEmpty ? nil : fahrzeitText
+                if defaultFuelTypeKey != "hybrid" {
+                    let fuelType: FuelType = {
+                        switch defaultFuelTypeKey {
+                        case "e5":      return .e5
+                        case "diesel":  return .diesel
+                        case "elektro": return .elektro
+                        default:        return .e10
+                        }
+                    }()
+                    let priceStr = switch defaultFuelTypeKey {
+                        case "e5":      defaultPriceE5
+                        case "diesel":  defaultPriceDiesel
+                        case "elektro": defaultPriceElektro
+                        default:        defaultPriceE10
+                    }
+                    let consStr = switch defaultFuelTypeKey {
+                        case "e5":      defaultConsE5
+                        case "diesel":  defaultConsDiesel
+                        case "elektro": defaultConsElektro
+                        default:        defaultConsE10
+                    }
+                    let price = Double(priceStr.replacingOccurrences(of: ",", with: "."))
+                    let cons  = Double(consStr.replacingOccurrences(of: ",", with: "."))
+                    if let price { trip.fuelPricePerLiter = price }
+                    if let cons  { trip.fuelConsumption   = cons  }
+                    trip.fuelTypeRaw = fuelType.storageKey
+                }
+                store.addTrip(trip)
+                AppLogger.shared.log("GPS-Fahrt (auto-gestoppt) gespeichert: \(from) → \(to), \(String(format: "%.1f", km)) km", level: .gps)
+            }
         }
     }
 
