@@ -458,6 +458,15 @@ struct EinstellungenView: View {
     @ViewBuilder private var collapsibleWochenendzulage: some View {
         Section {
             DisclosureGroup(isExpanded: $expandWochenendzulage) {
+                Toggle(isOn: Binding(
+                    get: { store.wochenendzulageEnabled },
+                    set: { store.wochenendzulageEnabled = $0 }
+                )) {
+                    Label("Wochenendzulage berechnen", systemImage: "calendar.badge.exclamationmark")
+                }
+                Text("Gesetzlich gibt es keine Wochenend-/Feiertagszulage – nur wenn vertraglich vereinbart.")
+                    .font(.caption2).foregroundStyle(.secondary)
+                if store.wochenendzulageEnabled {
                 HStack {
                     Label(lm.t("settings.weekend.inland.label"), systemImage: "flag.fill")
                     Spacer()
@@ -491,6 +500,7 @@ struct EinstellungenView: View {
                         .frame(width: 80)
                     Text("€").foregroundStyle(.secondary).font(.subheadline)
                 }
+                } // end if wochenendzulageEnabled
             } label: {
                 Label(lm.t("settings.weekend.allowance"), systemImage: "calendar.badge.exclamationmark")
                     .foregroundStyle(.primary)

@@ -106,6 +106,9 @@ class DataStore: ObservableObject {
     @Published var monteurszulageEnabled: Bool {
         didSet { local.set(monteurszulageEnabled, forKey: "monteurszulageEnabled") }
     }
+    @Published var wochenendzulageEnabled: Bool {
+        didSet { local.set(wochenendzulageEnabled, forKey: "wochenendzulageEnabled") }
+    }
     // Gesetzliche Tagessätze Inland (€)
     @Published var legalInlandDay:     Double { didSet { local.set(legalInlandDay,     forKey: "legalInlandDay") } }
     @Published var legalInlandFullDay: Double { didSet { local.set(legalInlandFullDay, forKey: "legalInlandFullDay") } }
@@ -157,7 +160,8 @@ class DataStore: ObservableObject {
         // v1.18 – Gesetzlicher Modus
         mealMode = MealMode(rawValue: local.string(forKey: "mealMode") ?? "") ?? .gesetzlich
         allowanceForTripsOnly = local.object(forKey: "allowanceForTripsOnly") as? Bool ?? true
-        monteurszulageEnabled = local.object(forKey: "monteurszulageEnabled") as? Bool ?? true
+        monteurszulageEnabled   = local.object(forKey: "monteurszulageEnabled")   as? Bool ?? true
+        wochenendzulageEnabled  = local.object(forKey: "wochenendzulageEnabled")  as? Bool ?? true
         legalInlandDay     = local.double(forKey: "legalInlandDay").ifZero(14.0)
         legalInlandFullDay = local.double(forKey: "legalInlandFullDay").ifZero(28.0)
         legalSwissDay      = local.double(forKey: "legalSwissDay").ifZero(47.0)
@@ -566,6 +570,7 @@ class DataStore: ObservableObject {
     /// WICHTIG: Wird wie die Monteurszulage über den Lohn ausbezahlt – NICHT Teil der
     /// steuerfreien Verpflegungspauschale/Gesamterstattung, sondern separat ausgewiesen.
     func wochenendzulage(for meal: MealEntry) -> Double {
+        guard wochenendzulageEnabled else { return 0 }
         guard !meal.isTraining, !meal.weekendAwayOnly else { return 0 }
         let weekday = Calendar.current.component(.weekday, from: meal.date) // 1 = Sonntag, 7 = Samstag
         let isWeekend = weekday == 1 || weekday == 7
