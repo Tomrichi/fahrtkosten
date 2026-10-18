@@ -1,19 +1,19 @@
 import SwiftUI
 
-// Einheitliches Element für die Liste: entweder MealEntry oder Trip-only Tag
+// Einheitliches Element für die Liste: entweder MealEntry(s) oder Trip-only Tag
 enum ArbeitszeitItem: Identifiable {
-    case meal(MealEntry)
+    case meals([MealEntry])   // ein oder mehrere MealEntries des gleichen Tages
     case tripsOnly([Trip])
 
     var id: String {
         switch self {
-        case .meal(let m):      return m.id.uuidString
-        case .tripsOnly(let t): return "trip-" + (t.first?.date.shortDate ?? "")
+        case .meals(let m):     return "meals-" + (m.first?.date.shortDate ?? "")
+        case .tripsOnly(let t): return "trip-"  + (t.first?.date.shortDate ?? "")
         }
     }
     var date: Date {
         switch self {
-        case .meal(let m):      return m.date
+        case .meals(let m):     return m.first?.date ?? Date()
         case .tripsOnly(let t): return t.first?.date ?? Date()
         }
     }
@@ -82,7 +82,9 @@ struct ArbeitszeitView: View {
         let tripOnlyTrips = allFilteredTrips.filter { !mealDates.contains(cal.startOfDay(for: $0.date)) && $0.art == .geschaeftlich }
         let tripGroups = Dictionary(grouping: tripOnlyTrips) { cal.startOfDay(for: $0.date) }
 
-        var items: [ArbeitszeitItem] = filteredMeals.map { .meal($0) }
+        // Mehrere MealEntries am gleichen Tag → ein gemeinsamer Eintrag
+        let mealsByDay = Dictionary(grouping: filteredMeals) { cal.startOfDay(for: $0.date) }
+        var items: [ArbeitszeitItem] = mealsByDay.values.map { .meals($0.sorted { $0.date < $1.date }) }
         items += tripGroups.values.map { .tripsOnly($0) }
         return items.sorted { $0.date > $1.date }
     }
@@ -399,43 +401,46 @@ struct ArbeitszeitView: View {
         Section(filterLabel) {
             ForEach(combinedItems) { item in
                 switch item {
-                case .meal(let meal):
+                case .meals(let mealGroup):
+                    let primary = mealGroup.max(by: { store.adjustedMealAllowance(for: $0) < store.adjustedMealAllowance(for: $1) }) ?? mealGroup[0]
+                    let allTrips = tripsForMeal(primary)
                     ArbeitszeitRow(
-                        meal: meal,
-                        trips: tripsForMeal(meal),
-                        adjusted: store.adjustedMealAllowance(for: meal),
-                        totalH: store.totalWorkHours(for: meal),
-                        isExpanded: expandedMeals.contains(meal.id),
+                        meal: primary,
+                        allMeals: mealGroup,
+                        trips: allTrips,
+                        adjusted: store.adjustedMealAllowance(for: primary),
+                        totalH: store.totalWorkHours(for: primary),
+                        isExpanded: expandedMeals.contains(primary.id),
                         onToggle: {
                             withOptionalAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                                if expandedMeals.contains(meal.id) { expandedMeals.remove(meal.id) }
-                                else { expandedMeals.insert(meal.id) }
+                                if expandedMeals.contains(primary.id) { expandedMeals.remove(primary.id) }
+                                else { expandedMeals.insert(primary.id) }
                             }
                         }
                     )
                     .contentShape(Rectangle())
                     .onTapGesture {
                         withOptionalAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                            if expandedMeals.contains(meal.id) { expandedMeals.remove(meal.id) }
-                            else { expandedMeals.insert(meal.id) }
+                            if expandedMeals.contains(primary.id) { expandedMeals.remove(primary.id) }
+                            else { expandedMeals.insert(primary.id) }
                         }
                     }
                     .dynamicSwipeActions(
                         onDelete: {
-                            AppLogger.shared.logTap("Arbeitszeit gelöscht: \(meal.date.shortDate)")
-                            store.deleteMeal(meal.id)
+                            AppLogger.shared.logTap("Arbeitszeit gelöscht: \(primary.date.shortDate)")
+                            store.deleteMeal(primary.id)
                         },
-                        onEdit: { editMeal = meal },
+                        onEdit: { editMeal = primary },
                         onDuplicate: {
-                            AppLogger.shared.logTap("Arbeitszeit dupliziert: \(meal.date.shortDate)")
-                            store.duplicateMeal(meal)
+                            AppLogger.shared.logTap("Arbeitszeit dupliziert: \(primary.date.shortDate)")
+                            store.duplicateMeal(primary)
                         }
                     )
                     .contextMenu {
-                        Button { editMeal = meal } label: { Label(lm.t("action.edit"), systemImage: "pencil") }
-                        Button { store.duplicateMeal(meal) } label: { Label("Eintrag duplizieren", systemImage: "doc.on.doc") }
+                        Button { editMeal = primary } label: { Label(lm.t("action.edit"), systemImage: "pencil") }
+                        Button { store.duplicateMeal(primary) } label: { Label("Eintrag duplizieren", systemImage: "doc.on.doc") }
                         Divider()
-                        Button(role: .destructive) { store.deleteMeal(meal.id) } label: {
+                        Button(role: .destructive) { store.deleteMeal(primary.id) } label: {
                             Label(lm.t("action.delete"), systemImage: "trash")
                         }.tint(.red)
                     }
@@ -472,6 +477,7 @@ struct ArbeitszeitRow: View {
     @EnvironmentObject var store: DataStore
     @AppStorage("homeAddress") private var homeAddress: String = ""
     let meal:       MealEntry
+    var allMeals:   [MealEntry] = []   // alle MealEntries des Tages (inkl. meal selbst)
     let trips:      [Trip]
     let adjusted:   Double
     let totalH:     Double
@@ -540,7 +546,7 @@ struct ArbeitszeitRow: View {
                         .font(.system(size: 15, weight: .bold, design: .monospaced))
                         .foregroundColor(.blue)
 
-                    if !trips.isEmpty {
+                    if !trips.isEmpty || allMeals.count > 1 {
                         Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundColor(.secondary)
@@ -549,37 +555,40 @@ struct ArbeitszeitRow: View {
             }
             .padding(.vertical, 6)
             .contentShape(Rectangle())
-            .onTapGesture { if !trips.isEmpty { onToggle() } }
+            .onTapGesture { if !trips.isEmpty || allMeals.count > 1 { onToggle() } }
 
             // ── Aufgeklappter Bereich: Fahrten ────────────────────
-            if isExpanded && !trips.isEmpty {
+            if isExpanded && (!trips.isEmpty || allMeals.count > 1) {
                 Divider()
                     .padding(.leading, 48)
                     .padding(.top, 2)
 
                 VStack(alignment: .leading, spacing: 5) {
-                    // Arbeitszeit-Zeile mit Löschen-Option
-                    HStack(spacing: 8) {
-                        Image(systemName: "clock.fill")
-                            .font(.system(size: 10))
-                            .foregroundColor(.green)
-                            .frame(width: 14)
-                        Text("Arbeitszeit: \(meal.startTime.timeOnly)–\(meal.endTime.timeOnly)")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Spacer()
-                        Button {
-                            store.deleteMeal(meal.id)
-                        } label: {
-                            Image(systemName: "trash")
-                                .font(.system(size: 11))
-                                .foregroundColor(.red.opacity(0.8))
+                    // Alle Arbeitszeit-Einträge des Tages anzeigen
+                    let mealsToShow = allMeals.isEmpty ? [meal] : allMeals
+                    ForEach(mealsToShow) { m in
+                        HStack(spacing: 8) {
+                            Image(systemName: "clock.fill")
+                                .font(.system(size: 10))
+                                .foregroundColor(.green)
+                                .frame(width: 14)
+                            Text("Arbeitszeit: \(m.startTime.timeOnly)–\(m.endTime.timeOnly)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Button {
+                                store.deleteMeal(m.id)
+                            } label: {
+                                Image(systemName: "trash")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(.red.opacity(0.8))
+                            }
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
+                        .padding(.vertical, 2)
                     }
-                    .padding(.vertical, 2)
 
-                    Divider().padding(.leading, 22)
+                    if !trips.isEmpty { Divider().padding(.leading, 22) }
 
                     ForEach(trips) { trip in
                         HStack(spacing: 8) {
@@ -747,12 +756,12 @@ struct TripOnlyArbeitszeitRow: View {
                         Image(systemName: "clock.badge.checkmark")
                             .font(.system(size: 10))
                             .foregroundColor(.green)
-                        Text(String(format: "Gesamt %.1f h", tripDurationSum))
+                        Text(String(format: "Abwesenheit %.1f h", totalH))
                             .font(.caption.bold())
                             .foregroundColor(.green)
                         Text("→ \(allowance.euroFormatted)")
                             .font(.caption.bold())
-                            .foregroundColor(.green)
+                            .foregroundColor(allowance > 0 ? .green : .secondary)
                     }
                     .padding(.top, 2)
                 }

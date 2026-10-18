@@ -319,7 +319,7 @@ struct MealEntry: Identifiable, Codable {
         case .abreisetag:  return "Abreisetag"
         case .vollerTag:   return "Voller Tag"
         case .eintaegig, .automatisch:
-            return h > 8 ? "ab 8 h" : "bis 8 h"
+            return h > 8 ? "> 8 h" : "bis 8 h"
         }
     }
 }

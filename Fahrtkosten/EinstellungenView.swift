@@ -286,12 +286,12 @@ struct EinstellungenView: View {
                         Text("Inland (§ 9 Abs. 4a EStG)").font(.caption).foregroundStyle(.secondary)
                             .padding(.top, 8).padding(.bottom, 4)
                         legalMealRow(label: "bis 8 h (kein Anspruch)", value: "0 €", color: .gray)
-                        legalMealRow(label: "ab 8 h / An- & Abreisetag", value: String(format: "%.0f €", store.legalInlandDay), color: .orange)
+                        legalMealRow(label: "> 8 h / An- & Abreisetag", value: String(format: "%.0f €", store.legalInlandDay), color: .orange)
                         legalMealRow(label: "voller Tag (24 h)", value: String(format: "%.0f €", store.legalInlandFullDay), color: .green)
                         Divider().padding(.vertical, 6)
                         Text("Schweiz").font(.caption).foregroundStyle(.secondary).padding(.bottom, 4)
                         legalMealRow(label: "bis 8 h", value: "0 CHF", color: .gray)
-                        legalMealRow(label: "ab 8 h / An- & Abreisetag", value: String(format: "%.0f CHF", store.legalSwissDay), color: .orange)
+                        legalMealRow(label: "> 8 h / An- & Abreisetag", value: String(format: "%.0f CHF", store.legalSwissDay), color: .orange)
                         legalMealRow(label: "voller Tag (24 h)", value: String(format: "%.0f CHF", store.legalSwissFullDay), color: .green)
                         HStack {
                             Label("Kurs (EUR = … CHF)", systemImage: "arrow.left.arrow.right")
@@ -331,8 +331,17 @@ struct EinstellungenView: View {
                             }
                         }
                         .padding(.bottom, 4)
-                        mealRow(label: "ab 8 h / An- & Abreisetag", icon: "2.circle.fill", color: .orange, binding: $legalAbroadDayStr)
+                        mealRow(label: "> 8 h / An- & Abreisetag", icon: "2.circle.fill", color: .orange, binding: $legalAbroadDayStr)
                         mealRow(label: "voller Tag (24 h)",          icon: "3.circle.fill", color: .green,  binding: $legalAbroadFullDayStr)
+                        Divider().padding(.vertical, 6)
+                        Toggle(isOn: Binding(
+                            get: { store.allowanceForTripsOnly },
+                            set: { store.allowanceForTripsOnly = $0 }
+                        )) {
+                            Label("Pauschale für Tage ohne Arbeitszeit", systemImage: "car.fill")
+                        }
+                        Text("Fahrt-Tage ohne Arbeitszeiteintrag: Pauschale basiert auf Abwesenheitszeit (früheste Abfahrt bis späteste Rückkehr). Ausschalten, wenn nur Tage mit Arbeitszeiteintrag gewertet werden sollen.")
+                            .font(.caption2).foregroundStyle(.secondary)
                     } else {
                         // ── Eigene Stufen ──
                         Text(lm.t("settings.region.inland")).font(.caption).foregroundStyle(.secondary)
@@ -379,6 +388,13 @@ struct EinstellungenView: View {
     @ViewBuilder private var collapsibleMonteurszulage: some View {
         Section {
             DisclosureGroup(isExpanded: $expandMonteurszulage) {
+                Toggle(isOn: Binding(
+                    get: { store.monteurszulageEnabled },
+                    set: { store.monteurszulageEnabled = $0 }
+                )) {
+                    Label("Monteurszulage berechnen", systemImage: "wrench.fill")
+                }
+                if store.monteurszulageEnabled {
                 HStack {
                     Label("Werk-Standort", systemImage: "building.2.fill")
                     Spacer()
@@ -428,6 +444,7 @@ struct EinstellungenView: View {
                         .frame(width: 80)
                     Text("€").foregroundStyle(.secondary).font(.subheadline)
                 }
+                } // end if monteurszulageEnabled
             } label: {
                 Label(lm.t("settings.mechanic.allowance"), systemImage: "wrench.and.screwdriver.fill")
                     .foregroundStyle(.primary)

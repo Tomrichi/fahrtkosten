@@ -100,6 +100,12 @@ class DataStore: ObservableObject {
     @Published var mealMode: MealMode {
         didSet { local.set(mealMode.rawValue, forKey: "mealMode") }
     }
+    @Published var allowanceForTripsOnly: Bool {
+        didSet { local.set(allowanceForTripsOnly, forKey: "allowanceForTripsOnly") }
+    }
+    @Published var monteurszulageEnabled: Bool {
+        didSet { local.set(monteurszulageEnabled, forKey: "monteurszulageEnabled") }
+    }
     // Gesetzliche Tagessätze Inland (€)
     @Published var legalInlandDay:     Double { didSet { local.set(legalInlandDay,     forKey: "legalInlandDay") } }
     @Published var legalInlandFullDay: Double { didSet { local.set(legalInlandFullDay, forKey: "legalInlandFullDay") } }
@@ -150,6 +156,8 @@ class DataStore: ObservableObject {
         profilKennzeichen = local.string(forKey: "profilKennzeichen") ?? ""
         // v1.18 – Gesetzlicher Modus
         mealMode = MealMode(rawValue: local.string(forKey: "mealMode") ?? "") ?? .gesetzlich
+        allowanceForTripsOnly = local.object(forKey: "allowanceForTripsOnly") as? Bool ?? true
+        monteurszulageEnabled = local.object(forKey: "monteurszulageEnabled") as? Bool ?? true
         legalInlandDay     = local.double(forKey: "legalInlandDay").ifZero(14.0)
         legalInlandFullDay = local.double(forKey: "legalInlandFullDay").ifZero(28.0)
         legalSwissDay      = local.double(forKey: "legalSwissDay").ifZero(47.0)
@@ -530,6 +538,7 @@ class DataStore: ObservableObject {
     /// erstattung nach § 9 EStG. Sie darf deshalb nicht in die Verpflegungspauschale/
     /// Gesamterstattung eingerechnet werden, sondern wird separat ausgewiesen.
     func monteurszulage(for meal: MealEntry) -> Double {
+        guard monteurszulageEnabled else { return 0 }
         guard !meal.weekendAwayOnly else { return 0 } // "Wochenende": nicht gearbeitet, keine Zulage
         let h = totalWorkHours(for: meal)
         guard h >= 3 else { return 0 }           // < 3 h: keine Zulage
@@ -828,6 +837,7 @@ extension DataStore {
 
     /// Verpflegungspauschale für Tage mit nur Fahrten (kein MealEntry).
     func mealAllowanceForTripsOnly(_ dayTrips: [Trip]) -> Double {
+        guard allowanceForTripsOnly else { return 0 }
         guard let refDate = dayTrips.first?.date else { return 0 }
         let cal = Calendar.current
         let allDayTrips = trips.filter { cal.isDate($0.date, inSameDayAs: refDate) && $0.art == .geschaeftlich }
@@ -856,15 +866,12 @@ extension DataStore {
     }
 
     func totalWorkHoursForTripsOnly(_ dayTrips: [Trip]) -> Double {
+        // Summe der einzelnen Fahrtzeiten (nicht Spanne von erster bis letzter Fahrt)
         let timed = dayTrips.filter { $0.startTime != nil && $0.endTime != nil }
         if !timed.isEmpty {
-            let cal = Calendar.current
-            func toSec(_ d: Date) -> Double {
-                Double(cal.component(.hour, from: d) * 3600 + cal.component(.minute, from: d) * 60)
+            return timed.reduce(0.0) { acc, trip in
+                acc + max(0, trip.endTime!.timeIntervalSince(trip.startTime!) / 3600.0)
             }
-            let earliest = timed.compactMap { $0.startTime }.map(toSec).min() ?? 0
-            let latest   = timed.compactMap { $0.endTime   }.map(toSec).max() ?? 0
-            return max(0, (latest - earliest) / 3600.0)
         }
         // Fallback: nur fahrzeitText summieren
         return dayTrips.reduce(0.0) { acc, trip in
@@ -923,41 +930,22 @@ extension DataStore {
         // Alle MealEntries des gleichen Tages einbeziehen – nicht nur den aktuellen
         let dayMeals = meals.filter { cal.isDate($0.date, inSameDayAs: meal.date) && !$0.excludeTrips }
 
+        // Summe aller Arbeitszeiten des Tages
+        let workH = dayMeals.reduce(0.0) { $0 + $1.hours }
+
+        // Summe der einzelnen Fahrtzeiten (nicht Spanne von erster bis letzter Fahrt)
         let tripsWithTimes = dayTrips.filter { $0.startTime != nil && $0.endTime != nil }
-        if !tripsWithTimes.isEmpty {
-            // Span über alle Meals + Fahrten des Tages aufspannen
-            var allStarts: [Date] = dayMeals.map { $0.startTime }
-            var allEnds:   [Date] = dayMeals.map { $0.endTime }
-            allStarts += tripsWithTimes.compactMap { $0.startTime }
-            allEnds   += tripsWithTimes.compactMap { $0.endTime }
-
-            func toSeconds(_ d: Date) -> Double {
-                let h = cal.component(.hour,   from: d)
-                let m = cal.component(.minute, from: d)
-                let s = cal.component(.second, from: d)
-                return Double(h * 3600 + m * 60 + s)
-            }
-            let earliest = allStarts.map(toSeconds).min() ?? 0
-            let latest   = allEnds.map(toSeconds).max()   ?? 0
-            let spanH = max(0, (latest - earliest) / 3600.0)
-
-            // Fahrten ohne Zeitstempel aber mit expliziter Fahrzeit separat addieren
-            let tripsWithoutTimes = dayTrips.filter { $0.startTime == nil || $0.endTime == nil }
-            let extraH = tripsWithoutTimes.reduce(0.0) { acc, trip in
-                guard let text = trip.fahrzeitText, !text.isEmpty else { return acc }
-                return acc + parseFahrzeitText(text)
-            }
-            return spanH + extraH
+        let tripH = tripsWithTimes.reduce(0.0) { acc, trip in
+            acc + max(0, trip.endTime!.timeIntervalSince(trip.startTime!) / 3600.0)
         }
 
-        // Fallback: Keine Fahrt hat Zeitstempel.
-        // Alle Arbeitszeiten des Tages + explizit eingetragene Fahrzeiten summieren.
-        let workH = dayMeals.reduce(0.0) { $0 + $1.hours }
-        let driveH = dayTrips.reduce(0.0) { acc, trip in
+        // Fahrten ohne Zeitstempel: explizit eingetragene Fahrzeit addieren
+        let tripsWithoutTimes = dayTrips.filter { $0.startTime == nil || $0.endTime == nil }
+        let extraH = tripsWithoutTimes.reduce(0.0) { acc, trip in
             guard let text = trip.fahrzeitText, !text.isEmpty else { return acc }
             return acc + parseFahrzeitText(text)
         }
-        return workH + driveH
+        return workH + tripH + extraH
     }
 
     private func parseFahrzeitText(_ text: String) -> Double {
