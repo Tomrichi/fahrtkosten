@@ -83,10 +83,14 @@ struct ArbeitszeitView: View {
         let tripGroups = Dictionary(grouping: tripOnlyTrips) { cal.startOfDay(for: $0.date) }
 
         // Mehrere MealEntries am gleichen Tag → ein gemeinsamer Eintrag
-        let mealsByDay = Dictionary(grouping: filteredMeals) { cal.startOfDay(for: $0.date) }
-        var items: [ArbeitszeitItem] = mealsByDay.values.map { .meals($0.sorted { $0.date < $1.date }) }
-        items += tripGroups.values.map { .tripsOnly($0) }
-        return items.sorted { $0.date > $1.date }
+        let mealsByDay = Dictionary(grouping: filteredMeals) { (m: MealEntry) in cal.startOfDay(for: m.date) }
+        var items: [ArbeitszeitItem] = mealsByDay.values.map { (group: [MealEntry]) -> ArbeitszeitItem in
+            ArbeitszeitItem.meals(group.sorted { (a: MealEntry, b: MealEntry) in a.date < b.date })
+        }
+        for (_, dayTrips) in tripGroups {
+            items.append(ArbeitszeitItem.tripsOnly(dayTrips))
+        }
+        return items.sorted { (a: ArbeitszeitItem, b: ArbeitszeitItem) in a.date > b.date }
     }
 
     private var combinedTotal: Double {
@@ -333,8 +337,8 @@ struct ArbeitszeitView: View {
                 countLabel: "\(combinedItems.count) \(lm.t("meals.unit"))",
                 total: combinedItems.reduce(0.0) { sum, item in
                     switch item {
-                    case .meal(let m):      return sum + store.adjustedMealAllowance(for: m)
-                    case .tripsOnly(let t): return sum + store.mealAllowanceForTripsOnly(t)
+                    case .meals(let group):  return sum + store.adjustedMealAllowance(for: group[0])
+                    case .tripsOnly(let t):  return sum + store.mealAllowanceForTripsOnly(t)
                     }
                 }
             )
@@ -402,48 +406,11 @@ struct ArbeitszeitView: View {
             ForEach(combinedItems) { item in
                 switch item {
                 case .meals(let mealGroup):
-                    let primary = mealGroup.max(by: { store.adjustedMealAllowance(for: $0) < store.adjustedMealAllowance(for: $1) }) ?? mealGroup[0]
-                    let allTrips = tripsForMeal(primary)
-                    ArbeitszeitRow(
-                        meal: primary,
-                        allMeals: mealGroup,
-                        trips: allTrips,
-                        adjusted: store.adjustedMealAllowance(for: primary),
-                        totalH: store.totalWorkHours(for: primary),
-                        isExpanded: expandedMeals.contains(primary.id),
-                        onToggle: {
-                            withOptionalAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                                if expandedMeals.contains(primary.id) { expandedMeals.remove(primary.id) }
-                                else { expandedMeals.insert(primary.id) }
-                            }
-                        }
+                    MealGroupEntryRow(
+                        mealGroup: mealGroup,
+                        expandedMeals: $expandedMeals,
+                        editMeal: $editMeal
                     )
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        withOptionalAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                            if expandedMeals.contains(primary.id) { expandedMeals.remove(primary.id) }
-                            else { expandedMeals.insert(primary.id) }
-                        }
-                    }
-                    .dynamicSwipeActions(
-                        onDelete: {
-                            AppLogger.shared.logTap("Arbeitszeit gelöscht: \(primary.date.shortDate)")
-                            store.deleteMeal(primary.id)
-                        },
-                        onEdit: { editMeal = primary },
-                        onDuplicate: {
-                            AppLogger.shared.logTap("Arbeitszeit dupliziert: \(primary.date.shortDate)")
-                            store.duplicateMeal(primary)
-                        }
-                    )
-                    .contextMenu {
-                        Button { editMeal = primary } label: { Label(lm.t("action.edit"), systemImage: "pencil") }
-                        Button { store.duplicateMeal(primary) } label: { Label("Eintrag duplizieren", systemImage: "doc.on.doc") }
-                        Divider()
-                        Button(role: .destructive) { store.deleteMeal(primary.id) } label: {
-                            Label(lm.t("action.delete"), systemImage: "trash")
-                        }.tint(.red)
-                    }
                 case .tripsOnly(let dayTrips):
                     TripOnlyArbeitszeitRow(
                         trips: dayTrips,
@@ -468,6 +435,62 @@ struct ArbeitszeitView: View {
         if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let root = scene.windows.first?.rootViewController {
             root.present(controller, animated: true)
+        }
+    }
+}
+
+// MARK: - Wrapper für eine Gruppe von MealEntries am gleichen Tag
+struct MealGroupEntryRow: View {
+    @EnvironmentObject var store: DataStore
+    @EnvironmentObject var lm: LocalizationManager
+    let mealGroup: [MealEntry]
+    @Binding var expandedMeals: Set<UUID>
+    @Binding var editMeal: MealEntry?
+
+    private var primary: MealEntry { mealGroup[0] }
+    private var allTrips: [Trip] {
+        let cal = Calendar.current
+        return store.trips.filter { cal.isDate($0.date, inSameDayAs: primary.date) }
+    }
+    private var isExpanded: Bool { expandedMeals.contains(primary.id) }
+
+    private func toggle() {
+        withOptionalAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+            if expandedMeals.contains(primary.id) { expandedMeals.remove(primary.id) }
+            else { expandedMeals.insert(primary.id) }
+        }
+    }
+
+    var body: some View {
+        ArbeitszeitRow(
+            meal: primary,
+            allMeals: mealGroup,
+            trips: allTrips,
+            adjusted: store.adjustedMealAllowance(for: primary),
+            totalH: store.totalWorkHours(for: primary),
+            isExpanded: isExpanded,
+            onToggle: toggle
+        )
+        .contentShape(Rectangle())
+        .onTapGesture { toggle() }
+        .dynamicSwipeActions(
+            onDelete: {
+                AppLogger.shared.logTap("Arbeitszeit gelöscht: \(primary.date.shortDate)")
+                store.deleteMeal(primary.id)
+            },
+            onEdit: { editMeal = primary },
+            onDuplicate: {
+                AppLogger.shared.logTap("Arbeitszeit dupliziert: \(primary.date.shortDate)")
+                store.duplicateMeal(primary)
+            }
+        )
+        .contextMenu {
+            Button { editMeal = primary } label: { Label(lm.t("action.edit"), systemImage: "pencil") }
+            Button { store.duplicateMeal(primary) } label: { Label("Eintrag duplizieren", systemImage: "doc.on.doc") }
+            Divider()
+            Button(role: .destructive) { store.deleteMeal(primary.id) } label: {
+                Label(lm.t("action.delete"), systemImage: "trash")
+            }.tint(.red)
         }
     }
 }
