@@ -2,13 +2,19 @@
 
 ---
 
-## Version 1.17.46 Build 84 (Oktober 2026)
+## Version 1.17.47 Build 87 (Oktober 2026)
 
 - **Verbesserung: Tagesgruppierung** – Mehrere Arbeitszeit-Einträge am gleichen Tag werden jetzt als eine einzige Karte angezeigt. Aufgeklappt sind alle Einträge und alle Fahrten des Tages sichtbar.
+- **Verbesserung: Abwesenheitszeit** – Die Abwesenheitszeit für die gesetzliche Verpflegungspauschale ist jetzt die Summe der einzelnen Zeiten (Arbeitszeit und Fahrten) und nicht mehr die Spanne zwischen frühester Abfahrt und spätester Rückkehr.
 - **Neu: Toggle „Wochenendzulage berechnen"** – In den Einstellungen (Wochenend-/Feiertagszulage) lässt sich die Zulage per Schalter deaktivieren. Hinweis: Gesetzlich gibt es keine Wochenendzulage – nur wenn vertraglich vereinbart.
 - **Neu: Toggle „Monteurszulage berechnen"** – In den Einstellungen (Monteurszulage) lässt sich die Zulage jetzt per Schalter komplett deaktivieren. Bei aktiver gesetzlicher Verpflegungspauschale können damit beide Berechnungen unabhängig gesteuert werden.
 - **Neu: Toggle „Pauschale für Tage ohne Arbeitszeit"** – In den Einstellungen (Verpflegung → Gesetzlich) lässt sich einstellen, ob Fahrt-Tage ohne Arbeitszeiteintrag für die Verpflegungspauschale gewertet werden. Basis ist die Abwesenheitszeit (früheste Abfahrt bis späteste Rückkehr).
 - **Verbesserung: Anzeige Fahrt-Tage** – Die „Gesamt"-Zeile in Fahrt-only-Einträgen zeigt jetzt „Abwesenheit X h" (die tatsächliche Basis für die Schwelle) statt der reinen Fahrtzeit.
+
+---
+
+## Version 1.17.46 Build 84 (Oktober 2026)
+
 - **Fehlerbehebung: GPS-Fahrt nach Pause-Timeout nicht gespeichert** – Wird eine pausierte GPS-Fahrt nicht innerhalb von 15 Minuten fortgesetzt, beendet die App die Aufzeichnung automatisch. Die Fahrt wurde bisher verworfen und nicht in die Liste übernommen. Ab sofort wird sie automatisch gespeichert (mit Vermerk „GPS-Fahrt (auto)").
 
 ---

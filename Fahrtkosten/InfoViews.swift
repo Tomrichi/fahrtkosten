@@ -1355,13 +1355,39 @@ private let versionHistoryHTML_de = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.43 – aktuell -->
+<!-- 1.17.47 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.43
+        Version 1.17.47
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">Tagesgruppierung · Abwesenheitszeit · Zulagen-Schalter · GPS-Timeout</div>
+    </div>
+    <span class="build-info">Oktober 2026 · Build 87</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-change">VERBESSERUNG</span> <strong>Tagesgruppierung:</strong> Mehrere Arbeitszeit-Einträge am gleichen Tag werden als eine Karte angezeigt. Aufgeklappt sind alle Einträge und Fahrten des Tages sichtbar.</li>
+      <li><span class="badge-change">VERBESSERUNG</span> <strong>Abwesenheitszeit:</strong> Für die gesetzliche Verpflegungspauschale zählt jetzt die Summe der einzelnen Zeiten, nicht mehr die Spanne zwischen frühester Abfahrt und spätester Rückkehr.</li>
+      <li><span class="badge-new">NEU</span> <strong>Schalter „Monteurszulage berechnen":</strong> Die Monteurszulage lässt sich in den Einstellungen komplett deaktivieren.</li>
+      <li><span class="badge-new">NEU</span> <strong>Schalter „Wochenendzulage berechnen":</strong> Die Wochenend-/Feiertagszulage lässt sich in den Einstellungen per Schalter deaktivieren (gesetzlich gibt es keine Wochenendzulage – nur wenn vertraglich vereinbart).</li>
+      <li><span class="badge-new">NEU</span> <strong>Schalter „Pauschale für Tage ohne Arbeitszeit":</strong> Legt fest, ob Fahrt-Tage ohne Arbeitszeiteintrag für die Verpflegungspauschale gewertet werden.</li>
+      <li><span class="badge-fix">FIX</span> <strong>GPS-Fahrt nach Pause-Timeout:</strong> Wird eine pausierte GPS-Fahrt nicht innerhalb von 15 Minuten fortgesetzt, beendet die App die Aufzeichnung und speichert die Fahrt jetzt automatisch (Vermerk „GPS-Fahrt (auto)").</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.43 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.43
       </div>
       <div class="preview-text">GPS-Pause · Statistik · Suche · Lock Screen Widget · GPS-Probe · Backup</div>
     </div>
