@@ -2,7 +2,7 @@
 
 ---
 
-## Version 1.17.48 Build 88 (November 2026)
+## Version 1.17.49 Build 89 (November 2026)
 
 - **Neu: Fahrtenbuchmodus** – Neuer Schalter in den Einstellungen für die Fahrtenbuchmethode (Privatnutzung Betriebsfahrzeug): Kilometerstand-Felder bei Fahrten, unveränderliches, hash-verkettetes Änderungsprotokoll für alle Einträge (einsehbar in den Einstellungen, als Anhang im PDF-Export) und Abwesenheitszeit als durchgehende Spanne statt Summe der Einzelzeiten.
 - **Neu: Km-Statistik Geschäftlich/Privat** – Die Statistik zeigt jährlich und monatlich jetzt zusätzlich die Aufteilung der gefahrenen Kilometer in geschäftlich/privat inklusive Prozentanteilen.

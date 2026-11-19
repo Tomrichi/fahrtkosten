@@ -1263,17 +1263,17 @@ let versionHistoryHTML_de = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.48 – aktuell -->
+<!-- 1.17.49 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.48
+        Version 1.17.49
         <span class="current-badge">● Aktuell</span>
       </div>
       <div class="preview-text">Fahrtenbuchmodus · Km-Statistik Geschäftlich/Privat · Manuelle Abwesenheitszeit</div>
     </div>
-    <span class="build-info">November 2026 · Build 88</span>
+    <span class="build-info">November 2026 · Build 89</span>
     <span class="chevron">›</span>
   </summary>
   <div class="detail-content">
