@@ -2,7 +2,7 @@
 
 ---
 
-## Version 1.17.49 Build 91 (November 2026)
+## Version 1.17.49 Build 92 (November 2026)
 
 - **Neu: Fahrtenbuchmodus** – Neuer Schalter in den Einstellungen für die Fahrtenbuchmethode (Privatnutzung Betriebsfahrzeug): Kilometerstand-Felder bei Fahrten, unveränderliches, hash-verkettetes Änderungsprotokoll für alle Einträge (einsehbar in den Einstellungen, als Anhang im PDF-Export) und Abwesenheitszeit als durchgehende Spanne statt Summe der Einzelzeiten.
 - **Neu: Km-Statistik Geschäftlich/Privat** – Die Statistik zeigt jährlich und monatlich jetzt zusätzlich die Aufteilung der gefahrenen Kilometer in geschäftlich/privat inklusive Prozentanteilen.
@@ -10,6 +10,7 @@
 - **Fehlerbehebung: Kilometerpauschale** – Übersicht, Statistik sowie PDF- und CSV-Export zählten private Fahrten bisher fälschlich zur Kilometererstattung. Jetzt zählen wie vorgesehen nur geschäftliche Fahrten (§ 9 EStG); private Fahrten bleiben zur Dokumentation sichtbar.
 - **Fehlerbehebung: Kraftstoffkosten bei Apple-Watch-Fahrten** – Über die Apple Watch gestoppte Fahrten übernahmen die in den Einstellungen hinterlegten Standard-Werte für Kraftstoffpreis/-verbrauch nicht. Jetzt wie bei allen anderen Wegen (manuell, GPS am iPhone, Maps-Import) korrekt.
 - **Fehlerbehebung: Spritdaten beim Bearbeiten** – Beim Bearbeiten einer Fahrt mit eigenen, von den aktuellen Einstellungen abweichenden Spritdaten (z. B. älterer Preis) wurden diese sofort durch die aktuellen Standard-Werte überschrieben. Jetzt bleiben die zur Fahrt gespeicherten Werte beim Öffnen erhalten; die Einstellungs-Standardwerte werden nur noch übernommen, wenn die Kraftstoffart aktiv im Formular gewechselt wird.
+- **Fehlerbehebung: Spritdaten bei CarPlay und Siri** – GPS-Fahrten über CarPlay sowie per Siri-Kurzbefehl gestartete/gespeicherte Fahrten übernahmen die in den Einstellungen hinterlegten Standard-Werte für Kraftstoffpreis/-verbrauch nicht (CarPlay las zuvor aus der falschen Datenquelle). Jetzt wie bei allen anderen Wegen korrekt.
 
 ---
 

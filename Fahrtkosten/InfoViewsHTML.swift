@@ -1273,7 +1273,7 @@ let versionHistoryHTML_de = #"""
       </div>
       <div class="preview-text">Fahrtenbuchmodus · Km-Statistik Geschäftlich/Privat · Manuelle Abwesenheitszeit</div>
     </div>
-    <span class="build-info">November 2026 · Build 91</span>
+    <span class="build-info">November 2026 · Build 92</span>
     <span class="chevron">›</span>
   </summary>
   <div class="detail-content">
@@ -1284,6 +1284,7 @@ let versionHistoryHTML_de = #"""
       <li><span class="badge-fix">FIX</span> <strong>Kilometerpauschale:</strong> Übersicht, Statistik sowie PDF- und CSV-Export zählten private Fahrten bisher fälschlich zur Kilometererstattung. Jetzt zählen wie vorgesehen nur geschäftliche Fahrten.</li>
       <li><span class="badge-fix">FIX</span> <strong>Kraftstoffkosten bei Apple-Watch-Fahrten:</strong> Über die Apple Watch gestoppte Fahrten übernahmen die in den Einstellungen hinterlegten Standard-Werte für Kraftstoffpreis/-verbrauch nicht. Jetzt wie bei allen anderen Wegen korrekt.</li>
       <li><span class="badge-fix">FIX</span> <strong>Spritdaten beim Bearbeiten:</strong> Eigene, von den aktuellen Einstellungen abweichende Spritdaten einer Fahrt wurden beim Öffnen zum Bearbeiten sofort überschrieben. Jetzt bleiben sie erhalten.</li>
+      <li><span class="badge-fix">FIX</span> <strong>Spritdaten bei CarPlay und Siri:</strong> GPS-Fahrten über CarPlay sowie per Siri-Kurzbefehl angelegte Fahrten übernahmen die Standard-Werte für Kraftstoffpreis/-verbrauch nicht. Jetzt korrekt.</li>
     </ul>
   </div>
 </details>
