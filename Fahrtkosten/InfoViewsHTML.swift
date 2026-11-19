@@ -1273,7 +1273,7 @@ let versionHistoryHTML_de = #"""
       </div>
       <div class="preview-text">Fahrtenbuchmodus · Km-Statistik Geschäftlich/Privat · Manuelle Abwesenheitszeit</div>
     </div>
-    <span class="build-info">November 2026 · Build 93</span>
+    <span class="build-info">November 2026 · Build 94</span>
     <span class="chevron">›</span>
   </summary>
   <div class="detail-content">

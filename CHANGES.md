@@ -2,7 +2,7 @@
 
 ---
 
-## Version 1.17.49 Build 93 (November 2026)
+## Version 1.17.49 Build 94 (November 2026)
 
 - **Neu: Pflichtangaben im Fahrtenbuchmodus** – Kilometerstand und Fahrtzweck (bei geschäftlichen Fahrten) müssen jetzt ausgefüllt sein; fehlende Angaben werden in der Fahrtenliste als Hinweis markiert.
 - **Neu: Arbeitsweg-Kennzeichnung** – Fahrten zwischen Wohnung und erster Tätigkeitsstätte lassen sich jetzt gesondert als „Wohnung – Arbeitsstätte" kennzeichnen statt als normale Privatfahrt.
