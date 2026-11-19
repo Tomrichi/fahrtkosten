@@ -10,6 +10,7 @@ struct ProUpgradeView: View {
         ("doc.richtext.fill",      "Export PDF & Excel",     .green,  "Fertige Abrechnung als Dokument"),
         ("arrow.clockwise.icloud", "Backup & Restore",       .cyan,   "Daten sichern und wiederherstellen"),
         ("car.fill",               "CarPlay",                .indigo, "GPS-Aufzeichnung am Fahrzeugdisplay"),
+        ("lock.doc.fill",          "Fahrtenbuchmodus",       .orange, "Kilometerstand, Änderungsprotokoll, Km-Statistik"),
     ]
 
     var body: some View {

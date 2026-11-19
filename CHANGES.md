@@ -9,7 +9,7 @@
 - **Neu: GPS-Route im Fahrtenbuchmodus** – Bei GPS-Fahrten über iPhone und CarPlay wird jetzt die tatsächlich gefahrene Route aufgezeichnet und im Export ausgewiesen.
 - **Neu: Änderungsprotokoll auch im CSV-Export** – Der CSV-Export enthält jetzt wie der PDF-Export den vollständigen Änderungsprotokoll-Anhang.
 - **Neu: Zeitnähe-Hinweis** – Fahrten, die später als 7 Tage nach Fahrtende erfasst wurden, werden in der Liste markiert.
-- **Änderung: Fahrtenbuchmodus ist PRO-Feature** – Der Fahrtenbuchmodus lässt sich jetzt nur mit einem PRO-Abo aktivieren.
+- **Änderung: Fahrtenbuchmodus ist PRO-Feature** – Der Fahrtenbuchmodus lässt sich jetzt nur mit Fahrtkosten Pro (Einmalkauf) aktivieren.
 - **Neu: Fahrtenbuchmodus** – Neuer Schalter in den Einstellungen für die Fahrtenbuchmethode (Privatnutzung Betriebsfahrzeug): Kilometerstand-Felder bei Fahrten, unveränderliches, hash-verkettetes Änderungsprotokoll für alle Einträge (einsehbar in den Einstellungen, als Anhang im PDF-Export) und Abwesenheitszeit als durchgehende Spanne statt Summe der Einzelzeiten.
 - **Neu: Km-Statistik Geschäftlich/Privat** – Die Statistik zeigt jährlich und monatlich jetzt zusätzlich die Aufteilung der gefahrenen Kilometer in geschäftlich/privat inklusive Prozentanteilen.
 - **Neu: Manuelle Gesamt-Abwesenheitszeit** – Im Verpflegungs-Formular lässt sich die tägliche Abwesenheitszeit jetzt direkt als Gesamtstundenzahl eingeben (statt einzelner Fahrt-/Arbeitszeiten), die Verpflegungspauschale wird automatisch daraus berechnet.
