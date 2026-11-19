@@ -520,7 +520,7 @@ struct EinstellungenView: View {
                     get: { store.fahrtenbuchModusEnabled },
                     set: { store.fahrtenbuchModusEnabled = $0 }
                 )) {
-                    Label("Fahrtenbuchmodus", systemImage: "lock.doc.fill")
+                    Label("Fahrtenbuchmodus aktivieren", systemImage: "lock.doc.fill")
                 }
                 Text("Für die Fahrtenbuchmethode (Privatnutzung Betriebsfahrzeug): zeigt Kilometerstand-Felder bei Fahrten, berechnet die Abwesenheitszeit als durchgehende Spanne (statt Summe der Einzelzeiten) und protokolliert jede nachträgliche Änderung oder Löschung unveränderlich.")
                     .font(.caption2).foregroundStyle(.secondary)
