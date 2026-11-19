@@ -205,12 +205,6 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
         NotificationCenter.default.post(name: NSNotification.Name("carPlayStopGPS"), object: nil)
 
         let startDate = LocationTracker.shared.tripStartDate
-        // Spritdaten aus App Group lesen (gleiche Quelle wie @AppStorage in der App)
-        let fuelTypeKey  = ud.string(forKey: "defaultFuelType") ?? "e10"
-        let fuelPriceStr = ud.string(forKey: "defaultFuelPrice.\(fuelTypeKey)") ?? ""
-        let fuelConsStr  = ud.string(forKey: "defaultConsumption.\(fuelTypeKey)") ?? ""
-        let fuelPrice    = Double(fuelPriceStr.replacingOccurrences(of: ",", with: "."))
-        let fuelCons     = Double(fuelConsStr.replacingOccurrences(of: ",", with: "."))
 
         LocationTracker.shared.stopAndGeocode { [weak self] from, to, km in
             let start = startDate ?? Date()
@@ -221,20 +215,10 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
                 note: "GPS via CarPlay",
                 startTime: start, endTime: Date()
             )
-            // Spritdaten übernehmen (außer Hybrid)
-            if fuelTypeKey != "hybrid" {
-                let fuelType: FuelType = {
-                    switch fuelTypeKey {
-                    case "e5":      return .e5
-                    case "diesel":  return .diesel
-                    case "elektro": return .elektro
-                    default:        return .e10
-                    }
-                }()
-                trip.fuelTypeRaw = fuelType.storageKey
-                if let p = fuelPrice, p > 0 { trip.fuelPricePerLiter = p }
-                if let c = fuelCons,  c > 0 { trip.fuelConsumption   = c }
-            }
+            // Standard-Spritdaten aus den Einstellungen übernehmen (UserDefaults.standard –
+            // dort liegen sie tatsächlich, nicht in der App Group; die vorherige Version las
+            // aus der falschen Quelle und fand die Werte deshalb nie).
+            applyDefaultFuelData(to: &trip)
             CarPlayDataAccess.saveTrip(trip)
             self?.renderDashboard()
         }

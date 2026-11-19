@@ -55,8 +55,10 @@ private struct IntentDataAccess {
     }
 
     static func makeTrip(from: String, to: String, km: Double, note: String, startTime: Date?, endTime: Date?) -> Trip {
-        Trip(from: from, to: to, date: Date(), km: km, note: note,
-             startTime: startTime, endTime: endTime)
+        var trip = Trip(from: from, to: to, date: Date(), km: km, note: note,
+                         startTime: startTime, endTime: endTime)
+        applyDefaultFuelData(to: &trip)
+        return trip
     }
 }
 
