@@ -1273,7 +1273,7 @@ let versionHistoryHTML_de = #"""
       </div>
       <div class="preview-text">Fahrtenbuchmodus · Km-Statistik Geschäftlich/Privat · Manuelle Abwesenheitszeit</div>
     </div>
-    <span class="build-info">November 2026 · Build 89</span>
+    <span class="build-info">November 2026 · Build 90</span>
     <span class="chevron">›</span>
   </summary>
   <div class="detail-content">
@@ -1282,6 +1282,7 @@ let versionHistoryHTML_de = #"""
       <li><span class="badge-new">NEU</span> <strong>Km-Statistik Geschäftlich/Privat:</strong> Jahres- und Monatsansicht zeigen jetzt die Aufteilung der gefahrenen Kilometer in geschäftlich/privat inklusive Prozentanteilen.</li>
       <li><span class="badge-new">NEU</span> <strong>Manuelle Gesamt-Abwesenheitszeit:</strong> Im Verpflegungs-Formular lässt sich die tägliche Abwesenheitszeit direkt als Gesamtstundenzahl eingeben, statt einzelner Fahrt-/Arbeitszeiten.</li>
       <li><span class="badge-fix">FIX</span> <strong>Kilometerpauschale:</strong> Übersicht, Statistik sowie PDF- und CSV-Export zählten private Fahrten bisher fälschlich zur Kilometererstattung. Jetzt zählen wie vorgesehen nur geschäftliche Fahrten.</li>
+      <li><span class="badge-fix">FIX</span> <strong>Kraftstoffkosten bei Apple-Watch-Fahrten:</strong> Über die Apple Watch gestoppte Fahrten übernahmen die in den Einstellungen hinterlegten Standard-Werte für Kraftstoffpreis/-verbrauch nicht. Jetzt wie bei allen anderen Wegen korrekt.</li>
     </ul>
   </div>
 </details>

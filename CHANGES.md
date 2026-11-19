@@ -2,12 +2,13 @@
 
 ---
 
-## Version 1.17.49 Build 89 (November 2026)
+## Version 1.17.49 Build 90 (November 2026)
 
 - **Neu: Fahrtenbuchmodus** – Neuer Schalter in den Einstellungen für die Fahrtenbuchmethode (Privatnutzung Betriebsfahrzeug): Kilometerstand-Felder bei Fahrten, unveränderliches, hash-verkettetes Änderungsprotokoll für alle Einträge (einsehbar in den Einstellungen, als Anhang im PDF-Export) und Abwesenheitszeit als durchgehende Spanne statt Summe der Einzelzeiten.
 - **Neu: Km-Statistik Geschäftlich/Privat** – Die Statistik zeigt jährlich und monatlich jetzt zusätzlich die Aufteilung der gefahrenen Kilometer in geschäftlich/privat inklusive Prozentanteilen.
 - **Neu: Manuelle Gesamt-Abwesenheitszeit** – Im Verpflegungs-Formular lässt sich die tägliche Abwesenheitszeit jetzt direkt als Gesamtstundenzahl eingeben (statt einzelner Fahrt-/Arbeitszeiten), die Verpflegungspauschale wird automatisch daraus berechnet.
 - **Fehlerbehebung: Kilometerpauschale** – Übersicht, Statistik sowie PDF- und CSV-Export zählten private Fahrten bisher fälschlich zur Kilometererstattung. Jetzt zählen wie vorgesehen nur geschäftliche Fahrten (§ 9 EStG); private Fahrten bleiben zur Dokumentation sichtbar.
+- **Fehlerbehebung: Kraftstoffkosten bei Apple-Watch-Fahrten** – Über die Apple Watch gestoppte Fahrten übernahmen die in den Einstellungen hinterlegten Standard-Werte für Kraftstoffpreis/-verbrauch nicht. Jetzt wie bei allen anderen Wegen (manuell, GPS am iPhone, Maps-Import) korrekt.
 
 ---
 
