@@ -738,6 +738,18 @@ class DataStore: ObservableObject {
         ))
     }
 
+    /// GoBD-Zeitnähe-Prüfung: eine Fahrt muss spätestens 7 Kalendertage nach Fahrtende erfasst
+    /// sein. Nutzt den "angelegt"-Zeitstempel aus dem Änderungsprotokoll (unabhängig vom frei
+    /// editierbaren `trip.date`) – ohne Log-Eintrag (Fahrt entstand vor Aktivierung des Modus,
+    /// oder Modus aktuell aus) ist keine Aussage möglich, dann `false`.
+    func wasCreatedLate(_ trip: Trip, thresholdDays: Int = 7) -> Bool {
+        guard let created = changeLog.first(where: {
+            $0.entityType == .trip && $0.entityID == trip.id && $0.changeType == .created
+        }) else { return false }
+        let days = Calendar.current.dateComponents([.day], from: trip.date, to: created.timestamp).day ?? 0
+        return days > thresholdDays
+    }
+
     // MARK: - CRUD
     func addTrip(_ t: Trip) {
         trips.append(t); trips.sort { $0.date < $1.date }

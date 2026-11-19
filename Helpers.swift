@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import UIKit
+import CoreLocation
 
 // MARK: - Formatters
 extension Double {
@@ -108,6 +109,19 @@ func parseCurrency(_ s: String) -> Double {
 /// CSV-Export nicht unabhängig voneinander (und potenziell abweichend) rechnen.
 func tripReimbursement(_ trips: [Trip], rate: Double) -> Double {
     trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km * rate }
+}
+
+// MARK: - GPS-Route (Fahrtenbuchmodus)
+/// Kodiert die während einer GPS-Fahrt aufgezeichneten Koordinaten kompakt als
+/// "lat,lon;lat,lon;...", damit die tatsächlich gefahrene Route nachweisbar bleibt (GoBD:
+/// Reiseroute muss bei Umwegen nachvollziehbar sein). Dünnt lange Routen auf `maxPoints`
+/// aus, damit die gespeicherte Fahrt nicht unnötig aufgebläht wird.
+func encodeRoute(_ coords: [CLLocationCoordinate2D], maxPoints: Int = 200) -> String? {
+    guard coords.count > 1 else { return nil }
+    let step = max(1, coords.count / maxPoints)
+    let sampled = stride(from: 0, to: coords.count, by: step).map { coords[$0] }
+    return sampled.map { String(format: "%.5f,%.5f", $0.latitude, $0.longitude) }
+                  .joined(separator: ";")
 }
 
 // MARK: - Standard-Kraftstoffdaten

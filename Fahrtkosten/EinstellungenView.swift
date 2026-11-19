@@ -518,9 +518,23 @@ struct EinstellungenView: View {
             DisclosureGroup(isExpanded: $expandFahrtenbuch) {
                 Toggle(isOn: Binding(
                     get: { store.fahrtenbuchModusEnabled },
-                    set: { store.fahrtenbuchModusEnabled = $0 }
+                    set: { newValue in
+                        guard newValue else { store.fahrtenbuchModusEnabled = false; return }
+                        guard proMgr.isPro else { showProUpgrade = true; return }
+                        store.fahrtenbuchModusEnabled = true
+                    }
                 )) {
-                    Label("Fahrtenbuchmodus aktivieren", systemImage: "lock.doc.fill")
+                    HStack(spacing: 6) {
+                        Label("Fahrtenbuchmodus aktivieren", systemImage: "lock.doc.fill")
+                        if !proMgr.isPro {
+                            Text("PRO")
+                                .font(.caption2.bold())
+                                .padding(.horizontal, 6).padding(.vertical, 2)
+                                .background(Color.orange)
+                                .foregroundColor(.white)
+                                .clipShape(Capsule())
+                        }
+                    }
                 }
                 Text("Für die Fahrtenbuchmethode (Privatnutzung Betriebsfahrzeug): zeigt Kilometerstand-Felder bei Fahrten, berechnet die Abwesenheitszeit als durchgehende Spanne (statt Summe der Einzelzeiten) und protokolliert jede nachträgliche Änderung oder Löschung unveränderlich.")
                     .font(.caption2).foregroundStyle(.secondary)

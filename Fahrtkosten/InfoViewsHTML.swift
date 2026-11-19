@@ -1273,11 +1273,17 @@ let versionHistoryHTML_de = #"""
       </div>
       <div class="preview-text">Fahrtenbuchmodus · Km-Statistik Geschäftlich/Privat · Manuelle Abwesenheitszeit</div>
     </div>
-    <span class="build-info">November 2026 · Build 92</span>
+    <span class="build-info">November 2026 · Build 93</span>
     <span class="chevron">›</span>
   </summary>
   <div class="detail-content">
     <ul>
+      <li><span class="badge-new">NEU</span> <strong>Pflichtangaben im Fahrtenbuchmodus:</strong> Kilometerstand und Fahrtzweck (bei geschäftlichen Fahrten) müssen jetzt ausgefüllt sein; fehlende Angaben werden in der Fahrtenliste als Hinweis markiert.</li>
+      <li><span class="badge-new">NEU</span> <strong>Arbeitsweg-Kennzeichnung:</strong> Fahrten zwischen Wohnung und erster Tätigkeitsstätte lassen sich jetzt gesondert als „Wohnung – Arbeitsstätte" kennzeichnen statt als normale Privatfahrt.</li>
+      <li><span class="badge-new">NEU</span> <strong>GPS-Route im Fahrtenbuchmodus:</strong> Bei GPS-Fahrten über iPhone und CarPlay wird jetzt die tatsächlich gefahrene Route aufgezeichnet und im Export ausgewiesen.</li>
+      <li><span class="badge-new">NEU</span> <strong>Änderungsprotokoll auch im CSV-Export:</strong> Der CSV-Export enthält jetzt wie der PDF-Export den vollständigen Änderungsprotokoll-Anhang.</li>
+      <li><span class="badge-new">NEU</span> <strong>Zeitnähe-Hinweis:</strong> Fahrten, die später als 7 Tage nach Fahrtende erfasst wurden, werden in der Liste markiert.</li>
+      <li><span class="badge-change">ÄNDERUNG</span> <strong>Fahrtenbuchmodus ist PRO-Feature:</strong> Der Fahrtenbuchmodus lässt sich jetzt nur mit einem PRO-Abo aktivieren.</li>
       <li><span class="badge-new">NEU</span> <strong>Fahrtenbuchmodus:</strong> Neuer Schalter in den Einstellungen für die Fahrtenbuchmethode (Privatnutzung Betriebsfahrzeug) – Kilometerstand-Felder bei Fahrten, unveränderliches Änderungsprotokoll für alle Einträge (in den Einstellungen einsehbar, als Anhang im PDF-Export) und Abwesenheitszeit als durchgehende Spanne statt Summe der Einzelzeiten.</li>
       <li><span class="badge-new">NEU</span> <strong>Km-Statistik Geschäftlich/Privat:</strong> Jahres- und Monatsansicht zeigen jetzt die Aufteilung der gefahrenen Kilometer in geschäftlich/privat inklusive Prozentanteilen.</li>
       <li><span class="badge-new">NEU</span> <strong>Manuelle Gesamt-Abwesenheitszeit:</strong> Im Verpflegungs-Formular lässt sich die tägliche Abwesenheitszeit direkt als Gesamtstundenzahl eingeben, statt einzelner Fahrt-/Arbeitszeiten.</li>

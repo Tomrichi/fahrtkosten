@@ -111,6 +111,12 @@ struct Trip: Identifiable, Codable {
     var purpose: String             // Fahrtgrund (z.B. Einzeltraining, Besprechung)
     var odometerStart: Double?      // Kilometerstand bei Fahrtbeginn (Fahrtenbuchmodus)
     var odometerEnd: Double?        // Kilometerstand bei Fahrtende (Fahrtenbuchmodus)
+    var isCommute: Bool = false     // Wohnung–Arbeitsstätte (nur bei art == .privat relevant)
+    var routeCoordinatesEncoded: String?  // GPS-Route "lat,lon;lat,lon;..." (Fahrtenbuchmodus)
+
+    /// Anzeigetext für Art/Kategorie – Arbeitsweg wird gesondert ausgewiesen (GoBD-Vorgabe),
+    /// bleibt aber intern eine Privatfahrt (nicht erstattungsfähig, siehe tripReimbursement).
+    var artLabel: String { art == .privat && isCommute ? "Wohnung – Arbeitsstätte" : art.rawValue }
 
     var fuelCost: Double? {
         guard km > 0 else { return nil }
@@ -135,7 +141,7 @@ struct Trip: Identifiable, Codable {
     enum CodingKeys: String, CodingKey {
         case id, from, to, date, km, note, art, distanceText, durationText, fahrzeitText
         case fuelPricePerLiter, fuelConsumption, fuelTypeRaw, startTime, endTime, purpose
-        case odometerStart, odometerEnd
+        case odometerStart, odometerEnd, isCommute, routeCoordinatesEncoded
     }
 
     init(id: UUID = UUID(), from: String, to: String, date: Date = Date(),
@@ -144,7 +150,8 @@ struct Trip: Identifiable, Codable {
          durationText: String? = nil, fahrzeitText: String? = nil,
          fuelPricePerLiter: Double? = nil, fuelConsumption: Double? = nil,
          fuelTypeRaw: String? = nil, startTime: Date? = nil, endTime: Date? = nil,
-         purpose: String = "", odometerStart: Double? = nil, odometerEnd: Double? = nil) {
+         purpose: String = "", odometerStart: Double? = nil, odometerEnd: Double? = nil,
+         isCommute: Bool = false, routeCoordinatesEncoded: String? = nil) {
         self.id = id; self.from = from; self.to = to; self.date = date
         self.km = km; self.note = note; self.art = art; self.distanceText = distanceText
         self.durationText = durationText; self.fahrzeitText = fahrzeitText
@@ -152,6 +159,7 @@ struct Trip: Identifiable, Codable {
         self.fuelTypeRaw = fuelTypeRaw; self.startTime = startTime; self.endTime = endTime
         self.purpose = purpose
         self.odometerStart = odometerStart; self.odometerEnd = odometerEnd
+        self.isCommute = isCommute; self.routeCoordinatesEncoded = routeCoordinatesEncoded
     }
 
     init(from decoder: Decoder) throws {
@@ -174,6 +182,8 @@ struct Trip: Identifiable, Codable {
         purpose   = try c.decodeIfPresent(String.self, forKey: .purpose) ?? ""
         odometerStart = try c.decodeIfPresent(Double.self, forKey: .odometerStart)
         odometerEnd   = try c.decodeIfPresent(Double.self, forKey: .odometerEnd)
+        isCommute     = try c.decodeIfPresent(Bool.self, forKey: .isCommute) ?? false
+        routeCoordinatesEncoded = try c.decodeIfPresent(String.self, forKey: .routeCoordinatesEncoded)
     }
 }
 

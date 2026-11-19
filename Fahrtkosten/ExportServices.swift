@@ -177,13 +177,17 @@ struct PDFExportService {
                           let os = trip.odometerStart, let oe = trip.odometerEnd else { return nil }
                     return "Km-Stand: \(Int(os))–\(Int(oe))"
                 }()
+                let routeLine: String? = trip.routeCoordinatesEncoded.map {
+                    "Route: \($0.split(separator: ";").count) GPS-Punkte aufgezeichnet"
+                }
 
                 // Zeilenhöhe: max(Adresstexte, Grund-Texte)
-                var grundParts = [trip.art.rawValue]
+                var grundParts = [trip.artLabel]
                 if hasPurpose { grundParts.append(trip.purpose) }
                 let filteredNoteH = trip.note.lowercased().contains("gps") ? "" : trip.note
                 if !filteredNoteH.isEmpty { grundParts.append(filteredNoteH) }
                 if let odometerLine { grundParts.append(odometerLine) }
+                if let routeLine { grundParts.append(routeLine) }
                 let grundStr = grundParts.joined(separator: "\n")
                 let grundH = (grundStr as NSString).boundingRect(
                     with: CGSize(width: wZweck - 4, height: .greatestFiniteMagnitude),
@@ -212,11 +216,12 @@ struct PDFExportService {
 
                 // Grund: Art + Fahrtgrund + Notiz — reiner Text, auf Spaltenbreite begrenzt
                 let grundRect = CGRect(x: cZweck + 2, y: y + 3, width: wZweck - 4, height: effectiveRowH - 4)
-                var grundLines: [String] = [trip.art.rawValue]
+                var grundLines: [String] = [trip.artLabel]
                 if hasPurpose { grundLines.append(trip.purpose) }
                 let filteredNote = trip.note.lowercased().contains("gps") ? "" : trip.note
                 if !filteredNote.isEmpty { grundLines.append(filteredNote) }
                 if let odometerLine { grundLines.append(odometerLine) }
+                if let routeLine { grundLines.append(routeLine) }
                 let grundText = grundLines.joined(separator: "\n")
                 grundText.draw(in: grundRect, withAttributes: a(.systemFont(ofSize: 6.5), textSec))
 
@@ -566,7 +571,12 @@ struct CSVExportService {
                 liter = String(format: "%.2f", (trip.km / 100.0) * cons)
             } else { liter = "" }
             let date = trip.date.formatted(date: .numeric, time: .omitted)
-            csv += "\(date);Fahrt;\(from);\(to);\(String(format: "%.1f", trip.km));\(spritpreis);\(verbrauch);\(liter);\(String(format: "%.2f", erstattung));\(trip.note)\n"
+            var notiz = trip.art == .privat ? "\(trip.artLabel)" : trip.note
+            if trip.art == .privat && !trip.note.isEmpty { notiz += " – \(trip.note)" }
+            if let route = trip.routeCoordinatesEncoded {
+                notiz += " [Route: \(route.split(separator: ";").count) GPS-Punkte]"
+            }
+            csv += "\(date);Fahrt;\(from);\(to);\(String(format: "%.1f", trip.km));\(spritpreis);\(verbrauch);\(liter);\(String(format: "%.2f", erstattung));\(notiz)\n"
         }
 
         // Verpflegung
@@ -599,6 +609,22 @@ struct CSVExportService {
         for exp in privateExpenses.sorted(by: { $0.date > $1.date }) {
             let date = exp.date.formatted(date: .numeric, time: .omitted)
             csv += "\(date);Privat;;\(exp.title);;;;;;;\(String(format: "%.2f", exp.amount));\(exp.note)\n"
+        }
+
+        // Änderungsprotokoll (Fahrtenbuchmodus) – analog zum Anhang im PDF-Export, damit das
+        // CSV-Format ebenfalls als geschlossene, vollständige Datei gültig ist.
+        if store.fahrtenbuchModusEnabled && !store.changeLog.isEmpty {
+            let sortedLog = store.changeLog.sorted { $0.timestamp < $1.timestamp }
+            csv += "\n\nÄnderungsprotokoll (Fahrtenbuchmodus)\n"
+            csv += "Zeitstempel;Typ;Entität-ID;Änderungsart;Hash\n"
+            let df = DateFormatter()
+            df.locale = Locale(identifier: "de_DE"); df.dateFormat = "dd.MM.yyyy HH:mm"
+            for entry in sortedLog {
+                let changeLabel = entry.changeType == .created ? "angelegt"
+                                 : entry.changeType == .updated ? "geändert" : "gelöscht"
+                csv += "\(df.string(from: entry.timestamp));\(entry.entityType.rawValue);\(entry.entityID.uuidString.prefix(8));\(changeLabel);\(entry.hash)\n"
+            }
+            csv += "Letzter Ketten-Hash;;;;\(sortedLog.last!.hash)\n"
         }
 
         return csv

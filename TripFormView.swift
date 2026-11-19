@@ -40,6 +40,7 @@ struct TripFormView: View {
     @State private var note              = ""
     @State private var purpose           = ""
     @State private var tripArt: TripArt  = .geschaeftlich
+    @State private var isCommute: Bool   = false
     @State private var fahrzeitText      = ""
     @State private var fahrzeitStart     : Date = Calendar.current.date(bySettingHour: 8, minute: 0, second: 0, of: Date()) ?? Date()
     @State private var fahrzeitEnd       : Date = Calendar.current.date(bySettingHour: 17, minute: 0, second: 0, of: Date()) ?? Date()
@@ -124,7 +125,13 @@ struct TripFormView: View {
         return nil
     }
     private var kmValue: Double { parseCurrency(kmString) }
-    private var isValid: Bool { !from.isEmpty && !to.isEmpty && kmValue > 0 }
+    private var isValid: Bool {
+        guard !from.isEmpty, !to.isEmpty, kmValue > 0 else { return false }
+        guard store.fahrtenbuchModusEnabled else { return true }
+        guard !odometerStartString.isEmpty, !odometerEndString.isEmpty else { return false }
+        if tripArt == .geschaeftlich { return !purpose.isEmpty }
+        return true
+    }
 
     var body: some View {
         NavigationStack {
@@ -334,6 +341,7 @@ struct TripFormView: View {
                     HStack(spacing: 0) {
                         Button {
                             tripArt = .geschaeftlich
+                            isCommute = false
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: "briefcase.fill")
@@ -364,6 +372,11 @@ struct TripFormView: View {
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .listRowInsets(EdgeInsets())
+                    // Arbeitsweg: GoBD verlangt eine gesonderte Kennzeichnung für Fahrten
+                    // Wohnung–Arbeitsstätte, getrennt von normalen Privatfahrten.
+                    if tripArt == .privat {
+                        Toggle("Arbeitsweg (Wohnung–Arbeitsstätte)", isOn: $isCommute)
+                    }
                     // Abfahrtszeit
                     DatePicker("Abfahrt", selection: $fahrzeitStart, displayedComponents: .hourAndMinute)
                         .foregroundColor(.purple)
@@ -894,6 +907,7 @@ struct TripFormView: View {
             note        = t.note
             purpose     = t.purpose
             tripArt     = t.art
+            isCommute   = t.isCommute
             fahrzeitText = t.fahrzeitText ?? t.durationText ?? ""
             // Picker-Modus aktivieren wenn Fahrzeit vorhanden
             // Start/Endzeit wiederherstellen
@@ -1006,10 +1020,16 @@ struct TripFormView: View {
             endTime:   fahrzeitEnd > fahrzeitStart ? fahrzeitEnd   : nil,
             purpose: purpose,
             odometerStart: store.fahrtenbuchModusEnabled && !odometerStartString.isEmpty ? parseCurrency(odometerStartString) : nil,
-            odometerEnd:   store.fahrtenbuchModusEnabled && !odometerEndString.isEmpty   ? parseCurrency(odometerEndString)   : nil
+            odometerEnd:   store.fahrtenbuchModusEnabled && !odometerEndString.isEmpty   ? parseCurrency(odometerEndString)   : nil,
+            isCommute: tripArt == .privat ? isCommute : false
         )
         trip.fahrzeitText = fahrzeitText.isEmpty ? nil : fahrzeitText
-        if let existing = editingTrip { trip.id = existing.id }
+        if let existing = editingTrip {
+            trip.id = existing.id
+            // Das Formular hat keine Eingabe für die GPS-Route – beim Bearbeiten einer
+            // automatisch aufgezeichneten Fahrt darf sie nicht verloren gehen.
+            trip.routeCoordinatesEncoded = existing.routeCoordinatesEncoded
+        }
         if isEdit {
             store.updateTrip(trip)
             AppLogger.shared.log("Fahrt aktualisiert: \(from) → \(to), \(String(format: "%.1f", kmValue)) km", level: .store)

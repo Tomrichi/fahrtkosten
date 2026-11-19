@@ -219,6 +219,7 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
             // dort liegen sie tatsächlich, nicht in der App Group; die vorherige Version las
             // aus der falschen Quelle und fand die Werte deshalb nie).
             applyDefaultFuelData(to: &trip)
+            trip.routeCoordinatesEncoded = encodeRoute(LocationTracker.shared.routeCoordinates)
             CarPlayDataAccess.saveTrip(trip)
             self?.renderDashboard()
         }

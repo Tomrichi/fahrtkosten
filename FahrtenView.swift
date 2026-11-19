@@ -398,7 +398,7 @@ struct FahrtenView: View {
                     } else {
                         Section(filterLabel) {
                             ForEach(filteredTrips) { trip in
-                                TripRow(trip: trip, kmRate: store.kmRate)
+                                TripRow(trip: trip, kmRate: store.kmRate, fahrtenbuchModusEnabled: store.fahrtenbuchModusEnabled, createdLate: store.fahrtenbuchModusEnabled && store.wasCreatedLate(trip))
                                     .contentShape(Rectangle())
                                     .onTapGesture {
                                         AppLogger.shared.logTap("Fahrt bearbeiten: \(trip.from) → \(trip.to)")
@@ -541,9 +541,19 @@ struct FahrtenView: View {
                     )
                     trip.fahrzeitText = fahrzeitText.isEmpty ? nil : fahrzeitText
                     applyDefaultFuelData(to: &trip)
+                    trip.routeCoordinatesEncoded = encodeRoute(locationTracker.routeCoordinates)
                     store.addTrip(trip)
                     AppLogger.shared.log("GPS-Fahrt gespeichert: \(from) → \(to.isEmpty ? from : to), \(String(format: "%.1f", km)) km", level: .gps)
                     showGPSSheet = false
+                    // Fahrtenbuchmodus: GPS-Fahrten bekommen nie einen Kilometerstand, weil sie
+                    // ohne Formular gespeichert werden – direkt zum Nachtragen öffnen. Kurze
+                    // Verzögerung, da SwiftUI zwei .sheet-Präsentationen nicht überlappend
+                    // anzeigen kann (erst muss showGPSSheet vollständig geschlossen sein).
+                    if store.fahrtenbuchModusEnabled {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                            editTrip = trip
+                        }
+                    }
                 }
                 .onAppear { locationTracker.requestAndStart() }
             }
@@ -591,6 +601,7 @@ struct FahrtenView: View {
                 )
                 trip.fahrzeitText = fahrzeitText.isEmpty ? nil : fahrzeitText
                 applyDefaultFuelData(to: &trip)
+                trip.routeCoordinatesEncoded = encodeRoute(locationTracker.routeCoordinates)
                 store.addTrip(trip)
                 AppLogger.shared.log("GPS-Fahrt (auto-gestoppt) gespeichert: \(from) → \(to), \(String(format: "%.1f", km)) km", level: .gps)
             }
@@ -983,6 +994,31 @@ struct TripRow: View {
 
     let trip: Trip
     let kmRate: Double
+    let fahrtenbuchModusEnabled: Bool
+    let createdLate: Bool
+
+    /// Fahrtenbuchmodus verlangt einen Kilometerstand – GPS-Fahrten (iPhone, Watch, CarPlay)
+    /// legen die Fahrt aber ohne Formular an, wo dieser erfasst werden könnte. Dieses Badge
+    /// macht sichtbar, wo er noch nachgetragen werden muss.
+    private var missingOdometer: Bool {
+        fahrtenbuchModusEnabled && (trip.odometerStart == nil || trip.odometerEnd == nil)
+    }
+
+    /// Geschäftliche Fahrten brauchen einen Zweck (GoBD) – betrifft v.a. CarPlay/Watch/Siri-
+    /// Fahrten, die ohne Formular angelegt werden und daher nie zur Eingabe aufgefordert wurden.
+    private var missingPurpose: Bool {
+        fahrtenbuchModusEnabled && trip.art == .geschaeftlich && trip.purpose.isEmpty
+    }
+
+    @ViewBuilder private func warningLine(_ text: String) -> some View {
+        HStack(spacing: 3) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 9))
+            Text(text)
+                .font(.system(size: 11))
+        }
+        .foregroundColor(.orange)
+    }
 
     private var fuelInfo: String? {
         guard let price = trip.fuelPricePerLiter,
@@ -1002,6 +1038,10 @@ struct TripRow: View {
         if let fuelCost = trip.fuelCost {
             parts.append("Spritkosten \(String(format: "%.2f €", fuelCost))")
         }
+        if missingOdometer { parts.append("Kilometerstand fehlt") }
+        if missingPurpose { parts.append("Zweck fehlt") }
+        if createdLate { parts.append("Nicht zeitnah erfasst") }
+        if trip.isCommute { parts.append(trip.artLabel) }
         return parts.joined(separator: ", ")
     }
 
@@ -1075,6 +1115,17 @@ struct TripRow: View {
                         .font(.system(size: 11))
                         .foregroundColor(Color(red: 0.3, green: 0.3, blue: 0.3))
                         .lineLimit(1)
+                }
+
+                // Zeile 4: GoBD-Hinweise (nur Fahrtenbuchmodus) + Arbeitsweg-Kennzeichnung
+                if missingOdometer { warningLine("Kilometerstand fehlt").accessibilityHidden(true) }
+                if missingPurpose { warningLine("Zweck fehlt").accessibilityHidden(true) }
+                if createdLate { warningLine("Nicht zeitnah erfasst (> 7 Tage)").accessibilityHidden(true) }
+                if trip.isCommute {
+                    Text(trip.artLabel)
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                        .accessibilityHidden(true)
                 }
             }
 
