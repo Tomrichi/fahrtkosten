@@ -40,6 +40,16 @@
                ReferencedContainer = "container:Fahrtkosten.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "7DB6019C1D2A1DA0E5E2D891"
+               BuildableName = "FahrtkostenUITests.xctest"
+               BlueprintName = "FahrtkostenUITests"
+               ReferencedContainer = "container:Fahrtkosten.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

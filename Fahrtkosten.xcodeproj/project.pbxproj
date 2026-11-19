@@ -42,6 +42,7 @@
 		4AE9A9632FB37024003B89DF /* FahrtkostenWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4AE9A94F2FB37022003B89DF /* FahrtkostenWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		53D736B73771B7938D00F124 /* MapsRouteViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C952B13C8606E50302F1A6DD /* MapsRouteViews.swift */; };
 		738B14F05190145C301F5FED /* TripFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C0F5B1DFB4476FECEEB1DD /* TripFormView.swift */; };
+		87E04108CED397827B41B1A1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 87990AAD4420F4FB67ECFC23 /* Foundation.framework */; };
 		BE0F0001CAFECAFE /* RecurringTripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0F0002CAFECAFE /* RecurringTripView.swift */; };
 		C283FA734A1EC80B1DEDD06A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 87990AAD4420F4FB67ECFC23 /* Foundation.framework */; };
 /* End PBXBuildFile section */
@@ -67,6 +68,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 4AE9A94E2FB37022003B89DF;
 			remoteInfo = FahrtkostenWidgetExtension;
+		};
+		73B33622A59ACD5681299B06 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4A86748F2F82E1CD00885EED /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4A8674962F82E1CD00885EED;
+			remoteInfo = Fahrtkosten;
 		};
 		F9A2D86D6EFFCE7B5CB368CB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -141,6 +149,7 @@
 		4AE9A94F2FB37022003B89DF /* FahrtkostenWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FahrtkostenWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		4AE9A9512FB37022003B89DF /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		4AE9A9532FB37022003B89DF /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		7DFAF53B8A44BA612246813A /* FahrtkostenUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FahrtkostenUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		87990AAD4420F4FB67ECFC23 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		BE0F0002CAFECAFE /* RecurringTripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringTripView.swift; sourceTree = "<group>"; };
 		C952B13C8606E50302F1A6DD /* MapsRouteViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapsRouteViews.swift; sourceTree = "<group>"; };
@@ -170,6 +179,13 @@
 			exceptions = (
 			);
 			path = FahrtkostenTests;
+			sourceTree = "<group>";
+		};
+		2753BC7E224AFF86CD0434AB /* FahrtkostenUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = FahrtkostenUITests;
 			sourceTree = "<group>";
 		};
 		4A01B71B2FB4C29F00CC57DF /* FahrtkostenWatch Watch App */ = {
@@ -225,6 +241,14 @@
 			files = (
 				4AE9A9542FB37022003B89DF /* SwiftUI.framework in Frameworks */,
 				4AE9A9522FB37022003B89DF /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A415727C4C4E01A998AA6CF4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				87E04108CED397827B41B1A1 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -287,6 +311,7 @@
 				21E5261CD3E7D4212E0EF166 /* FahrtkostenTests */,
 				F9C0F5B1DFB4476FECEEB1DD /* TripFormView.swift */,
 				C952B13C8606E50302F1A6DD /* MapsRouteViews.swift */,
+				2753BC7E224AFF86CD0434AB /* FahrtkostenUITests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -298,6 +323,7 @@
 				4A01B71A2FB4C29F00CC57DF /* FahrtkostenWatch Watch App.app */,
 				4A0948A62FBA1CC000C21556 /* FahrtkostenShareExtension.appex */,
 				48863A77D42797ED17F9EAC5 /* FahrtkostenTests.xctest */,
+				7DFAF53B8A44BA612246813A /* FahrtkostenUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -408,6 +434,27 @@
 			productReference = 4AE9A94F2FB37022003B89DF /* FahrtkostenWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		7DB6019C1D2A1DA0E5E2D891 /* FahrtkostenUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2BE5D4E59821A1A39D205C04 /* Build configuration list for PBXNativeTarget "FahrtkostenUITests" */;
+			buildPhases = (
+				6FA9178208EBAC72F41E5D51 /* Sources */,
+				A415727C4C4E01A998AA6CF4 /* Frameworks */,
+				19AEF59C35859642D4BE6D38 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D456E271273A9406CC440900 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				2753BC7E224AFF86CD0434AB /* FahrtkostenUITests */,
+			);
+			name = FahrtkostenUITests;
+			productName = FahrtkostenUITests;
+			productReference = 7DFAF53B8A44BA612246813A /* FahrtkostenUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		EFA0E93011181A5D8C425D42 /* FahrtkostenTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 92A5FB3FB873E735BE64D5DA /* Build configuration list for PBXNativeTarget "FahrtkostenTests" */;
@@ -473,11 +520,19 @@
 				4A01B7192FB4C29F00CC57DF /* FahrtkostenWatch Watch App */,
 				4A0948A52FBA1CC000C21556 /* FahrtkostenShareExtension */,
 				EFA0E93011181A5D8C425D42 /* FahrtkostenTests */,
+				7DB6019C1D2A1DA0E5E2D891 /* FahrtkostenUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		19AEF59C35859642D4BE6D38 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		48ABF4304A0D0742AF07CE4D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -604,6 +659,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6FA9178208EBAC72F41E5D51 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -627,6 +689,12 @@
 			isa = PBXTargetDependency;
 			target = 4AE9A94E2FB37022003B89DF /* FahrtkostenWidgetExtension */;
 			targetProxy = 4AE9A9612FB37024003B89DF /* PBXContainerItemProxy */;
+		};
+		D456E271273A9406CC440900 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Fahrtkosten;
+			target = 4A8674962F82E1CD00885EED /* Fahrtkosten */;
+			targetProxy = 73B33622A59ACD5681299B06 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -659,6 +727,24 @@
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Fahrtkosten.app/Fahrtkosten";
 			};
 			name = Debug;
+		};
+		49B8F9F52073C99542E47FE4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2HE885H8JT;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Thomas.FahrtkostenUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Fahrtkosten;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
 		};
 		4A01B7262FB4C2A100CC57DF /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -1058,6 +1144,23 @@
 			};
 			name = Release;
 		};
+		4EAA482C3F42AA15902E2A46 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2HE885H8JT;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Thomas.FahrtkostenUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Fahrtkosten;
+			};
+			name = Debug;
+		};
 		ED77C593759555EC262D7875 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1080,6 +1183,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		2BE5D4E59821A1A39D205C04 /* Build configuration list for PBXNativeTarget "FahrtkostenUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				49B8F9F52073C99542E47FE4 /* Release */,
+				4EAA482C3F42AA15902E2A46 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		4A01B7252FB4C2A100CC57DF /* Build configuration list for PBXNativeTarget "FahrtkostenWatch Watch App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
