@@ -429,7 +429,13 @@ struct TripFormView: View {
                         Label("Antrieb / Kraftstoff", systemImage: selectedFuelType.icon)
                             .foregroundColor(.orange)
                         Spacer()
-                        Picker("", selection: $selectedFuelType) {
+                        Picker("", selection: Binding(
+                            get: { selectedFuelType },
+                            set: { newType in
+                                selectedFuelType = newType
+                                loadSavedFuelDefaults(for: newType)
+                            }
+                        )) {
                             ForEach(FuelType.allCases) { ft in
                                 Label(ft.rawValue, systemImage: ft.icon).tag(ft)
                             }
@@ -640,25 +646,6 @@ struct TripFormView: View {
                     )
                 }
             }
-            .onChange(of: selectedFuelType) { _, newType in
-                // Gespeicherte Werte für neue Kraftstoffart laden
-                let savedPrice: String
-                let savedCons: String
-                switch newType {
-                case .e5:      savedPrice = defaultPriceE5;      savedCons = defaultConsE5
-                case .e10:     savedPrice = defaultPriceE10;     savedCons = defaultConsE10
-                case .diesel:  savedPrice = defaultPriceDiesel;  savedCons = defaultConsDiesel
-                case .elektro: savedPrice = defaultPriceElektro; savedCons = defaultConsElektro
-                case .hybrid:  savedPrice = defaultPriceHybrid;  savedCons = defaultConsHybrid
-                }
-                fuelPriceStr      = savedPrice
-                fuelConsumptionStr = savedCons
-                // Tankerkönig abrufen wenn kein gespeicherter Preis und kein Elektro
-                if savedPrice.isEmpty && !newType.isElectric {
-                    locationProvider.requestOnce()
-                    Task { await fuelService.fetchPrice(fuelType: newType, near: locationProvider.location) }
-                }
-            }
             // Auto-Berechnung: nur im Add-Modus (nicht bei GPS, nicht beim Bearbeiten)
             .onChange(of: from) { _, _ in
                 if !isGPS && !isEdit { scheduleAutoCalculate() }
@@ -859,6 +846,31 @@ struct TripFormView: View {
         let v = s.replacingOccurrences(of: ",", with: ".")
         guard let d = Double(v), d > 0 else { return nil }
         return d
+    }
+
+    /// Lädt die in den Einstellungen gespeicherten Standardwerte für eine Kraftstoffart – NUR
+    /// wenn die Nutzerin/der Nutzer die Art aktiv im Picker wechselt (siehe Picker-Binding
+    /// oben). Bewusst NICHT als .onChange(of: selectedFuelType), da das auch beim
+    /// programmatischen Setzen in prefill() (Bearbeiten-Modus) feuert und dort die bereits
+    /// korrekt aus der Fahrt geladenen Spritdaten mit den aktuellen Einstellungen überschreiben
+    /// würde.
+    private func loadSavedFuelDefaults(for newType: FuelType) {
+        let savedPrice: String
+        let savedCons: String
+        switch newType {
+        case .e5:      savedPrice = defaultPriceE5;      savedCons = defaultConsE5
+        case .e10:     savedPrice = defaultPriceE10;     savedCons = defaultConsE10
+        case .diesel:  savedPrice = defaultPriceDiesel;  savedCons = defaultConsDiesel
+        case .elektro: savedPrice = defaultPriceElektro; savedCons = defaultConsElektro
+        case .hybrid:  savedPrice = defaultPriceHybrid;  savedCons = defaultConsHybrid
+        }
+        fuelPriceStr       = savedPrice
+        fuelConsumptionStr = savedCons
+        // Tankerkönig abrufen wenn kein gespeicherter Preis und kein Elektro
+        if savedPrice.isEmpty && !newType.isElectric {
+            locationProvider.requestOnce()
+            Task { await fuelService.fetchPrice(fuelType: newType, near: locationProvider.location) }
+        }
     }
 
     private func prefill() {
