@@ -82,12 +82,13 @@ final class WatchSessionManager: NSObject, ObservableObject {
             trip.endTime = Date()
 
             var trips = loadTrips()
-            let fullTrip = Trip(
+            var fullTrip = Trip(
                 from: trip.from, to: trip.to,
                 date: trip.startTime ?? Date(),
                 km: km, note: "Via Apple Watch",
                 startTime: trip.startTime, endTime: trip.endTime
             )
+            applyDefaultFuelData(to: &fullTrip)
             trips.append(fullTrip)
             saveTrips(trips)
             groupDefaults.removeObject(forKey: "activeTrip")
@@ -128,7 +129,7 @@ final class WatchSessionManager: NSObject, ObservableObject {
 
                 await MainActor.run {
                     var trips = loadTrips()
-                    let trip = Trip(
+                    var trip = Trip(
                         from:      fromAddr.isEmpty ? "Startort" : fromAddr,
                         to:        toAddr.isEmpty   ? "Zielort"  : toAddr,
                         date:      startTime,
@@ -137,6 +138,7 @@ final class WatchSessionManager: NSObject, ObservableObject {
                         startTime: startTime,
                         endTime:   Date()
                     )
+                    applyDefaultFuelData(to: &trip)
                     trips.append(trip)
                     saveTrips(trips)
                     groupDefaults.removeObject(forKey: "activeTrip")

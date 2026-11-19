@@ -162,15 +162,6 @@ struct FahrtenView: View {
     @AppStorage("fahrten.selectedFilter") private var selectedFilter: TripFilter = .alle
     @AppStorage("gps.trialUsed") private var gpsTrialUsed: Bool = false
     @State private var showGPSTrial = false
-    @AppStorage("defaultFuelType")              private var defaultFuelTypeKey: String = "e10"
-    @AppStorage("defaultFuelPrice.e5")          private var defaultPriceE5: String = ""
-    @AppStorage("defaultFuelPrice.e10")         private var defaultPriceE10: String = ""
-    @AppStorage("defaultFuelPrice.diesel")      private var defaultPriceDiesel: String = ""
-    @AppStorage("defaultFuelPrice.elektro")     private var defaultPriceElektro: String = ""
-    @AppStorage("defaultConsumption.e5")        private var defaultConsE5: String = ""
-    @AppStorage("defaultConsumption.e10")       private var defaultConsE10: String = ""
-    @AppStorage("defaultConsumption.diesel")    private var defaultConsDiesel: String = ""
-    @AppStorage("defaultConsumption.elektro")   private var defaultConsElektro: String = ""
     @State private var selectedDate: Date = Date()
 
     private var filteredTrips: [Trip] {
@@ -549,34 +540,7 @@ struct FahrtenView: View {
                         endTime: endDate
                     )
                     trip.fahrzeitText = fahrzeitText.isEmpty ? nil : fahrzeitText
-                    if defaultFuelTypeKey != "hybrid" {
-                        let fuelType: FuelType = {
-                            switch defaultFuelTypeKey {
-                            case "e5":      return .e5
-                            case "diesel":  return .diesel
-                            case "elektro": return .elektro
-                            default:        return .e10
-                            }
-                        }()
-                        let priceStr = switch defaultFuelTypeKey {
-                            case "e5":      defaultPriceE5
-                            case "diesel":  defaultPriceDiesel
-                            case "elektro": defaultPriceElektro
-                            default:        defaultPriceE10
-                        }
-                        let consStr = switch defaultFuelTypeKey {
-                            case "e5":      defaultConsE5
-                            case "diesel":  defaultConsDiesel
-                            case "elektro": defaultConsElektro
-                            default:        defaultConsE10
-                        }
-                        let price = Double(priceStr.replacingOccurrences(of: ",", with: "."))
-                        let cons  = Double(consStr.replacingOccurrences(of: ",", with: "."))
-                        if let price { trip.fuelPricePerLiter = price }
-                        if let cons  { trip.fuelConsumption   = cons  }
-                        // storageKey verwenden damit Edit-Modus Kraftstoffart immer korrekt dekodiert
-                        trip.fuelTypeRaw = fuelType.storageKey
-                    }
+                    applyDefaultFuelData(to: &trip)
                     store.addTrip(trip)
                     AppLogger.shared.log("GPS-Fahrt gespeichert: \(from) → \(to.isEmpty ? from : to), \(String(format: "%.1f", km)) km", level: .gps)
                     showGPSSheet = false
@@ -626,33 +590,7 @@ struct FahrtenView: View {
                     endTime: endDate
                 )
                 trip.fahrzeitText = fahrzeitText.isEmpty ? nil : fahrzeitText
-                if defaultFuelTypeKey != "hybrid" {
-                    let fuelType: FuelType = {
-                        switch defaultFuelTypeKey {
-                        case "e5":      return .e5
-                        case "diesel":  return .diesel
-                        case "elektro": return .elektro
-                        default:        return .e10
-                        }
-                    }()
-                    let priceStr = switch defaultFuelTypeKey {
-                        case "e5":      defaultPriceE5
-                        case "diesel":  defaultPriceDiesel
-                        case "elektro": defaultPriceElektro
-                        default:        defaultPriceE10
-                    }
-                    let consStr = switch defaultFuelTypeKey {
-                        case "e5":      defaultConsE5
-                        case "diesel":  defaultConsDiesel
-                        case "elektro": defaultConsElektro
-                        default:        defaultConsE10
-                    }
-                    let price = Double(priceStr.replacingOccurrences(of: ",", with: "."))
-                    let cons  = Double(consStr.replacingOccurrences(of: ",", with: "."))
-                    if let price { trip.fuelPricePerLiter = price }
-                    if let cons  { trip.fuelConsumption   = cons  }
-                    trip.fuelTypeRaw = fuelType.storageKey
-                }
+                applyDefaultFuelData(to: &trip)
                 store.addTrip(trip)
                 AppLogger.shared.log("GPS-Fahrt (auto-gestoppt) gespeichert: \(from) → \(to), \(String(format: "%.1f", km)) km", level: .gps)
             }

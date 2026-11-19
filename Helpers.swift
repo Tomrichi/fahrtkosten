@@ -109,3 +109,33 @@ func parseCurrency(_ s: String) -> Double {
 func tripReimbursement(_ trips: [Trip], rate: Double) -> Double {
     trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km * rate }
 }
+
+// MARK: - Standard-Kraftstoffdaten
+/// Wendet die in den Einstellungen hinterlegten Standard-Werte für Kraftstoffpreis und
+/// -verbrauch auf eine automatisch angelegte Fahrt an (GPS-Autostopp am iPhone, Fahrten
+/// über die Apple Watch). Zentrale Stelle, damit diese Pfade nicht wie bisher unabhängig
+/// voneinander (und teils gar nicht) die Standardwerte anwenden – im Unterschied zur
+/// manuellen Eingabe/GPS-Ergebnis/Maps-Import über TripFormView, die das bereits korrekt tut.
+/// Für Hybrid-Fahrzeuge wird nichts gesetzt (eigene Zwei-Preis-Kodierung, dort muss der
+/// Nutzer die Werte im Formular nachtragen).
+func applyDefaultFuelData(to trip: inout Trip) {
+    let ud = UserDefaults.standard
+    let fuelTypeKey = ud.string(forKey: "defaultFuelType") ?? "e10"
+    guard fuelTypeKey != "hybrid" else { return }
+
+    let fuelType: FuelType = {
+        switch fuelTypeKey {
+        case "e5":      return .e5
+        case "diesel":  return .diesel
+        case "elektro": return .elektro
+        default:        return .e10
+        }
+    }()
+    let priceStr = ud.string(forKey: "defaultFuelPrice.\(fuelTypeKey)") ?? ""
+    let consStr  = ud.string(forKey: "defaultConsumption.\(fuelTypeKey)") ?? ""
+    let price = Double(priceStr.replacingOccurrences(of: ",", with: "."))
+    let cons  = Double(consStr.replacingOccurrences(of: ",", with: "."))
+    if let price { trip.fuelPricePerLiter = price }
+    if let cons  { trip.fuelConsumption   = cons }
+    trip.fuelTypeRaw = fuelType.storageKey
+}
