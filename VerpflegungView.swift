@@ -414,6 +414,8 @@ struct MealFormView: View {
     @State private var ownBreakfastStr   = ""       // Eigenes Frühstück (selbst bezahlt)
     @State private var pauseMinutes: Int = 0
     @State private var includeTodaysTrips: Bool = true
+    @State private var useManualHours: Bool = false
+    @State private var manualHoursStr: String = ""
     @State private var workedAtPlant: Bool = false  // Am Werk (Heimatbetrieb) gearbeitet
     @State private var isHoliday: Bool = false
     @State private var isTraining: Bool = false
@@ -427,8 +429,16 @@ struct MealFormView: View {
     private var isEdit: Bool { if case .edit = mode { return true }; return false }
     private var editingMeal: MealEntry? { if case .edit(let m) = mode { return m }; return nil }
 
+    /// Bei manueller Gesamtzeit-Eingabe wird die Endzeit aus Beginn + eingegebener Stundenzahl
+    /// berechnet, statt sie separat per DatePicker zu erfassen.
+    private var effectiveEndTime: Date {
+        guard useManualHours else { return anchoredToFormDate(endTime) }
+        let h = parseCurrency(manualHoursStr)
+        return anchoredToFormDate(startTime).addingTimeInterval(h * 3600)
+    }
+
     private var hours: Double {
-        max(0, anchoredToFormDate(endTime).timeIntervalSince(anchoredToFormDate(startTime)) / 3600)
+        max(0, effectiveEndTime.timeIntervalSince(anchoredToFormDate(startTime)) / 3600)
     }
     private var rates: MealRates { store.mealRates(for: region) }
     /// Betrag aus Einstellungen – wird beim Setzen des Häkchens übernommen
@@ -438,11 +448,11 @@ struct MealFormView: View {
 
     private var currentMeal: MealEntry {
         MealEntry(id: editingMeal?.id ?? UUID(), date: date,
-                  startTime: anchoredToFormDate(startTime), endTime: anchoredToFormDate(endTime),
+                  startTime: anchoredToFormDate(startTime), endTime: effectiveEndTime,
                   note: note, region: region,
                   breakfastAmount: breakfastAmt, ownBreakfastAmount: ownBreakfastAmt,
                   pauseMinutes: pauseMinutes,
-                  excludeTrips: !includeTodaysTrips,
+                  excludeTrips: useManualHours || !includeTodaysTrips,
                   workedAtPlant: workedAtPlant, isHoliday: isHoliday, isTraining: isTraining,
                   weekendAwayOnly: weekendReason == .awayOnly,
                   dayType: dayType,
@@ -563,6 +573,26 @@ struct MealFormView: View {
                 Section("Arbeitszeit") {
                     DatePicker(lm.t("common.date"),   selection: $date,      displayedComponents: .date)
                     if weekendReason != .awayOnly {
+                        Toggle(isOn: $useManualHours.animation()) {
+                            Label("Gesamtzeit manuell eingeben", systemImage: "clock.badge.checkmark")
+                        }
+                        .onChange(of: useManualHours) { _, newValue in
+                            if newValue { includeTodaysTrips = false }
+                        }
+                        if useManualHours {
+                            DatePicker("Beginn", selection: $startTime, displayedComponents: .hourAndMinute)
+                            HStack {
+                                Label("Abwesenheit gesamt", systemImage: "hourglass")
+                                Spacer()
+                                TextField("10", text: $manualHoursStr)
+                                    .keyboardType(.decimalPad)
+                                    .multilineTextAlignment(.trailing)
+                                    .frame(width: 60)
+                                Text("Std.").foregroundColor(.secondary)
+                            }
+                            Text("Fahrt-, Arbeits- und Aufenthaltszeiten müssen nicht einzeln erfasst werden – die eingegebene Gesamtzeit wird direkt für die Verpflegungspauschale verwendet.")
+                                .font(.caption2).foregroundColor(.secondary)
+                        } else {
                         DatePicker(lm.t("meals.begin"),  selection: $startTime, displayedComponents: .hourAndMinute)
                         DatePicker(lm.t("meals.end"),    selection: $endTime,   displayedComponents: .hourAndMinute)
                         if anchoredToFormDate(endTime) < anchoredToFormDate(startTime) {
@@ -580,6 +610,7 @@ struct MealFormView: View {
                             Text("\(pauseMinutes) min")
                                 .foregroundColor(.secondary)
                                 .frame(width: 55, alignment: .trailing)
+                        }
                         }
                     } else {
                         HStack(spacing: 8) {
@@ -819,11 +850,11 @@ struct MealFormView: View {
                     let effectiveMeal = MealEntry(
                         date: date,
                         startTime: earliestTripStart ?? anchoredToFormDate(startTime),
-                        endTime: anchoredToFormDate(endTime), note: note, region: region,
+                        endTime: effectiveEndTime, note: note, region: region,
                         breakfastAmount: breakfastAmt,
                         ownBreakfastAmount: ownBreakfastAmt,
                         pauseMinutes: pauseMinutes,
-                        excludeTrips: !includeTodaysTrips,
+                        excludeTrips: useManualHours || !includeTodaysTrips,
                         workedAtPlant: workedAtPlant,
                         weekendAwayOnly: weekendReason == .awayOnly,
                         dayType: dayType,
@@ -979,12 +1010,12 @@ struct MealFormView: View {
 
     private func save() {
         let meal = MealEntry(id: editingMeal?.id ?? UUID(), date: date,
-                             startTime: anchoredToFormDate(startTime), endTime: anchoredToFormDate(endTime),
+                             startTime: anchoredToFormDate(startTime), endTime: effectiveEndTime,
                              note: note, region: region,
                              breakfastAmount: breakfastAmt,
                              ownBreakfastAmount: ownBreakfastAmt,
                              pauseMinutes: pauseMinutes,
-                             excludeTrips: !includeTodaysTrips,
+                             excludeTrips: useManualHours || !includeTodaysTrips,
                              workedAtPlant: workedAtPlant, isHoliday: isHoliday, isTraining: isTraining,
                              weekendAwayOnly: weekendReason == .awayOnly,
                              dayType: dayType,

@@ -35,6 +35,8 @@ struct TripFormView: View {
     @State private var to                = ""
     @State private var date              = Date()
     @State private var kmString          = ""
+    @State private var odometerStartString = ""
+    @State private var odometerEndString   = ""
     @State private var note              = ""
     @State private var purpose           = ""
     @State private var tripArt: TripArt  = .geschaeftlich
@@ -296,6 +298,26 @@ struct TripFormView: View {
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
                             .frame(width: 80)
+                    }
+                    if store.fahrtenbuchModusEnabled {
+                        HStack {
+                            Label("Kilometerstand Start", systemImage: "gauge.with.dots.needle.33percent")
+                            Spacer()
+                            TextField("0", text: $odometerStartString)
+                                .keyboardType(.decimalPad)
+                                .multilineTextAlignment(.trailing)
+                                .frame(width: 90)
+                            Text("km").foregroundStyle(.secondary).font(.subheadline)
+                        }
+                        HStack {
+                            Label("Kilometerstand Ende", systemImage: "gauge.with.dots.needle.67percent")
+                            Spacer()
+                            TextField("0", text: $odometerEndString)
+                                .keyboardType(.decimalPad)
+                                .multilineTextAlignment(.trailing)
+                                .frame(width: 90)
+                            Text("km").foregroundStyle(.secondary).font(.subheadline)
+                        }
                     }
                     HStack {
                         Label(lm.t("trips.purpose"), systemImage: "tag")
@@ -855,6 +877,8 @@ struct TripFormView: View {
             to          = t.to
             date        = t.date
             kmString    = String(Int(t.km.rounded()))
+            if let os = t.odometerStart { odometerStartString = String(Int(os.rounded())) }
+            if let oe = t.odometerEnd   { odometerEndString   = String(Int(oe.rounded())) }
             note        = t.note
             purpose     = t.purpose
             tripArt     = t.art
@@ -968,7 +992,9 @@ struct TripFormView: View {
             fuelTypeRaw: hybridExtra ?? ((parseFuelInput(fuelPriceStr) != nil || parseFuelInput(fuelConsumptionStr) != nil) ? selectedFuelType.tankerkoenigKey : nil),
             startTime: fahrzeitEnd > fahrzeitStart ? fahrzeitStart : nil,
             endTime:   fahrzeitEnd > fahrzeitStart ? fahrzeitEnd   : nil,
-            purpose: purpose
+            purpose: purpose,
+            odometerStart: store.fahrtenbuchModusEnabled && !odometerStartString.isEmpty ? parseCurrency(odometerStartString) : nil,
+            odometerEnd:   store.fahrtenbuchModusEnabled && !odometerEndString.isEmpty   ? parseCurrency(odometerEndString)   : nil
         )
         trip.fahrzeitText = fahrzeitText.isEmpty ? nil : fahrzeitText
         if let existing = editingTrip { trip.id = existing.id }

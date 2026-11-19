@@ -61,7 +61,9 @@ struct PDFExportService {
         let rowEven  = UIColor(red: 0.96, green: 0.96, blue: 0.97, alpha: 1)
 
         // Berechnungen
-        let tripTotal    = trips.reduce(0.0)  { $0 + $1.km * store.kmRate }
+        // Nur geschäftliche Fahrten sind erstattungsfähig (§ 9 EStG); private Fahrten
+        // erscheinen weiterhin in der Liste, aber ohne Erstattungsbetrag.
+        let tripTotal    = tripReimbursement(trips, rate: store.kmRate)
         let mealTotal    = meals.reduce(0.0)  { $0 + store.effectiveAllowance(for: $1) }
         let hotelTotal   = hotels.reduce(0.0) { $0 + $1.amount(flat: store.hotelFlat) }
         let spesenTotal  = reiseSpesen.reduce(0.0) { $0 + $1.amount }
@@ -169,11 +171,19 @@ struct PDFExportService {
                 let toH = (trip.to as NSString).boundingRect(
                     with: CGSize(width: wNach - 4, height: .greatestFiniteMagnitude),
                     options: opts, attributes: addrAttrs, context: nil).height
+                // Fahrtenbuchmodus: Kilometerstand Start/Ende als zusätzliche Zeile im Grund-Text
+                let odometerLine: String? = {
+                    guard store.fahrtenbuchModusEnabled,
+                          let os = trip.odometerStart, let oe = trip.odometerEnd else { return nil }
+                    return "Km-Stand: \(Int(os))–\(Int(oe))"
+                }()
+
                 // Zeilenhöhe: max(Adresstexte, Grund-Texte)
                 var grundParts = [trip.art.rawValue]
                 if hasPurpose { grundParts.append(trip.purpose) }
                 let filteredNoteH = trip.note.lowercased().contains("gps") ? "" : trip.note
                 if !filteredNoteH.isEmpty { grundParts.append(filteredNoteH) }
+                if let odometerLine { grundParts.append(odometerLine) }
                 let grundStr = grundParts.joined(separator: "\n")
                 let grundH = (grundStr as NSString).boundingRect(
                     with: CGSize(width: wZweck - 4, height: .greatestFiniteMagnitude),
@@ -206,12 +216,15 @@ struct PDFExportService {
                 if hasPurpose { grundLines.append(trip.purpose) }
                 let filteredNote = trip.note.lowercased().contains("gps") ? "" : trip.note
                 if !filteredNote.isEmpty { grundLines.append(filteredNote) }
+                if let odometerLine { grundLines.append(odometerLine) }
                 let grundText = grundLines.joined(separator: "\n")
                 grundText.draw(in: grundRect, withAttributes: a(.systemFont(ofSize: 6.5), textSec))
 
                 km(trip.km).draw(at: CGPoint(x: cStrecke + 2, y: y + 3), withAttributes: rAs)
                 String(format: "€%.2f", store.kmRate).draw(at: CGPoint(x: cKmSatz + 2, y: y + 3), withAttributes: rAs)
-                euro(trip.km * store.kmRate).draw(at: CGPoint(x: cBetrag + 2, y: y + 3), withAttributes: rAb)
+                // Private Fahrten bleiben zur Dokumentation sichtbar, sind aber nicht erstattungsfähig.
+                let rowBetrag = trip.art == .geschaeftlich ? euro(trip.km * store.kmRate) : "–"
+                rowBetrag.draw(at: CGPoint(x: cBetrag + 2, y: y + 3), withAttributes: rAb)
 
                 // Trennlinie
                 UIColor(red: 0.85, green: 0.85, blue: 0.87, alpha: 1).setStroke()
@@ -422,6 +435,43 @@ struct PDFExportService {
             hinweis.draw(at: CGPoint(x: margin, y: y),
                          withAttributes: a(.systemFont(ofSize: 7.5), textSec))
 
+            // ── ANHANG: Änderungsprotokoll (nur im Fahrtenbuchmodus) ────────────
+            if store.fahrtenbuchModusEnabled && !store.changeLog.isEmpty {
+                let sortedLog = store.changeLog.sorted { $0.timestamp < $1.timestamp }
+                newPageIfNeeded(needed: 60)
+                y += 20
+                "Anhang: Änderungsprotokoll".draw(at: CGPoint(x: margin, y: y), withAttributes: a(.boldSystemFont(ofSize: 11), accent))
+                y += 16
+                ("Vollständiges, unveränderliches Protokoll aller nachträglichen Änderungen und Löschungen "
+                 + "(\(sortedLog.count) Einträge seit \(sortedLog.first!.timestamp.formatted(date: .abbreviated, time: .omitted))). "
+                 + "Jeder Eintrag ist per Hash mit dem vorherigen verkettet – eine nachträgliche Manipulation der "
+                 + "gespeicherten Historie wäre dadurch an einer gebrochenen Kette erkennbar.")
+                    .draw(in: CGRect(x: margin, y: y, width: tableW, height: 30), withAttributes: a(.systemFont(ofSize: 7.5), textSec))
+                y += 34
+
+                let df = DateFormatter()
+                df.locale = Locale(identifier: "de_DE")
+                df.dateFormat = "dd.MM.yyyy HH:mm"
+
+                for entry in sortedLog {
+                    newPageIfNeeded(needed: 12)
+                    let changeLabel: String
+                    switch entry.changeType {
+                    case .created: changeLabel = "angelegt"
+                    case .updated: changeLabel = "geändert"
+                    case .deleted: changeLabel = "gelöscht"
+                    }
+                    let line = "\(df.string(from: entry.timestamp))  ·  \(entry.entityType.rawValue)  ·  \(changeLabel)  ·  ID \(entry.entityID.uuidString.prefix(8))…"
+                    line.draw(at: CGPoint(x: margin, y: y), withAttributes: a(.systemFont(ofSize: 7), textSec))
+                    y += 11
+                }
+
+                y += 6
+                "Letzter Ketten-Hash: \(sortedLog.last!.hash)"
+                    .draw(at: CGPoint(x: margin, y: y), withAttributes: a(.systemFont(ofSize: 6.5), textSec))
+                y += 10
+            }
+
             drawPageFooter()
         }
 
@@ -507,7 +557,8 @@ struct CSVExportService {
         for trip in trips.sorted(by: { $0.date > $1.date }) {
             let from = PDFExportService.cityOnly(from: trip.from)
             let to   = PDFExportService.cityOnly(from: trip.to)
-            let erstattung = trip.km * store.kmRate
+            // Nur geschäftliche Fahrten sind erstattungsfähig (§ 9 EStG).
+            let erstattung = trip.art == .geschaeftlich ? trip.km * store.kmRate : 0
             let spritpreis = trip.fuelPricePerLiter.map { String(format: "%.3f", $0) } ?? ""
             let verbrauch  = trip.fuelConsumption.map { String(format: "%.1f", $0) } ?? ""
             let liter: String

@@ -100,6 +100,7 @@ struct EinstellungenView: View {
     @State private var expandMeals   = false
     @State private var expandMonteurszulage = false
     @State private var expandWochenendzulage = false
+    @State private var expandFahrtenbuch = false
     @State private var expandHotel   = false
     @State private var expandFuel    = false
     @State private var expandSwipe   = false
@@ -124,6 +125,7 @@ struct EinstellungenView: View {
                 collapsibleMeals
                 collapsibleMonteurszulage
                 collapsibleWochenendzulage
+                collapsibleFahrtenbuch
                 collapsibleHotel
                 profilSection
                 resetSection
@@ -508,6 +510,33 @@ struct EinstellungenView: View {
             }
         } footer: {
             Text(lm.t("settings.weekend.footer"))
+        }
+    }
+
+    @ViewBuilder private var collapsibleFahrtenbuch: some View {
+        Section {
+            DisclosureGroup(isExpanded: $expandFahrtenbuch) {
+                Toggle(isOn: Binding(
+                    get: { store.fahrtenbuchModusEnabled },
+                    set: { store.fahrtenbuchModusEnabled = $0 }
+                )) {
+                    Label("Fahrtenbuchmodus", systemImage: "lock.doc.fill")
+                }
+                Text("Für die Fahrtenbuchmethode (Privatnutzung Betriebsfahrzeug): zeigt Kilometerstand-Felder bei Fahrten, berechnet die Abwesenheitszeit als durchgehende Spanne (statt Summe der Einzelzeiten) und protokolliert jede nachträgliche Änderung oder Löschung unveränderlich.")
+                    .font(.caption2).foregroundStyle(.secondary)
+                NavigationLink {
+                    ChangeLogView()
+                        .environmentObject(store)
+                } label: {
+                    Label("Änderungsprotokoll ansehen", systemImage: "list.bullet.clipboard")
+                }
+            } label: {
+                Label("Fahrtenbuchmodus", systemImage: "lock.doc.fill")
+                    .foregroundStyle(.primary)
+                    .fontWeight(.regular)
+            }
+        } footer: {
+            Text("Macht die App nicht automatisch zu einem zertifizierten Fahrtenbuch, schließt aber die technischen Lücken Kilometerstand, Abwesenheitsspanne und Änderungsprotokoll.")
         }
     }
 

@@ -2,6 +2,15 @@
 
 ---
 
+## Version 1.17.48 Build 88 (November 2026)
+
+- **Neu: Fahrtenbuchmodus** – Neuer Schalter in den Einstellungen für die Fahrtenbuchmethode (Privatnutzung Betriebsfahrzeug): Kilometerstand-Felder bei Fahrten, unveränderliches, hash-verkettetes Änderungsprotokoll für alle Einträge (einsehbar in den Einstellungen, als Anhang im PDF-Export) und Abwesenheitszeit als durchgehende Spanne statt Summe der Einzelzeiten.
+- **Neu: Km-Statistik Geschäftlich/Privat** – Die Statistik zeigt jährlich und monatlich jetzt zusätzlich die Aufteilung der gefahrenen Kilometer in geschäftlich/privat inklusive Prozentanteilen.
+- **Neu: Manuelle Gesamt-Abwesenheitszeit** – Im Verpflegungs-Formular lässt sich die tägliche Abwesenheitszeit jetzt direkt als Gesamtstundenzahl eingeben (statt einzelner Fahrt-/Arbeitszeiten), die Verpflegungspauschale wird automatisch daraus berechnet.
+- **Fehlerbehebung: Kilometerpauschale** – Übersicht, Statistik sowie PDF- und CSV-Export zählten private Fahrten bisher fälschlich zur Kilometererstattung. Jetzt zählen wie vorgesehen nur geschäftliche Fahrten (§ 9 EStG); private Fahrten bleiben zur Dokumentation sichtbar.
+
+---
+
 ## Version 1.17.47 Build 87 (Oktober 2026)
 
 - **Verbesserung: Tagesgruppierung** – Mehrere Arbeitszeit-Einträge am gleichen Tag werden jetzt als eine einzige Karte angezeigt. Aufgeklappt sind alle Einträge und alle Fahrten des Tages sichtbar.

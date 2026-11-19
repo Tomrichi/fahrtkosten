@@ -101,3 +101,11 @@ func parseCurrency(_ s: String) -> Double {
     let clean = s.replacingOccurrences(of: ",", with: ".").filter { $0.isNumber || $0 == "." }
     return Double(clean) ?? 0
 }
+
+// MARK: - Kilometerpauschale
+/// Erstattung nach § 9 EStG: NUR geschäftliche Fahrten sind erstattungsfähig, private
+/// Fahrten zählen nicht mit. Zentrale Stelle, damit Übersicht, Statistik, PDF- und
+/// CSV-Export nicht unabhängig voneinander (und potenziell abweichend) rechnen.
+func tripReimbursement(_ trips: [Trip], rate: Double) -> Double {
+    trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km * rate }
+}

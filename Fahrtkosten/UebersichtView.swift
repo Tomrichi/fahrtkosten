@@ -108,6 +108,7 @@ struct UebersichtView: View {
                     } label: {
                         Image(systemName: "square.and.arrow.up")
                     }
+                    .accessibilityLabel("Export-Menü")
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button { showSettings = true } label: {
@@ -224,7 +225,7 @@ struct UebersichtView: View {
     }
 
     private var filteredTotal: Double {
-        let tripTotal   = filteredTrips.reduce(0)  { $0 + ($1.km * store.kmRate) }
+        let tripTotal   = tripReimbursement(filteredTrips, rate: store.kmRate)
         let mealTotal   = filteredMeals.reduce(0)  { acc, m in acc + store.effectiveAllowance(for: m) }
         let hotelTotal  = filteredHotels.reduce(0) { $0 + $1.amount(flat: store.hotelFlat) }
         return tripTotal + mealTotal + hotelTotal
@@ -304,7 +305,7 @@ struct UebersichtView: View {
                 )
 
                 // ── Aufklappbare Kacheln ──
-                let tripAmount     = filteredTrips.reduce(0.0)          { $0 + ($1.km * store.kmRate) }
+                let tripAmount     = tripReimbursement(filteredTrips, rate: store.kmRate)
                 let mealAmount     = filteredMeals.reduce(0.0)          { acc, m in acc + store.effectiveAllowance(for: m) }
                 let hotelAmount    = filteredHotels.reduce(0.0)         { $0 + $1.amount(flat: store.hotelFlat) }
                 let vehicleAmount  = filteredVehicleCosts.reduce(0.0)    { $0 + $1.amount }

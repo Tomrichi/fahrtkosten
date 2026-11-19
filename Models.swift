@@ -109,6 +109,8 @@ struct Trip: Identifiable, Codable {
     var startTime: Date?            // Abfahrtszeit (Uhrzeit)
     var endTime: Date?              // Ankunftszeit (Uhrzeit)
     var purpose: String             // Fahrtgrund (z.B. Einzeltraining, Besprechung)
+    var odometerStart: Double?      // Kilometerstand bei Fahrtbeginn (Fahrtenbuchmodus)
+    var odometerEnd: Double?        // Kilometerstand bei Fahrtende (Fahrtenbuchmodus)
 
     var fuelCost: Double? {
         guard km > 0 else { return nil }
@@ -133,6 +135,7 @@ struct Trip: Identifiable, Codable {
     enum CodingKeys: String, CodingKey {
         case id, from, to, date, km, note, art, distanceText, durationText, fahrzeitText
         case fuelPricePerLiter, fuelConsumption, fuelTypeRaw, startTime, endTime, purpose
+        case odometerStart, odometerEnd
     }
 
     init(id: UUID = UUID(), from: String, to: String, date: Date = Date(),
@@ -141,13 +144,14 @@ struct Trip: Identifiable, Codable {
          durationText: String? = nil, fahrzeitText: String? = nil,
          fuelPricePerLiter: Double? = nil, fuelConsumption: Double? = nil,
          fuelTypeRaw: String? = nil, startTime: Date? = nil, endTime: Date? = nil,
-         purpose: String = "") {
+         purpose: String = "", odometerStart: Double? = nil, odometerEnd: Double? = nil) {
         self.id = id; self.from = from; self.to = to; self.date = date
         self.km = km; self.note = note; self.art = art; self.distanceText = distanceText
         self.durationText = durationText; self.fahrzeitText = fahrzeitText
         self.fuelPricePerLiter = fuelPricePerLiter; self.fuelConsumption = fuelConsumption
         self.fuelTypeRaw = fuelTypeRaw; self.startTime = startTime; self.endTime = endTime
         self.purpose = purpose
+        self.odometerStart = odometerStart; self.odometerEnd = odometerEnd
     }
 
     init(from decoder: Decoder) throws {
@@ -168,7 +172,46 @@ struct Trip: Identifiable, Codable {
         startTime = try c.decodeIfPresent(Date.self, forKey: .startTime)
         endTime   = try c.decodeIfPresent(Date.self, forKey: .endTime)
         purpose   = try c.decodeIfPresent(String.self, forKey: .purpose) ?? ""
+        odometerStart = try c.decodeIfPresent(Double.self, forKey: .odometerStart)
+        odometerEnd   = try c.decodeIfPresent(Double.self, forKey: .odometerEnd)
     }
+}
+
+// MARK: - Änderungsprotokoll (Fahrtenbuchmodus)
+// Unveränderliches, verkettetes Protokoll aller Änderungen/Löschungen an Fahrten, Arbeitszeiten,
+// Übernachtungen, KFZ-Kosten, Reisespesen und privaten Ausgaben. Nur aktiv, wenn
+// DataStore.fahrtenbuchModusEnabled eingeschaltet ist (siehe DataStore.logChange).
+// Jeder Eintrag referenziert per previousHash den Hash des vorherigen Eintrags – wird die lokal
+// gespeicherte Historie nachträglich manipuliert, bricht die Kette nachweisbar.
+enum ChangeType: String, Codable {
+    case created, updated, deleted
+}
+
+enum LoggedEntityType: String, Codable, CaseIterable {
+    case trip, meal, hotel, vehicleCost, reiseSpese, privateExpense
+
+    var localizedName: String {
+        switch self {
+        case .trip:           return L("tab.trips")
+        case .meal:            return L("tab.meals")
+        case .hotel:           return L("tab.accommodation")
+        case .vehicleCost:     return L("tab.vehicle")
+        case .reiseSpese:      return "Reisespesen"
+        case .privateExpense:  return "Private Ausgaben"
+        }
+    }
+}
+
+struct ChangeLogEntry: Identifiable, Codable {
+    let id: UUID
+    let entityType: LoggedEntityType
+    let entityID: UUID
+    let changeType: ChangeType
+    let timestamp: Date
+    let snapshotBefore: Data?   // JSON-Snapshot vor der Änderung (nil bei .created)
+    let snapshotAfter: Data?    // JSON-Snapshot nach der Änderung (nil bei .deleted)
+    let previousHash: String
+    let hash: String
 }
 
 // MARK: - Favorit-Fahrt

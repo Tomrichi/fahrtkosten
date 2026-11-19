@@ -1263,13 +1263,37 @@ let versionHistoryHTML_de = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.47 – aktuell -->
+<!-- 1.17.48 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.47
+        Version 1.17.48
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">Fahrtenbuchmodus · Km-Statistik Geschäftlich/Privat · Manuelle Abwesenheitszeit</div>
+    </div>
+    <span class="build-info">November 2026 · Build 88</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEU</span> <strong>Fahrtenbuchmodus:</strong> Neuer Schalter in den Einstellungen für die Fahrtenbuchmethode (Privatnutzung Betriebsfahrzeug) – Kilometerstand-Felder bei Fahrten, unveränderliches Änderungsprotokoll für alle Einträge (in den Einstellungen einsehbar, als Anhang im PDF-Export) und Abwesenheitszeit als durchgehende Spanne statt Summe der Einzelzeiten.</li>
+      <li><span class="badge-new">NEU</span> <strong>Km-Statistik Geschäftlich/Privat:</strong> Jahres- und Monatsansicht zeigen jetzt die Aufteilung der gefahrenen Kilometer in geschäftlich/privat inklusive Prozentanteilen.</li>
+      <li><span class="badge-new">NEU</span> <strong>Manuelle Gesamt-Abwesenheitszeit:</strong> Im Verpflegungs-Formular lässt sich die tägliche Abwesenheitszeit direkt als Gesamtstundenzahl eingeben, statt einzelner Fahrt-/Arbeitszeiten.</li>
+      <li><span class="badge-fix">FIX</span> <strong>Kilometerpauschale:</strong> Übersicht, Statistik sowie PDF- und CSV-Export zählten private Fahrten bisher fälschlich zur Kilometererstattung. Jetzt zählen wie vorgesehen nur geschäftliche Fahrten.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.47 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.47
       </div>
       <div class="preview-text">Tagesgruppierung · Abwesenheitszeit · Zulagen-Schalter · GPS-Timeout</div>
     </div>

@@ -75,10 +75,15 @@ struct StatistikView: View {
 
     // MARK: - Jahres-Zusammenfassung
     private var jahresSummary: some View {
-        let trips  = tripsForYear
-        let km     = trips.reduce(0) { $0 + $1.km }
-        let euro   = km * store.kmRate
-        let avgKm  = trips.isEmpty ? 0.0 : km / Double(trips.count)
+        let trips     = tripsForYear
+        let km        = trips.reduce(0) { $0 + $1.km }
+        // Erstattung: nur geschäftliche Fahrten sind nach § 9 EStG erstattungsfähig.
+        let euro      = tripReimbursement(trips, rate: store.kmRate)
+        let avgKm     = trips.isEmpty ? 0.0 : km / Double(trips.count)
+        let kmBiz     = trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km }
+        let kmPrivat  = km - kmBiz
+        let bizPct    = km > 0 ? kmBiz / km * 100 : 0
+        let privatPct = km > 0 ? kmPrivat / km * 100 : 0
 
         return VStack(spacing: 12) {
             HStack(spacing: 12) {
@@ -90,6 +95,16 @@ struct StatistikView: View {
                 summaryTile(icon: "arrow.left.and.right", color: .purple,
                             value: trips.isEmpty ? "–" : String(format: "%.1f km", avgKm).replacingOccurrences(of: ".", with: ","),
                             label: "Ø km/Fahrt")
+            }
+            if !trips.isEmpty {
+                HStack(spacing: 12) {
+                    summaryTile(icon: "briefcase.fill", color: .blue,
+                                value: "\(Int(kmBiz)) km",
+                                label: "Geschäftlich (\(Int(bizPct.rounded())) %)")
+                    summaryTile(icon: "person.fill", color: .orange,
+                                value: "\(Int(kmPrivat)) km",
+                                label: "Privat (\(Int(privatPct.rounded())) %)")
+                }
             }
         }
     }
@@ -230,6 +245,9 @@ struct StatistikView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .accessibilityElement(children: .combine)
                 }
+
+                // ── Monatliche km-Aufteilung Geschäftlich/Privat ──────────
+                monatsKmTabelle(data)
             }
 
             // ── Wochentags-Verteilung ──────────────────────────────────
@@ -238,6 +256,43 @@ struct StatistikView: View {
         .padding(16)
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func monatsKmTabelle(_ data: [MonthData]) -> some View {
+        let monthsWithKm = data.filter { $0.kmTotal > 0 }
+        return Group {
+            if !monthsWithKm.isEmpty {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Kilometer: Geschäftlich / Privat")
+                        .font(.subheadline.bold())
+                    VStack(spacing: 0) {
+                        ForEach(monthsWithKm) { item in
+                            HStack {
+                                Text(item.month)
+                                    .font(.caption)
+                                    .frame(width: 70, alignment: .leading)
+                                Text("\(Int(item.kmTotal)) km")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                Text("\(Int(item.kmGeschaeftlich)) km (\(Int(item.geschaeftlichPercent.rounded())) %)")
+                                    .font(.caption2)
+                                    .foregroundColor(.blue)
+                                Text("·")
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                                Text("\(Int(item.kmPrivat)) km (\(Int(item.privatPercent.rounded())) %)")
+                                    .font(.caption2)
+                                    .foregroundColor(.orange)
+                            }
+                            .padding(.vertical, 6)
+                            Divider()
+                        }
+                    }
+                }
+                .padding(.top, 4)
+            }
+        }
     }
 
     private func legendDot(color: Color, label: String) -> some View {
@@ -337,8 +392,9 @@ struct StatistikView: View {
     // MARK: - Steuer-Auswertung
     private var steuerAuswertung: some View {
         let trips   = tripsForYear
-        let km      = trips.reduce(0) { $0 + $1.km }
-        let euro    = km * store.kmRate
+        // Nur geschäftliche Fahrten sind erstattungsfähig (§ 9 EStG).
+        let km      = trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km }
+        let euro    = tripReimbursement(trips, rate: store.kmRate)
         let meals   = store.meals.filter { Calendar.current.component(.year, from: $0.date) == selectedYear }
         let hotels  = store.hotels.filter { Calendar.current.component(.year, from: $0.date) == selectedYear }
         let mealSum = meals.reduce(0.0) { $0 + store.effectiveAllowance(for: $1) }
@@ -466,7 +522,9 @@ struct StatistikView: View {
 
         return (1...12).map { month in
             let monthTrips = trips.filter { cal.component(.month, from: $0.date) == month }
-            let euro  = monthTrips.reduce(0) { $0 + $1.km * store.kmRate }
+            let euro       = tripReimbursement(monthTrips, rate: store.kmRate)
+            let kmBiz      = monthTrips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km }
+            let kmPrivat   = monthTrips.filter { $0.art == .privat }.reduce(0) { $0 + $1.km }
             let formatter = DateFormatter()
             formatter.locale = Locale(identifier: "de_DE")
             var comps = DateComponents(); comps.month = month; comps.year = year
@@ -479,6 +537,8 @@ struct StatistikView: View {
                 month: full,
                 shortMonth: short,
                 euro: euro,
+                kmGeschaeftlich: kmBiz,
+                kmPrivat: kmPrivat,
                 isCurrentMonth: month == currentMonth && year == currentYear
             )
         }
@@ -536,7 +596,13 @@ struct MonthData: Identifiable {
     let month: String
     let shortMonth: String
     let euro: Double
+    let kmGeschaeftlich: Double
+    let kmPrivat: Double
     let isCurrentMonth: Bool
+
+    var kmTotal: Double { kmGeschaeftlich + kmPrivat }
+    var geschaeftlichPercent: Double { kmTotal > 0 ? kmGeschaeftlich / kmTotal * 100 : 0 }
+    var privatPercent: Double { kmTotal > 0 ? kmPrivat / kmTotal * 100 : 0 }
 }
 
 struct RouteData {

@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import WidgetKit
+import CryptoKit
 
 /// Antwortformat der Frankfurter-API (https://api.frankfurter.dev/v2/rate/EUR/CHF),
 /// liefert EZB-Referenzkurse: {"date":"...","base":"EUR","quote":"CHF","rate":0.925}
@@ -53,6 +54,8 @@ class DataStore: ObservableObject {
     @Published var privateExpenses: [PrivateExpense] = [] { didSet { save(privateExpenses, old: oldValue, key: "privateExpenses") } }
     @Published var favorites:       [FavoriteTrip]   = [] { didSet { saveFavorites() } }
     @Published var recurringTrips:  [RecurringTrip]  = [] { didSet { saveRecurringTrips() } }
+    /// Unveränderliches Änderungsprotokoll (Fahrtenbuchmodus) – nur Anhängen, nie Bearbeiten/Löschen.
+    @Published var changeLog: [ChangeLogEntry] = [] { didSet { save(changeLog, old: oldValue, key: "changeLog") } }
     /// IDs gelöschter Favoriten / Wiederkehrender Fahrten – damit ein Löschen auf einem
     /// Gerät beim iCloud-Abgleich auf den anderen nicht wieder zurückkommt.
     private var deletedFavoriteIDs      = Set<UUID>()
@@ -60,7 +63,7 @@ class DataStore: ObservableObject {
     /// Pro Liste (trips, meals, …): IDs gelöschter Einträge. Wächst nur, wird nie zurückgenommen –
     /// wiederhergestellte Einträge bekommen deshalb neue IDs (siehe BackupManager.restore).
     private var deletedIDs: [String: Set<UUID>] = [:]
-    private static let syncedListKeys = ["trips", "meals", "hotels", "vehicleCosts", "reiseSpesen", "privateExpenses"]
+    private static let syncedListKeys = ["trips", "meals", "hotels", "vehicleCosts", "reiseSpesen", "privateExpenses", "changeLog"]
     private static func deletedKey(_ key: String) -> String { "deleted.\(key)" }
 
     // MARK: - Einstellungen (lokal in UserDefaults)
@@ -108,6 +111,11 @@ class DataStore: ObservableObject {
     }
     @Published var wochenendzulageEnabled: Bool {
         didSet { local.set(wochenendzulageEnabled, forKey: "wochenendzulageEnabled") }
+    }
+    /// Fahrtenbuchmodus: Kilometerstand-Felder, Abwesenheitszeit als durchgehende Spanne statt
+    /// Summe der Einzelzeiten, und unveränderliches Änderungsprotokoll für alle Eintragsarten.
+    @Published var fahrtenbuchModusEnabled: Bool {
+        didSet { local.set(fahrtenbuchModusEnabled, forKey: "fahrtenbuchModusEnabled") }
     }
     // Gesetzliche Tagessätze Inland (€)
     @Published var legalInlandDay:     Double { didSet { local.set(legalInlandDay,     forKey: "legalInlandDay") } }
@@ -162,6 +170,7 @@ class DataStore: ObservableObject {
         allowanceForTripsOnly = local.object(forKey: "allowanceForTripsOnly") as? Bool ?? true
         monteurszulageEnabled   = local.object(forKey: "monteurszulageEnabled")   as? Bool ?? true
         wochenendzulageEnabled  = local.object(forKey: "wochenendzulageEnabled")  as? Bool ?? true
+        fahrtenbuchModusEnabled = local.object(forKey: "fahrtenbuchModusEnabled") as? Bool ?? false
         legalInlandDay     = local.double(forKey: "legalInlandDay").ifZero(14.0)
         legalInlandFullDay = local.double(forKey: "legalInlandFullDay").ifZero(28.0)
         legalSwissDay      = local.double(forKey: "legalSwissDay").ifZero(47.0)
@@ -210,6 +219,49 @@ class DataStore: ObservableObject {
         Task { @MainActor [weak self] in
             await self?.refreshEurChfRateIfNeeded()
         }
+
+        // Nur für Demo-/Promo-Aufnahmen (UI-Test-Launch-Argument), keine Auswirkung auf echte Nutzung.
+        if ProcessInfo.processInfo.arguments.contains("-demoSeed") && trips.isEmpty {
+            seedDemoData()
+        }
+    }
+
+    /// Füllt die App mit plausiblen Demo-Daten für Screenshots/Videos. Wird ausschließlich über
+    /// das Launch-Argument `-demoSeed` aktiviert (siehe FahrtkostenUITests) und läuft nie in der
+    /// regulär installierten App.
+    private func seedDemoData() {
+        UserDefaults.standard.set(true, forKey: "kmRateHinweis2026Gezeigt")
+        let cal = Calendar.current
+        func day(_ offset: Int, hour: Int, minute: Int) -> Date {
+            let base = cal.date(byAdding: .day, value: -offset, to: Date()) ?? Date()
+            return cal.date(bySettingHour: hour, minute: minute, second: 0, of: base) ?? base
+        }
+        trips = [
+            Trip(from: "Musterstraße 12, 80331 München", to: "Werksstraße 4, 86150 Augsburg",
+                 date: day(4, hour: 8, minute: 15), km: 68.4, note: "Kundentermin",
+                 startTime: day(4, hour: 8, minute: 15), endTime: day(4, hour: 9, minute: 5),
+                 purpose: "Besprechung"),
+            Trip(from: "Werksstraße 4, 86150 Augsburg", to: "Musterstraße 12, 80331 München",
+                 date: day(4, hour: 16, minute: 30), km: 68.4, note: "Rückfahrt",
+                 startTime: day(4, hour: 16, minute: 30), endTime: day(4, hour: 17, minute: 20),
+                 purpose: "Besprechung"),
+            Trip(from: "Musterstraße 12, 80331 München", to: "Industriepark 9, 89073 Ulm",
+                 date: day(2, hour: 7, minute: 45), km: 142.0, note: "Montageeinsatz",
+                 startTime: day(2, hour: 7, minute: 45), endTime: day(2, hour: 9, minute: 10),
+                 purpose: "Montage"),
+            Trip(from: "Industriepark 9, 89073 Ulm", to: "Musterstraße 12, 80331 München",
+                 date: day(2, hour: 18, minute: 0), km: 142.0, note: "Rückfahrt",
+                 startTime: day(2, hour: 18, minute: 0), endTime: day(2, hour: 19, minute: 25),
+                 purpose: "Montage"),
+        ]
+        meals = [
+            MealEntry(date: day(4, hour: 8, minute: 15), startTime: day(4, hour: 8, minute: 15),
+                      endTime: day(4, hour: 17, minute: 20), note: "Kundentermin Augsburg",
+                      region: .inland),
+            MealEntry(date: day(2, hour: 7, minute: 45), startTime: day(2, hour: 7, minute: 45),
+                      endTime: day(2, hour: 19, minute: 25), note: "Montageeinsatz Ulm",
+                      region: .inland),
+        ]
     }
 
     // MARK: - EUR/CHF-Wechselkurs (automatisch alle 14 Tage, Frankfurter-API/EZB)
@@ -313,6 +365,7 @@ class DataStore: ObservableObject {
         vehicleCosts    = loadLocal(key: "vehicleCosts")    ?? []
         reiseSpesen     = loadLocal(key: "reiseSpesen")     ?? []
         privateExpenses = loadLocal(key: "privateExpenses") ?? []
+        changeLog       = loadLocal(key: "changeLog")       ?? []
 
         let rawMeals: [MealEntry] = loadLocal(key: "meals") ?? []
         if rawMeals.contains(where: { $0.breakfastAmount < 0 }) {
@@ -343,6 +396,7 @@ class DataStore: ObservableObject {
         case "vehicleCosts":    if let m = syncedList(vehicleCosts,    key: key) { vehicleCosts    = m }
         case "reiseSpesen":     if let m = syncedList(reiseSpesen,     key: key) { reiseSpesen     = m }
         case "privateExpenses": if let m = syncedList(privateExpenses, key: key) { privateExpenses = m }
+        case "changeLog":       if let m = syncedList(changeLog,       key: key) { changeLog       = m }
         default: break
         }
     }
@@ -601,51 +655,174 @@ class DataStore: ObservableObject {
     /// Reisespesen, Fahrzeugkosten und Private Ausgaben sind NICHT enthalten
     var grandTotal: Double { totalKmAmount + totalMeal + totalHotel }
 
+    // MARK: - Änderungsprotokoll (Fahrtenbuchmodus)
+    /// Hängt bei aktivem Fahrtenbuchmodus einen unveränderlichen, mit dem vorherigen Eintrag
+    /// verketteten Änderungseintrag an (siehe ChangeLogEntry). `before`/`after` sind nil, wenn
+    /// der Eintrag neu angelegt bzw. gelöscht wurde. Kein Logging, solange der Modus aus ist.
+    private func logChange<E: Codable>(_ entityType: LoggedEntityType, id: UUID, before: E?, after: E?) {
+        guard fahrtenbuchModusEnabled else { return }
+        let changeType: ChangeType = before == nil ? .created : (after == nil ? .deleted : .updated)
+        let enc = JSONEncoder()
+        let beforeData = before.flatMap { try? enc.encode($0) }
+        let afterData  = after.flatMap  { try? enc.encode($0) }
+        let timestamp = Date()
+        let previousHash = changeLog.last?.hash ?? "genesis"
+
+        var hasher = SHA256()
+        hasher.update(data: Data(previousHash.utf8))
+        hasher.update(data: Data(entityType.rawValue.utf8))
+        hasher.update(data: Data(id.uuidString.utf8))
+        hasher.update(data: Data(changeType.rawValue.utf8))
+        hasher.update(data: Data(String(timestamp.timeIntervalSince1970).utf8))
+        if let beforeData { hasher.update(data: beforeData) }
+        if let afterData  { hasher.update(data: afterData) }
+        let hashString = hasher.finalize().compactMap { String(format: "%02x", $0) }.joined()
+
+        changeLog.append(ChangeLogEntry(
+            id: UUID(), entityType: entityType, entityID: id, changeType: changeType,
+            timestamp: timestamp, snapshotBefore: beforeData, snapshotAfter: afterData,
+            previousHash: previousHash, hash: hashString
+        ))
+    }
+
     // MARK: - CRUD
-    func addTrip(_ t: Trip)    { trips.append(t); trips.sort { $0.date < $1.date }; AppLogger.shared.logData("Fahrt hinzugefügt: \(t.from) → \(t.to), \(String(format: "%.1f", t.km)) km") }
-    func updateTrip(_ t: Trip) { if let i = trips.firstIndex(where: { $0.id == t.id }) { trips[i] = t; trips.sort { $0.date < $1.date }; AppLogger.shared.logData("Fahrt aktualisiert: \(t.from) → \(t.to)") } }
-    func deleteTrip(_ id: UUID){ trips.removeAll { $0.id == id }; AppLogger.shared.logData("Fahrt gelöscht") }
+    func addTrip(_ t: Trip) {
+        trips.append(t); trips.sort { $0.date < $1.date }
+        logChange(.trip, id: t.id, before: Optional<Trip>.none, after: t)
+        AppLogger.shared.logData("Fahrt hinzugefügt: \(t.from) → \(t.to), \(String(format: "%.1f", t.km)) km")
+    }
+    func updateTrip(_ t: Trip) {
+        guard let i = trips.firstIndex(where: { $0.id == t.id }) else { return }
+        let old = trips[i]
+        trips[i] = t; trips.sort { $0.date < $1.date }
+        logChange(.trip, id: t.id, before: old, after: t)
+        AppLogger.shared.logData("Fahrt aktualisiert: \(t.from) → \(t.to)")
+    }
+    func deleteTrip(_ id: UUID) {
+        guard let old = trips.first(where: { $0.id == id }) else { return }
+        trips.removeAll { $0.id == id }
+        logChange(.trip, id: id, before: old, after: Optional<Trip>.none)
+        AppLogger.shared.logData("Fahrt gelöscht")
+    }
     func duplicateTrip(_ trip: Trip) {
         var copy = trip
         copy.id = UUID()
         trips.append(copy)
         trips.sort { $0.date < $1.date }
+        logChange(.trip, id: copy.id, before: Optional<Trip>.none, after: copy)
         AppLogger.shared.logData("Fahrt dupliziert: \(trip.from) → \(trip.to)")
     }
 
-    func addMeal(_ m: MealEntry)    { meals.append(m); meals.sort { $0.date < $1.date }; AppLogger.shared.logData("Speseneintrag hinzugefügt: \(m.region.rawValue), \(String(format: "%.1f", m.hours))h") }
-    func updateMeal(_ m: MealEntry) { if let i = meals.firstIndex(where: { $0.id == m.id }) { meals[i] = m; meals.sort { $0.date < $1.date }; AppLogger.shared.logData("Speseneintrag aktualisiert") } }
-    func deleteMeal(_ id: UUID)     { meals.removeAll { $0.id == id }; AppLogger.shared.logData("Speseneintrag gelöscht") }
+    func addMeal(_ m: MealEntry) {
+        meals.append(m); meals.sort { $0.date < $1.date }
+        logChange(.meal, id: m.id, before: Optional<MealEntry>.none, after: m)
+        AppLogger.shared.logData("Speseneintrag hinzugefügt: \(m.region.rawValue), \(String(format: "%.1f", m.hours))h")
+    }
+    func updateMeal(_ m: MealEntry) {
+        guard let i = meals.firstIndex(where: { $0.id == m.id }) else { return }
+        let old = meals[i]
+        meals[i] = m; meals.sort { $0.date < $1.date }
+        logChange(.meal, id: m.id, before: old, after: m)
+        AppLogger.shared.logData("Speseneintrag aktualisiert")
+    }
+    func deleteMeal(_ id: UUID) {
+        guard let old = meals.first(where: { $0.id == id }) else { return }
+        meals.removeAll { $0.id == id }
+        logChange(.meal, id: id, before: old, after: Optional<MealEntry>.none)
+        AppLogger.shared.logData("Speseneintrag gelöscht")
+    }
     func duplicateMeal(_ meal: MealEntry) {
         var copy = meal
         copy.id = UUID()
         meals.append(copy)
         meals.sort { $0.date < $1.date }
+        logChange(.meal, id: copy.id, before: Optional<MealEntry>.none, after: copy)
         AppLogger.shared.logData("Arbeitszeit dupliziert: \(meal.date.shortDate)")
     }
 
-    func addHotel(_ h: HotelEntry)    { hotels.append(h); hotels.sort { $0.date < $1.date }; AppLogger.shared.logData("Übernachtung hinzugefügt: \(h.city), \(h.numberOfNights) Nacht/Nächte") }
-    func updateHotel(_ h: HotelEntry) { if let i = hotels.firstIndex(where: { $0.id == h.id }) { hotels[i] = h; hotels.sort { $0.date < $1.date }; AppLogger.shared.logData("Übernachtung aktualisiert") } }
-    func deleteHotel(_ id: UUID)      { hotels.removeAll { $0.id == id }; AppLogger.shared.logData("Übernachtung gelöscht") }
+    func addHotel(_ h: HotelEntry) {
+        hotels.append(h); hotels.sort { $0.date < $1.date }
+        logChange(.hotel, id: h.id, before: Optional<HotelEntry>.none, after: h)
+        AppLogger.shared.logData("Übernachtung hinzugefügt: \(h.city), \(h.numberOfNights) Nacht/Nächte")
+    }
+    func updateHotel(_ h: HotelEntry) {
+        guard let i = hotels.firstIndex(where: { $0.id == h.id }) else { return }
+        let old = hotels[i]
+        hotels[i] = h; hotels.sort { $0.date < $1.date }
+        logChange(.hotel, id: h.id, before: old, after: h)
+        AppLogger.shared.logData("Übernachtung aktualisiert")
+    }
+    func deleteHotel(_ id: UUID) {
+        guard let old = hotels.first(where: { $0.id == id }) else { return }
+        hotels.removeAll { $0.id == id }
+        logChange(.hotel, id: id, before: old, after: Optional<HotelEntry>.none)
+        AppLogger.shared.logData("Übernachtung gelöscht")
+    }
     func duplicateHotel(_ hotel: HotelEntry) {
         var copy = hotel
         copy.id = UUID()
         hotels.append(copy)
         hotels.sort { $0.date < $1.date }
+        logChange(.hotel, id: copy.id, before: Optional<HotelEntry>.none, after: copy)
         AppLogger.shared.logData("Übernachtung dupliziert: \(hotel.city)")
     }
 
-    func addVehicleCost(_ v: VehicleCost)    { vehicleCosts.append(v); vehicleCosts.sort { $0.date < $1.date }; AppLogger.shared.logData("KFZ-Kosten hinzugefügt: \(v.category.rawValue), \(String(format: "%.2f", v.amount)) €") }
-    func updateVehicleCost(_ v: VehicleCost) { if let i = vehicleCosts.firstIndex(where: { $0.id == v.id }) { vehicleCosts[i] = v; vehicleCosts.sort { $0.date < $1.date }; AppLogger.shared.logData("KFZ-Kosten aktualisiert") } }
-    func deleteVehicleCost(_ id: UUID)       { vehicleCosts.removeAll { $0.id == id }; AppLogger.shared.logData("KFZ-Kosten gelöscht") }
+    func addVehicleCost(_ v: VehicleCost) {
+        vehicleCosts.append(v); vehicleCosts.sort { $0.date < $1.date }
+        logChange(.vehicleCost, id: v.id, before: Optional<VehicleCost>.none, after: v)
+        AppLogger.shared.logData("KFZ-Kosten hinzugefügt: \(v.category.rawValue), \(String(format: "%.2f", v.amount)) €")
+    }
+    func updateVehicleCost(_ v: VehicleCost) {
+        guard let i = vehicleCosts.firstIndex(where: { $0.id == v.id }) else { return }
+        let old = vehicleCosts[i]
+        vehicleCosts[i] = v; vehicleCosts.sort { $0.date < $1.date }
+        logChange(.vehicleCost, id: v.id, before: old, after: v)
+        AppLogger.shared.logData("KFZ-Kosten aktualisiert")
+    }
+    func deleteVehicleCost(_ id: UUID) {
+        guard let old = vehicleCosts.first(where: { $0.id == id }) else { return }
+        vehicleCosts.removeAll { $0.id == id }
+        logChange(.vehicleCost, id: id, before: old, after: Optional<VehicleCost>.none)
+        AppLogger.shared.logData("KFZ-Kosten gelöscht")
+    }
 
-    func addReiseSpese(_ r: ReiseSpese)    { reiseSpesen.append(r); reiseSpesen.sort { $0.date < $1.date }; AppLogger.shared.logData("Reisespese hinzugefügt: \(r.kategorie.rawValue), \(String(format: "%.2f", r.amount)) €") }
-    func updateReiseSpese(_ r: ReiseSpese) { if let i = reiseSpesen.firstIndex(where: { $0.id == r.id }) { reiseSpesen[i] = r; reiseSpesen.sort { $0.date < $1.date }; AppLogger.shared.logData("Reisespese aktualisiert") } }
-    func deleteReiseSpese(_ id: UUID)      { reiseSpesen.removeAll { $0.id == id }; AppLogger.shared.logData("Reisespese gelöscht") }
+    func addReiseSpese(_ r: ReiseSpese) {
+        reiseSpesen.append(r); reiseSpesen.sort { $0.date < $1.date }
+        logChange(.reiseSpese, id: r.id, before: Optional<ReiseSpese>.none, after: r)
+        AppLogger.shared.logData("Reisespese hinzugefügt: \(r.kategorie.rawValue), \(String(format: "%.2f", r.amount)) €")
+    }
+    func updateReiseSpese(_ r: ReiseSpese) {
+        guard let i = reiseSpesen.firstIndex(where: { $0.id == r.id }) else { return }
+        let old = reiseSpesen[i]
+        reiseSpesen[i] = r; reiseSpesen.sort { $0.date < $1.date }
+        logChange(.reiseSpese, id: r.id, before: old, after: r)
+        AppLogger.shared.logData("Reisespese aktualisiert")
+    }
+    func deleteReiseSpese(_ id: UUID) {
+        guard let old = reiseSpesen.first(where: { $0.id == id }) else { return }
+        reiseSpesen.removeAll { $0.id == id }
+        logChange(.reiseSpese, id: id, before: old, after: Optional<ReiseSpese>.none)
+        AppLogger.shared.logData("Reisespese gelöscht")
+    }
 
-    func addPrivateExpense(_ p: PrivateExpense)    { privateExpenses.append(p); privateExpenses.sort { $0.date < $1.date }; AppLogger.shared.logData("Private Ausgabe hinzugefügt: \(String(format: "%.2f", p.amount)) €") }
-    func updatePrivateExpense(_ p: PrivateExpense) { if let i = privateExpenses.firstIndex(where: { $0.id == p.id }) { privateExpenses[i] = p; privateExpenses.sort { $0.date < $1.date }; AppLogger.shared.logData("Private Ausgabe aktualisiert") } }
-    func deletePrivateExpense(_ id: UUID)          { privateExpenses.removeAll { $0.id == id }; AppLogger.shared.logData("Private Ausgabe gelöscht") }
+    func addPrivateExpense(_ p: PrivateExpense) {
+        privateExpenses.append(p); privateExpenses.sort { $0.date < $1.date }
+        logChange(.privateExpense, id: p.id, before: Optional<PrivateExpense>.none, after: p)
+        AppLogger.shared.logData("Private Ausgabe hinzugefügt: \(String(format: "%.2f", p.amount)) €")
+    }
+    func updatePrivateExpense(_ p: PrivateExpense) {
+        guard let i = privateExpenses.firstIndex(where: { $0.id == p.id }) else { return }
+        let old = privateExpenses[i]
+        privateExpenses[i] = p; privateExpenses.sort { $0.date < $1.date }
+        logChange(.privateExpense, id: p.id, before: old, after: p)
+        AppLogger.shared.logData("Private Ausgabe aktualisiert")
+    }
+    func deletePrivateExpense(_ id: UUID) {
+        guard let old = privateExpenses.first(where: { $0.id == id }) else { return }
+        privateExpenses.removeAll { $0.id == id }
+        logChange(.privateExpense, id: id, before: old, after: Optional<PrivateExpense>.none)
+        AppLogger.shared.logData("Private Ausgabe gelöscht")
+    }
 
     func addFavorite(from trip: Trip) {
         guard !favorites.contains(where: { $0.from == trip.from && $0.to == trip.to }) else { return }
@@ -934,6 +1111,21 @@ extension DataStore {
         let dayTrips = trips.filter { cal.isDate($0.date, inSameDayAs: meal.date) && $0.art == .geschaeftlich }
         // Alle MealEntries des gleichen Tages einbeziehen – nicht nur den aktuellen
         let dayMeals = meals.filter { cal.isDate($0.date, inSameDayAs: meal.date) && !$0.excludeTrips }
+
+        // Fahrtenbuchmodus: durchgehende Abwesenheitsspanne (früheste Abfahrt/früheste Arbeitszeit
+        // bis späteste Rückkehr/späteste Arbeitszeit) statt Summe der Einzelzeiten – schließt
+        // Lücken zwischen zwei Fahrten (z. B. Kundentermin) automatisch mit ein, ohne dass diese
+        // separat als Arbeitszeit-Eintrag nachgetragen werden müssen.
+        if fahrtenbuchModusEnabled {
+            var starts = dayMeals.map { $0.startTime }
+            var ends   = dayMeals.map { $0.endTime }
+            for trip in dayTrips {
+                if let s = trip.startTime { starts.append(s) }
+                if let e = trip.endTime   { ends.append(e) }
+            }
+            guard let spanStart = starts.min(), let spanEnd = ends.max() else { return 0 }
+            return max(0, spanEnd.timeIntervalSince(spanStart) / 3600.0)
+        }
 
         // Summe aller Arbeitszeiten des Tages
         let workH = dayMeals.reduce(0.0) { $0 + $1.hours }
