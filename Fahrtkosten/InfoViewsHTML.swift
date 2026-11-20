@@ -1263,13 +1263,39 @@ let versionHistoryHTML_de = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.49 – aktuell -->
+<!-- 1.17.50 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.49
+        Version 1.17.50
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">Hardware-Hash-Kette · Externe Zeitstempel · Storno statt Löschen</div>
+    </div>
+    <span class="build-info">November 2026 · Build 95</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-new">NEU</span> <strong>Hardware-gesicherte Hash-Kette:</strong> Jeder Änderungsprotokoll-Eintrag wird zusätzlich mit einem geräte­gebundenen Schlüssel (Secure Enclave) signiert. Ein Rollback-Schutz erkennt, wenn ein altes Backup eingespielt wurde.</li>
+      <li><span class="badge-new">NEU</span> <strong>Externe Zeitstempel:</strong> Jeder neue Eintrag bekommt einen amtlichen Zeitstempel von einer unabhängigen externen Zeitstempelstelle, unabhängig von der Systemzeit des Geräts.</li>
+      <li><span class="badge-new">NEU</span> <strong>Tachostand-Kontinuität:</strong> Beim Anlegen einer Fahrt wird der Start-Kilometerstand aus der letzten Fahrt vorgeschlagen; eine Abweichung muss begründet werden.</li>
+      <li><span class="badge-new">NEU</span> <strong>Pflicht-Änderungsgrund:</strong> Das Bearbeiten einer Fahrt im Fahrtenbuchmodus verlangt jetzt einen Änderungsgrund.</li>
+      <li><span class="badge-new">NEU</span> <strong>Storno statt Löschen:</strong> Eine Fahrt wird im Fahrtenbuchmodus beim Löschen nur noch storniert (durchgestrichen sichtbar in Liste, PDF, CSV), nicht mehr entfernt – zählt nicht mehr zur Erstattung.</li>
+      <li><span class="badge-change">ÄNDERUNG</span> <strong>Export:</strong> Der „Nachtrag &gt; 7 Tage"-Hinweis ist jetzt auch im PDF-/CSV-Export sichtbar, nicht mehr nur in der App.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.49 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.49
       </div>
       <div class="preview-text">Fahrtenbuchmodus · Km-Statistik Geschäftlich/Privat · Manuelle Abwesenheitszeit</div>
     </div>

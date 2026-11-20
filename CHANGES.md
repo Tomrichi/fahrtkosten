@@ -2,6 +2,17 @@
 
 ---
 
+## Version 1.17.50 Build 95 (November 2026)
+
+- **Neu: Hardware-gesicherte Hash-Kette** – Jeder Änderungsprotokoll-Eintrag wird zusätzlich mit einem geräte­gebundenen Schlüssel (Secure Enclave) signiert. Ein Rollback-Schutz erkennt, wenn ein altes Backup eingespielt wurde.
+- **Neu: Externe Zeitstempel** – Jeder neue Eintrag bekommt einen amtlichen Zeitstempel von einer unabhängigen externen Zeitstempelstelle, unabhängig von der Systemzeit des Geräts.
+- **Neu: Tachostand-Kontinuität** – Beim Anlegen einer Fahrt wird der Start-Kilometerstand aus der letzten Fahrt vorgeschlagen; eine Abweichung muss begründet werden.
+- **Neu: Pflicht-Änderungsgrund** – Das Bearbeiten einer Fahrt im Fahrtenbuchmodus verlangt jetzt einen Änderungsgrund.
+- **Neu: Storno statt Löschen** – Eine Fahrt wird im Fahrtenbuchmodus beim Löschen nur noch storniert (durchgestrichen sichtbar in Liste, PDF, CSV), nicht mehr entfernt – zählt nicht mehr zur Erstattung.
+- **Verbesserung: Export** – Der "Nachtrag > 7 Tage"-Hinweis ist jetzt auch im PDF-/CSV-Export sichtbar, nicht mehr nur in der App.
+
+---
+
 ## Version 1.17.49 Build 94 (November 2026)
 
 - **Neu: Pflichtangaben im Fahrtenbuchmodus** – Kilometerstand und Fahrtzweck (bei geschäftlichen Fahrten) müssen jetzt ausgefüllt sein; fehlende Angaben werden in der Fahrtenliste als Hinweis markiert.
