@@ -11,6 +11,7 @@ final class PDFExportFahrtenbuchTests: XCTestCase {
         store.trips = []
         store.meals = []
         store.changeLog = []
+        RollbackGuard.resetForTesting()
 
         let trip = Trip(
             from: "Start", to: "Ziel", date: Date(), km: 42, purpose: "Kundentermin",

@@ -80,7 +80,7 @@ struct StatistikView: View {
         // Erstattung: nur geschäftliche Fahrten sind nach § 9 EStG erstattungsfähig.
         let euro      = tripReimbursement(trips, rate: store.kmRate)
         let avgKm     = trips.isEmpty ? 0.0 : km / Double(trips.count)
-        let kmBiz     = trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km }
+        let kmBiz     = trips.filter { $0.art == .geschaeftlich && !$0.isStorno }.reduce(0) { $0 + $1.km }
         let kmPrivat  = km - kmBiz
         let bizPct    = km > 0 ? kmBiz / km * 100 : 0
         let privatPct = km > 0 ? kmPrivat / km * 100 : 0
@@ -393,7 +393,7 @@ struct StatistikView: View {
     private var steuerAuswertung: some View {
         let trips   = tripsForYear
         // Nur geschäftliche Fahrten sind erstattungsfähig (§ 9 EStG).
-        let km      = trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km }
+        let km      = trips.filter { $0.art == .geschaeftlich && !$0.isStorno }.reduce(0) { $0 + $1.km }
         let euro    = tripReimbursement(trips, rate: store.kmRate)
         let meals   = store.meals.filter { Calendar.current.component(.year, from: $0.date) == selectedYear }
         let hotels  = store.hotels.filter { Calendar.current.component(.year, from: $0.date) == selectedYear }
@@ -523,8 +523,8 @@ struct StatistikView: View {
         return (1...12).map { month in
             let monthTrips = trips.filter { cal.component(.month, from: $0.date) == month }
             let euro       = tripReimbursement(monthTrips, rate: store.kmRate)
-            let kmBiz      = monthTrips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km }
-            let kmPrivat   = monthTrips.filter { $0.art == .privat }.reduce(0) { $0 + $1.km }
+            let kmBiz      = monthTrips.filter { $0.art == .geschaeftlich && !$0.isStorno }.reduce(0) { $0 + $1.km }
+            let kmPrivat   = monthTrips.filter { $0.art == .privat && !$0.isStorno }.reduce(0) { $0 + $1.km }
             let formatter = DateFormatter()
             formatter.locale = Locale(identifier: "de_DE")
             var comps = DateComponents(); comps.month = month; comps.year = year

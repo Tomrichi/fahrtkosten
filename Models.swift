@@ -113,6 +113,8 @@ struct Trip: Identifiable, Codable {
     var odometerEnd: Double?        // Kilometerstand bei Fahrtende (Fahrtenbuchmodus)
     var isCommute: Bool = false     // Wohnung–Arbeitsstätte (nur bei art == .privat relevant)
     var routeCoordinatesEncoded: String?  // GPS-Route "lat,lon;lat,lon;..." (Fahrtenbuchmodus)
+    var odometerGapReason: String?  // Begründung, wenn Start-Kilometerstand vom Vorschlag abweicht
+    var isStorno: Bool = false      // Fahrtenbuchmodus: Löschen storniert nur, statt zu entfernen
 
     /// Anzeigetext für Art/Kategorie – Arbeitsweg wird gesondert ausgewiesen (GoBD-Vorgabe),
     /// bleibt aber intern eine Privatfahrt (nicht erstattungsfähig, siehe tripReimbursement).
@@ -142,6 +144,7 @@ struct Trip: Identifiable, Codable {
         case id, from, to, date, km, note, art, distanceText, durationText, fahrzeitText
         case fuelPricePerLiter, fuelConsumption, fuelTypeRaw, startTime, endTime, purpose
         case odometerStart, odometerEnd, isCommute, routeCoordinatesEncoded
+        case odometerGapReason, isStorno
     }
 
     init(id: UUID = UUID(), from: String, to: String, date: Date = Date(),
@@ -151,7 +154,8 @@ struct Trip: Identifiable, Codable {
          fuelPricePerLiter: Double? = nil, fuelConsumption: Double? = nil,
          fuelTypeRaw: String? = nil, startTime: Date? = nil, endTime: Date? = nil,
          purpose: String = "", odometerStart: Double? = nil, odometerEnd: Double? = nil,
-         isCommute: Bool = false, routeCoordinatesEncoded: String? = nil) {
+         isCommute: Bool = false, routeCoordinatesEncoded: String? = nil,
+         odometerGapReason: String? = nil, isStorno: Bool = false) {
         self.id = id; self.from = from; self.to = to; self.date = date
         self.km = km; self.note = note; self.art = art; self.distanceText = distanceText
         self.durationText = durationText; self.fahrzeitText = fahrzeitText
@@ -160,6 +164,7 @@ struct Trip: Identifiable, Codable {
         self.purpose = purpose
         self.odometerStart = odometerStart; self.odometerEnd = odometerEnd
         self.isCommute = isCommute; self.routeCoordinatesEncoded = routeCoordinatesEncoded
+        self.odometerGapReason = odometerGapReason; self.isStorno = isStorno
     }
 
     init(from decoder: Decoder) throws {
@@ -184,6 +189,8 @@ struct Trip: Identifiable, Codable {
         odometerEnd   = try c.decodeIfPresent(Double.self, forKey: .odometerEnd)
         isCommute     = try c.decodeIfPresent(Bool.self, forKey: .isCommute) ?? false
         routeCoordinatesEncoded = try c.decodeIfPresent(String.self, forKey: .routeCoordinatesEncoded)
+        odometerGapReason = try c.decodeIfPresent(String.self, forKey: .odometerGapReason)
+        isStorno = try c.decodeIfPresent(Bool.self, forKey: .isStorno) ?? false
     }
 }
 
@@ -195,6 +202,10 @@ struct Trip: Identifiable, Codable {
 // gespeicherte Historie nachträglich manipuliert, bricht die Kette nachweisbar.
 enum ChangeType: String, Codable {
     case created, updated, deleted
+    /// Von RollbackGuard eingefügt, wenn beim App-Start ein in der Keychain (geräte-
+    /// gebunden, backup-ausgeschlossen) gespeicherter Ketten-Stand weiter fortgeschritten
+    /// ist als die aktuell geladene changeLog – Hinweis auf ein eingespieltes altes Backup.
+    case rollbackDetected
 }
 
 enum LoggedEntityType: String, Codable, CaseIterable {
@@ -222,6 +233,42 @@ struct ChangeLogEntry: Identifiable, Codable {
     let snapshotAfter: Data?    // JSON-Snapshot nach der Änderung (nil bei .deleted)
     let previousHash: String
     let hash: String
+    var seq: Int = 0                     // fortlaufende Nummer, für RollbackGuard
+    var deviceSignature: String = ""     // ECDSA-Signatur von `hash`, siehe FahrtenbuchSigner
+    var tsaTokenBase64: String?          // RFC-3161-Zeitstempel-Token, asynchron nachgetragen
+    var changeReason: String?            // Pflicht-Änderungsgrund bei .updated im Fahrtenbuchmodus
+
+    init(id: UUID, entityType: LoggedEntityType, entityID: UUID, changeType: ChangeType,
+         timestamp: Date, snapshotBefore: Data?, snapshotAfter: Data?, previousHash: String,
+         hash: String, seq: Int = 0, deviceSignature: String = "", tsaTokenBase64: String? = nil,
+         changeReason: String? = nil) {
+        self.id = id; self.entityType = entityType; self.entityID = entityID
+        self.changeType = changeType; self.timestamp = timestamp
+        self.snapshotBefore = snapshotBefore; self.snapshotAfter = snapshotAfter
+        self.previousHash = previousHash; self.hash = hash
+        self.seq = seq; self.deviceSignature = deviceSignature
+        self.tsaTokenBase64 = tsaTokenBase64; self.changeReason = changeReason
+    }
+
+    // Eigener Decoder: seq/deviceSignature/tsaTokenBase64/changeReason kamen erst später dazu –
+    // ohne decodeIfPresent-Fallback würde das Decodieren bereits bestehender, gespeicherter
+    // Änderungsprotokolle (ohne diese Felder) komplett fehlschlagen und die Historie verlieren.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        entityType = try c.decode(LoggedEntityType.self, forKey: .entityType)
+        entityID = try c.decode(UUID.self, forKey: .entityID)
+        changeType = try c.decode(ChangeType.self, forKey: .changeType)
+        timestamp = try c.decode(Date.self, forKey: .timestamp)
+        snapshotBefore = try c.decodeIfPresent(Data.self, forKey: .snapshotBefore)
+        snapshotAfter = try c.decodeIfPresent(Data.self, forKey: .snapshotAfter)
+        previousHash = try c.decode(String.self, forKey: .previousHash)
+        hash = try c.decode(String.self, forKey: .hash)
+        seq = try c.decodeIfPresent(Int.self, forKey: .seq) ?? 0
+        deviceSignature = try c.decodeIfPresent(String.self, forKey: .deviceSignature) ?? ""
+        tsaTokenBase64 = try c.decodeIfPresent(String.self, forKey: .tsaTokenBase64)
+        changeReason = try c.decodeIfPresent(String.self, forKey: .changeReason)
+    }
 }
 
 // MARK: - Favorit-Fahrt

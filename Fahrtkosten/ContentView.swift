@@ -120,6 +120,7 @@ struct ContentView: View {
         .onAppear {
             AppLogger.shared.logData("Pro-Status beim Start: \(proMgr.isPro ? "Pro" : "nicht Pro – iCloud-Abgleich aus")")
             if proMgr.isPro { store.enableSync() }
+            store.retryMissingTSATimestamps()
             guard !kmRateHinweisGezeigt else { return }
             kmRateHinweisGezeigt = true
             showKmRateHinweis = true

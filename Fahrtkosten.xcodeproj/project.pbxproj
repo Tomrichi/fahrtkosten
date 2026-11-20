@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		231E65F2E78B8D2D7F3D1C13 /* FahrtenbuchSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B393610DF03791436B2F578F /* FahrtenbuchSecurity.swift */; };
 		4A01B7242FB4C2A100CC57DF /* FahrtkostenWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 4A01B71A2FB4C29F00CC57DF /* FahrtkostenWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4A0948B02FBA1CC100C21556 /* FahrtkostenShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4A0948A62FBA1CC000C21556 /* FahrtkostenShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4A2B565E2F96D76A00FCED71 /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A2B565D2F96D76A00FCED71 /* SplashScreenView.swift */; };
@@ -45,6 +46,7 @@
 		87E04108CED397827B41B1A1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 87990AAD4420F4FB67ECFC23 /* Foundation.framework */; };
 		BE0F0001CAFECAFE /* RecurringTripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0F0002CAFECAFE /* RecurringTripView.swift */; };
 		C283FA734A1EC80B1DEDD06A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 87990AAD4420F4FB67ECFC23 /* Foundation.framework */; };
+		C4C4F476D93F90BC3AA1D40E /* TSAClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB71360D15C8F4D1DEFA5459 /* TSAClient.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -151,6 +153,8 @@
 		4AE9A9532FB37022003B89DF /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		7DFAF53B8A44BA612246813A /* FahrtkostenUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FahrtkostenUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		87990AAD4420F4FB67ECFC23 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		B393610DF03791436B2F578F /* FahrtenbuchSecurity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FahrtenbuchSecurity.swift; sourceTree = "<group>"; };
+		BB71360D15C8F4D1DEFA5459 /* TSAClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TSAClient.swift; sourceTree = "<group>"; };
 		BE0F0002CAFECAFE /* RecurringTripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringTripView.swift; sourceTree = "<group>"; };
 		C952B13C8606E50302F1A6DD /* MapsRouteViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapsRouteViews.swift; sourceTree = "<group>"; };
 		F9C0F5B1DFB4476FECEEB1DD /* TripFormView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TripFormView.swift; sourceTree = "<group>"; };
@@ -312,6 +316,8 @@
 				F9C0F5B1DFB4476FECEEB1DD /* TripFormView.swift */,
 				C952B13C8606E50302F1A6DD /* MapsRouteViews.swift */,
 				2753BC7E224AFF86CD0434AB /* FahrtkostenUITests */,
+				B393610DF03791436B2F578F /* FahrtenbuchSecurity.swift */,
+				BB71360D15C8F4D1DEFA5459 /* TSAClient.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -649,6 +655,8 @@
 				BE0F0001CAFECAFE /* RecurringTripView.swift in Sources */,
 				738B14F05190145C301F5FED /* TripFormView.swift in Sources */,
 				53D736B73771B7938D00F124 /* MapsRouteViews.swift in Sources */,
+				231E65F2E78B8D2D7F3D1C13 /* FahrtenbuchSecurity.swift in Sources */,
+				C4C4F476D93F90BC3AA1D40E /* TSAClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -441,7 +441,9 @@ struct FahrtenView: View {
                                         Button(role: .destructive) {
                                             store.deleteTrip(trip.id)
                                         } label: {
-                                            Label(lm.t("action.delete"), systemImage: "trash")
+                                            // Fahrtenbuchmodus: Fahrten werden nur storniert, nie
+                                            // physisch gelöscht (Hash-Kette darf nicht reißen).
+                                            Label(store.fahrtenbuchModusEnabled ? "Stornieren" : lm.t("action.delete"), systemImage: "trash")
                                         }.tint(.red)
                                     }
                             }
@@ -1118,6 +1120,7 @@ struct TripRow: View {
                 }
 
                 // Zeile 4: GoBD-Hinweise (nur Fahrtenbuchmodus) + Arbeitsweg-Kennzeichnung
+                if trip.isStorno { warningLine("Storniert").accessibilityHidden(true) }
                 if missingOdometer { warningLine("Kilometerstand fehlt").accessibilityHidden(true) }
                 if missingPurpose { warningLine("Zweck fehlt").accessibilityHidden(true) }
                 if createdLate { warningLine("Nicht zeitnah erfasst (> 7 Tage)").accessibilityHidden(true) }
@@ -1146,6 +1149,8 @@ struct TripRow: View {
                 }
             }
         }
+        .strikethrough(trip.isStorno, pattern: .solid, color: .red)
+        .opacity(trip.isStorno ? 0.6 : 1)
         .padding(.vertical, 6)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityDescription)

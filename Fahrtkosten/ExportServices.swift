@@ -72,8 +72,10 @@ struct PDFExportService {
         let grandTotal   = tripTotal + mealTotal + hotelTotal
 
         // Hilfsfunktionen
-        func a(_ font: UIFont, _ color: UIColor = UIColor(red: 0.1, green: 0.1, blue: 0.12, alpha: 1)) -> [NSAttributedString.Key: Any] {
-            [.font: font, .foregroundColor: color]
+        func a(_ font: UIFont, _ color: UIColor = UIColor(red: 0.1, green: 0.1, blue: 0.12, alpha: 1), strikethrough: Bool = false) -> [NSAttributedString.Key: Any] {
+            var attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: color]
+            if strikethrough { attrs[.strikethroughStyle] = NSUnderlineStyle.single.rawValue }
+            return attrs
         }
         func euro(_ v: Double) -> String { String(format: "%.2f €", v) }
         func km(_ v: Double) -> String { String(format: "%.1f km", v) }
@@ -180,6 +182,9 @@ struct PDFExportService {
                 let routeLine: String? = trip.routeCoordinatesEncoded.map {
                     "Route: \($0.split(separator: ";").count) GPS-Punkte aufgezeichnet"
                 }
+                let gapReasonLine: String? = trip.odometerGapReason.map { "Lücke: \($0)" }
+                let lateLine: String? = store.wasCreatedLate(trip) ? "[Nachtrag > 7 Tage]" : nil
+                let stornoLine: String? = trip.isStorno ? "[STORNIERT]" : nil
 
                 // Zeilenhöhe: max(Adresstexte, Grund-Texte)
                 var grundParts = [trip.artLabel]
@@ -188,6 +193,9 @@ struct PDFExportService {
                 if !filteredNoteH.isEmpty { grundParts.append(filteredNoteH) }
                 if let odometerLine { grundParts.append(odometerLine) }
                 if let routeLine { grundParts.append(routeLine) }
+                if let gapReasonLine { grundParts.append(gapReasonLine) }
+                if let lateLine { grundParts.append(lateLine) }
+                if let stornoLine { grundParts.append(stornoLine) }
                 let grundStr = grundParts.joined(separator: "\n")
                 let grundH = (grundStr as NSString).boundingRect(
                     with: CGSize(width: wZweck - 4, height: .greatestFiniteMagnitude),
@@ -211,8 +219,8 @@ struct PDFExportService {
                     return df.string(from: trip.date)
                 }()
                 dateStr.draw(in: CGRect(x: cDatum + 2, y: y + 3, width: wDatum, height: effectiveRowH), withAttributes: rAs)
-                trip.from.draw(in: CGRect(x: cVon + 2, y: y + 3, width: wVon - 4, height: effectiveRowH), withAttributes: rA)
-                trip.to.draw(in: CGRect(x: cNach + 2, y: y + 3, width: wNach - 4, height: effectiveRowH), withAttributes: rA)
+                trip.from.draw(in: CGRect(x: cVon + 2, y: y + 3, width: wVon - 4, height: effectiveRowH), withAttributes: a(.systemFont(ofSize: 7.0), textPri, strikethrough: trip.isStorno))
+                trip.to.draw(in: CGRect(x: cNach + 2, y: y + 3, width: wNach - 4, height: effectiveRowH), withAttributes: a(.systemFont(ofSize: 7.0), textPri, strikethrough: trip.isStorno))
 
                 // Grund: Art + Fahrtgrund + Notiz — reiner Text, auf Spaltenbreite begrenzt
                 let grundRect = CGRect(x: cZweck + 2, y: y + 3, width: wZweck - 4, height: effectiveRowH - 4)
@@ -222,14 +230,18 @@ struct PDFExportService {
                 if !filteredNote.isEmpty { grundLines.append(filteredNote) }
                 if let odometerLine { grundLines.append(odometerLine) }
                 if let routeLine { grundLines.append(routeLine) }
+                if let gapReasonLine { grundLines.append(gapReasonLine) }
+                if let lateLine { grundLines.append(lateLine) }
+                if let stornoLine { grundLines.append(stornoLine) }
                 let grundText = grundLines.joined(separator: "\n")
-                grundText.draw(in: grundRect, withAttributes: a(.systemFont(ofSize: 6.5), textSec))
+                grundText.draw(in: grundRect, withAttributes: a(.systemFont(ofSize: 6.5), textSec, strikethrough: trip.isStorno))
 
-                km(trip.km).draw(at: CGPoint(x: cStrecke + 2, y: y + 3), withAttributes: rAs)
+                km(trip.km).draw(at: CGPoint(x: cStrecke + 2, y: y + 3), withAttributes: a(.systemFont(ofSize: 7.0), textSec, strikethrough: trip.isStorno))
                 String(format: "€%.2f", store.kmRate).draw(at: CGPoint(x: cKmSatz + 2, y: y + 3), withAttributes: rAs)
-                // Private Fahrten bleiben zur Dokumentation sichtbar, sind aber nicht erstattungsfähig.
-                let rowBetrag = trip.art == .geschaeftlich ? euro(trip.km * store.kmRate) : "–"
-                rowBetrag.draw(at: CGPoint(x: cBetrag + 2, y: y + 3), withAttributes: rAb)
+                // Private und stornierte Fahrten bleiben zur Dokumentation sichtbar, sind aber
+                // nicht erstattungsfähig.
+                let rowBetrag = (trip.art == .geschaeftlich && !trip.isStorno) ? euro(trip.km * store.kmRate) : "–"
+                rowBetrag.draw(at: CGPoint(x: cBetrag + 2, y: y + 3), withAttributes: a(.systemFont(ofSize: 7.0, weight: .semibold), textPri, strikethrough: trip.isStorno))
 
                 // Trennlinie
                 UIColor(red: 0.85, green: 0.85, blue: 0.87, alpha: 1).setStroke()
@@ -465,8 +477,11 @@ struct PDFExportService {
                     case .created: changeLabel = "angelegt"
                     case .updated: changeLabel = "geändert"
                     case .deleted: changeLabel = "gelöscht"
+                    case .rollbackDetected: changeLabel = "ROLLBACK ERKANNT"
                     }
-                    let line = "\(df.string(from: entry.timestamp))  ·  \(entry.entityType.rawValue)  ·  \(changeLabel)  ·  ID \(entry.entityID.uuidString.prefix(8))…"
+                    var line = "#\(entry.seq) · \(df.string(from: entry.timestamp))  ·  \(entry.entityType.rawValue)  ·  \(changeLabel)  ·  ID \(entry.entityID.uuidString.prefix(8))…"
+                    line += entry.tsaTokenBase64 != nil ? "  ·  TSA ✓" : "  ·  TSA –"
+                    if let reason = entry.changeReason, !reason.isEmpty { line += "  ·  Grund: \(reason)" }
                     line.draw(at: CGPoint(x: margin, y: y), withAttributes: a(.systemFont(ofSize: 7), textSec))
                     y += 11
                 }
@@ -562,8 +577,8 @@ struct CSVExportService {
         for trip in trips.sorted(by: { $0.date > $1.date }) {
             let from = PDFExportService.cityOnly(from: trip.from)
             let to   = PDFExportService.cityOnly(from: trip.to)
-            // Nur geschäftliche Fahrten sind erstattungsfähig (§ 9 EStG).
-            let erstattung = trip.art == .geschaeftlich ? trip.km * store.kmRate : 0
+            // Nur geschäftliche, nicht stornierte Fahrten sind erstattungsfähig (§ 9 EStG).
+            let erstattung = (trip.art == .geschaeftlich && !trip.isStorno) ? trip.km * store.kmRate : 0
             let spritpreis = trip.fuelPricePerLiter.map { String(format: "%.3f", $0) } ?? ""
             let verbrauch  = trip.fuelConsumption.map { String(format: "%.1f", $0) } ?? ""
             let liter: String
@@ -576,6 +591,9 @@ struct CSVExportService {
             if let route = trip.routeCoordinatesEncoded {
                 notiz += " [Route: \(route.split(separator: ";").count) GPS-Punkte]"
             }
+            if let reason = trip.odometerGapReason { notiz += " [Lücke: \(reason)]" }
+            if store.wasCreatedLate(trip) { notiz += " [Nachtrag > 7 Tage]" }
+            if trip.isStorno { notiz += " [STORNIERT]" }
             csv += "\(date);Fahrt;\(from);\(to);\(String(format: "%.1f", trip.km));\(spritpreis);\(verbrauch);\(liter);\(String(format: "%.2f", erstattung));\(notiz)\n"
         }
 
@@ -616,15 +634,21 @@ struct CSVExportService {
         if store.fahrtenbuchModusEnabled && !store.changeLog.isEmpty {
             let sortedLog = store.changeLog.sorted { $0.timestamp < $1.timestamp }
             csv += "\n\nÄnderungsprotokoll (Fahrtenbuchmodus)\n"
-            csv += "Zeitstempel;Typ;Entität-ID;Änderungsart;Hash\n"
+            csv += "Seq;Zeitstempel;Typ;Entität-ID;Änderungsart;Hash;Geräte-Signatur;TSA-Zeitstempel;Grund\n"
             let df = DateFormatter()
             df.locale = Locale(identifier: "de_DE"); df.dateFormat = "dd.MM.yyyy HH:mm"
             for entry in sortedLog {
-                let changeLabel = entry.changeType == .created ? "angelegt"
-                                 : entry.changeType == .updated ? "geändert" : "gelöscht"
-                csv += "\(df.string(from: entry.timestamp));\(entry.entityType.rawValue);\(entry.entityID.uuidString.prefix(8));\(changeLabel);\(entry.hash)\n"
+                let changeLabel: String
+                switch entry.changeType {
+                case .created: changeLabel = "angelegt"
+                case .updated: changeLabel = "geändert"
+                case .deleted: changeLabel = "gelöscht"
+                case .rollbackDetected: changeLabel = "ROLLBACK ERKANNT"
+                }
+                let tsa = entry.tsaTokenBase64 != nil ? "vorhanden" : "fehlt"
+                csv += "\(entry.seq);\(df.string(from: entry.timestamp));\(entry.entityType.rawValue);\(entry.entityID.uuidString.prefix(8));\(changeLabel);\(entry.hash);\(entry.deviceSignature.prefix(16));\(tsa);\(entry.changeReason ?? "")\n"
             }
-            csv += "Letzter Ketten-Hash;;;;\(sortedLog.last!.hash)\n"
+            csv += "Letzter Ketten-Hash;;;;;\(sortedLog.last!.hash);;;\n"
         }
 
         return csv

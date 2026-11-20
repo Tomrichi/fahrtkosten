@@ -14,6 +14,7 @@ final class MusterexportGeneratorTests: XCTestCase {
         store.changeLog = []
         store.fahrtenbuchModusEnabled = true
         store.kmRate = 0.38
+        RollbackGuard.resetForTesting()
 
         let cal = Calendar(identifier: .gregorian)
         func d(_ year: Int, _ month: Int, _ day: Int, _ hour: Int, _ minute: Int = 0) -> Date {

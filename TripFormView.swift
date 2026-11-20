@@ -37,6 +37,9 @@ struct TripFormView: View {
     @State private var kmString          = ""
     @State private var odometerStartString = ""
     @State private var odometerEndString   = ""
+    @State private var odometerGapReason   = ""
+    @State private var suggestedOdometerStart: Double? = nil
+    @State private var changeReasonText    = ""
     @State private var note              = ""
     @State private var purpose           = ""
     @State private var tripArt: TripArt  = .geschaeftlich
@@ -125,11 +128,22 @@ struct TripFormView: View {
         return nil
     }
     private var kmValue: Double { parseCurrency(kmString) }
+
+    /// Tachostand-Kontinuität (nur beim Neuanlegen): weicht der eingegebene Start-
+    /// Kilometerstand vom vorgeschlagenen (End-Kilometerstand der letzten Fahrt) ab, muss
+    /// das begründet werden.
+    private var odometerHasGap: Bool {
+        guard !isEdit, let suggested = suggestedOdometerStart, !odometerStartString.isEmpty else { return false }
+        return parseCurrency(odometerStartString) != suggested
+    }
+
     private var isValid: Bool {
         guard !from.isEmpty, !to.isEmpty, kmValue > 0 else { return false }
         guard store.fahrtenbuchModusEnabled else { return true }
         guard !odometerStartString.isEmpty, !odometerEndString.isEmpty else { return false }
-        if tripArt == .geschaeftlich { return !purpose.isEmpty }
+        if tripArt == .geschaeftlich && purpose.isEmpty { return false }
+        if odometerHasGap && odometerGapReason.isEmpty { return false }
+        if isEdit && changeReasonText.isEmpty { return false }
         return true
     }
 
@@ -324,6 +338,27 @@ struct TripFormView: View {
                                 .multilineTextAlignment(.trailing)
                                 .frame(width: 90)
                             Text("km").foregroundStyle(.secondary).font(.subheadline)
+                        }
+                        if let suggested = suggestedOdometerStart, !isEdit {
+                            Text("Vorschlag aus letzter Fahrt: \(Int(suggested)) km")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                        if odometerHasGap {
+                            HStack {
+                                Label("Begründung der Lücke", systemImage: "exclamationmark.triangle")
+                                Spacer()
+                                TextField("z.B. Privatfahrt nicht erfasst", text: $odometerGapReason)
+                                    .multilineTextAlignment(.trailing)
+                            }
+                        }
+                        if isEdit {
+                            HStack {
+                                Label("Änderungsgrund", systemImage: "pencil.and.list.clipboard")
+                                Spacer()
+                                TextField("z.B. Kilometerstand korrigiert", text: $changeReasonText)
+                                    .multilineTextAlignment(.trailing)
+                            }
                         }
                     }
                     HStack {
@@ -897,6 +932,12 @@ struct TripFormView: View {
             if !defaultPriceForCurrentFuel.isEmpty {
                 fuelPriceStr = defaultPriceForCurrentFuel
             }
+            // Tachostand-Kontinuität (Fahrtenbuchmodus): Start-Kilometerstand mit dem
+            // End-Kilometerstand der letzten Fahrt vorbefüllen.
+            if store.fahrtenbuchModusEnabled, let last = store.lastOdometerEnd(before: date) {
+                suggestedOdometerStart = last
+                odometerStartString = String(Int(last.rounded()))
+            }
         case .edit(let t):
             from        = t.from
             to          = t.to
@@ -1021,7 +1062,8 @@ struct TripFormView: View {
             purpose: purpose,
             odometerStart: store.fahrtenbuchModusEnabled && !odometerStartString.isEmpty ? parseCurrency(odometerStartString) : nil,
             odometerEnd:   store.fahrtenbuchModusEnabled && !odometerEndString.isEmpty   ? parseCurrency(odometerEndString)   : nil,
-            isCommute: tripArt == .privat ? isCommute : false
+            isCommute: tripArt == .privat ? isCommute : false,
+            odometerGapReason: odometerHasGap ? odometerGapReason : nil
         )
         trip.fahrzeitText = fahrzeitText.isEmpty ? nil : fahrzeitText
         if let existing = editingTrip {
@@ -1029,9 +1071,13 @@ struct TripFormView: View {
             // Das Formular hat keine Eingabe für die GPS-Route – beim Bearbeiten einer
             // automatisch aufgezeichneten Fahrt darf sie nicht verloren gehen.
             trip.routeCoordinatesEncoded = existing.routeCoordinatesEncoded
+            // Lücken-Begründung gilt für den Zeitpunkt des Anlegens – beim reinen Bearbeiten
+            // nicht neu bewertet (odometerHasGap ist im Edit-Modus immer false), daher erhalten.
+            trip.odometerGapReason = existing.odometerGapReason
+            trip.isStorno = existing.isStorno
         }
         if isEdit {
-            store.updateTrip(trip)
+            store.updateTrip(trip, reason: changeReasonText.isEmpty ? nil : changeReasonText)
             AppLogger.shared.log("Fahrt aktualisiert: \(from) → \(to), \(String(format: "%.1f", kmValue)) km", level: .store)
         } else {
             store.addTrip(trip)

@@ -48,6 +48,7 @@ private struct ChangeLogRow: View {
         case .created: return "plus.circle.fill"
         case .updated: return "pencil.circle.fill"
         case .deleted: return "trash.circle.fill"
+        case .rollbackDetected: return "exclamationmark.triangle.fill"
         }
     }
     private var color: Color {
@@ -55,6 +56,7 @@ private struct ChangeLogRow: View {
         case .created: return .iosGreen
         case .updated: return .orange
         case .deleted: return .red
+        case .rollbackDetected: return .red
         }
     }
     private var changeLabel: String {
@@ -62,6 +64,7 @@ private struct ChangeLogRow: View {
         case .created: return "Angelegt"
         case .updated: return "Geändert"
         case .deleted: return "Gelöscht"
+        case .rollbackDetected: return "Rollback erkannt"
         }
     }
 
@@ -73,10 +76,22 @@ private struct ChangeLogRow: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                Text("Hash: \(entry.hash.prefix(16))…  ·  Vorheriger: \(entry.previousHash.prefix(16))…")
+                if let reason = entry.changeReason, !reason.isEmpty {
+                    Text("Änderungsgrund: \(reason)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Text("#\(entry.seq) · Hash: \(entry.hash.prefix(16))…  ·  Vorheriger: \(entry.previousHash.prefix(16))…")
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
                     .monospaced()
+                Text("Geräte-Signatur: \(entry.deviceSignature.isEmpty ? "–" : String(entry.deviceSignature.prefix(16)) + "…")")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .monospaced()
+                Text(entry.tsaTokenBase64 != nil ? "RFC-3161-Zeitstempel: vorhanden ✓" : "RFC-3161-Zeitstempel: noch nicht abgerufen")
+                    .font(.caption2)
+                    .foregroundStyle(entry.tsaTokenBase64 != nil ? Color.secondary : Color.orange)
             }
             .padding(.top, 4)
         } label: {

@@ -108,7 +108,7 @@ func parseCurrency(_ s: String) -> Double {
 /// Fahrten zählen nicht mit. Zentrale Stelle, damit Übersicht, Statistik, PDF- und
 /// CSV-Export nicht unabhängig voneinander (und potenziell abweichend) rechnen.
 func tripReimbursement(_ trips: [Trip], rate: Double) -> Double {
-    trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km * rate }
+    trips.filter { $0.art == .geschaeftlich && !$0.isStorno }.reduce(0) { $0 + $1.km * rate }
 }
 
 // MARK: - GPS-Route (Fahrtenbuchmodus)
@@ -116,6 +116,23 @@ func tripReimbursement(_ trips: [Trip], rate: Double) -> Double {
 /// "lat,lon;lat,lon;...", damit die tatsächlich gefahrene Route nachweisbar bleibt (GoBD:
 /// Reiseroute muss bei Umwegen nachvollziehbar sein). Dünnt lange Routen auf `maxPoints`
 /// aus, damit die gespeicherte Fahrt nicht unnötig aufgebläht wird.
+extension Data {
+    /// Wandelt einen Hex-String (z.B. einen SHA256-Hash) zurück in Bytes – gebraucht, um den
+    /// im Änderungsprotokoll gespeicherten Hex-Hash für den RFC-3161-Zeitstempel erneut als
+    /// rohe 32 Byte zu übergeben.
+    init?(hexString: String) {
+        var data = Data(capacity: hexString.count / 2)
+        var index = hexString.startIndex
+        while index < hexString.endIndex {
+            guard let nextIndex = hexString.index(index, offsetBy: 2, limitedBy: hexString.endIndex),
+                  let byte = UInt8(hexString[index..<nextIndex], radix: 16) else { return nil }
+            data.append(byte)
+            index = nextIndex
+        }
+        self = data
+    }
+}
+
 func encodeRoute(_ coords: [CLLocationCoordinate2D], maxPoints: Int = 200) -> String? {
     guard coords.count > 1 else { return nil }
     let step = max(1, coords.count / maxPoints)

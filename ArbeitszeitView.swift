@@ -79,7 +79,7 @@ struct ArbeitszeitView: View {
         case .monat: allFilteredTrips = store.trips.filter { cal.isDate($0.date, equalTo: selectedDate, toGranularity: .month) }
         }
 
-        let tripOnlyTrips = allFilteredTrips.filter { !mealDates.contains(cal.startOfDay(for: $0.date)) && $0.art == .geschaeftlich }
+        let tripOnlyTrips = allFilteredTrips.filter { !mealDates.contains(cal.startOfDay(for: $0.date)) && $0.art == .geschaeftlich && !$0.isStorno }
         let tripGroups = Dictionary(grouping: tripOnlyTrips) { cal.startOfDay(for: $0.date) }
 
         // Mehrere MealEntries am gleichen Tag → ein gemeinsamer Eintrag

@@ -36,6 +36,11 @@ func mergeSyncedEntries<E: Identifiable>(local: [E], remote: [E], deleted: Set<U
 
 class DataStore: ObservableObject {
 
+    /// Erkennt, ob der Code gerade unter XCTest läuft – unterdrückt echte Netzwerkaufrufe
+    /// (RFC-3161-Zeitstempel) in Unit-Tests, damit sie deterministisch bleiben und den
+    /// kostenlosen öffentlichen Dienst nicht unnötig belasten.
+    static let isRunningUnitTests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+
     // MARK: - Storage
     private let icloud = NSUbiquitousKeyValueStore.default
     // App Group UserDefaults – geteilt mit Widget Extension
@@ -695,8 +700,8 @@ class DataStore: ObservableObject {
     }
 
     // MARK: - Totals
-    var totalKmAmount:    Double { trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km * kmRate } }
-    var totalKm:          Double { trips.filter { $0.art == .geschaeftlich }.reduce(0) { $0 + $1.km } }
+    var totalKmAmount:    Double { trips.filter { $0.art == .geschaeftlich && !$0.isStorno }.reduce(0) { $0 + $1.km * kmRate } }
+    var totalKm:          Double { trips.filter { $0.art == .geschaeftlich && !$0.isStorno }.reduce(0) { $0 + $1.km } }
     /// Verpflegungspauschale für einen Eintrag unter Berücksichtigung des Hotel-Frühstücks (20 % Abzug)
     var totalMeal: Double { meals.reduce(0) { $0 + effectiveAllowance(for: $1) } }
     var totalHotel:       Double { hotels.reduce(0)          { $0 + $1.amount(flat: hotelFlat) } }
@@ -712,8 +717,28 @@ class DataStore: ObservableObject {
     /// Hängt bei aktivem Fahrtenbuchmodus einen unveränderlichen, mit dem vorherigen Eintrag
     /// verketteten Änderungseintrag an (siehe ChangeLogEntry). `before`/`after` sind nil, wenn
     /// der Eintrag neu angelegt bzw. gelöscht wurde. Kein Logging, solange der Modus aus ist.
-    private func logChange<E: Codable>(_ entityType: LoggedEntityType, id: UUID, before: E?, after: E?) {
+    private func logChange<E: Codable>(_ entityType: LoggedEntityType, id: UUID, before: E?, after: E?, changeReason: String? = nil) {
         guard fahrtenbuchModusEnabled else { return }
+
+        // Rollback-Schutz: wurde ein älteres Backup eingespielt, "weiß" die Keychain
+        // (geräte­gebunden, backup-ausgeschlossen) noch vom späteren Stand. Vermerk VOR dem
+        // eigentlichen Eintrag, direkt konstruiert (nicht über logChange, sonst Rekursion).
+        if RollbackGuard.checkForRollback(currentChainCount: changeLog.count) {
+            let prevHash = changeLog.last?.hash ?? "genesis"
+            var hasher = SHA256()
+            hasher.update(data: Data(prevHash.utf8))
+            hasher.update(data: Data("rollbackDetected".utf8))
+            let rollbackHash = hasher.finalize().compactMap { String(format: "%02x", $0) }.joined()
+            let seq = changeLog.count + 1
+            changeLog.append(ChangeLogEntry(
+                id: UUID(), entityType: entityType, entityID: id, changeType: .rollbackDetected,
+                timestamp: Date(), snapshotBefore: nil, snapshotAfter: nil,
+                previousHash: prevHash, hash: rollbackHash, seq: seq,
+                deviceSignature: FahrtenbuchSigner.sign(rollbackHash)
+            ))
+            RollbackGuard.record(seq: seq, hash: rollbackHash)
+        }
+
         let changeType: ChangeType = before == nil ? .created : (after == nil ? .deleted : .updated)
         let enc = JSONEncoder()
         let beforeData = before.flatMap { try? enc.encode($0) }
@@ -730,12 +755,53 @@ class DataStore: ObservableObject {
         if let beforeData { hasher.update(data: beforeData) }
         if let afterData  { hasher.update(data: afterData) }
         let hashString = hasher.finalize().compactMap { String(format: "%02x", $0) }.joined()
+        let seq = changeLog.count + 1
+        let entryID = UUID()
 
         changeLog.append(ChangeLogEntry(
-            id: UUID(), entityType: entityType, entityID: id, changeType: changeType,
+            id: entryID, entityType: entityType, entityID: id, changeType: changeType,
             timestamp: timestamp, snapshotBefore: beforeData, snapshotAfter: afterData,
-            previousHash: previousHash, hash: hashString
+            previousHash: previousHash, hash: hashString, seq: seq,
+            deviceSignature: FahrtenbuchSigner.sign(hashString), changeReason: changeReason
         ))
+        RollbackGuard.record(seq: seq, hash: hashString)
+
+        // RFC-3161-Zeitstempel best-effort nachholen (Netz evtl. nicht vorhanden) – verankert
+        // den Hash bei einer externen, öffentlichen Zeitstempelstelle, unabhängig von der
+        // (manipulierbaren) Systemzeit des Geräts. Nicht in Unit-Tests – die sollen
+        // deterministisch bleiben und den kostenlosen öffentlichen Dienst nicht belasten.
+        guard !Self.isRunningUnitTests, let hashData = Data(hexString: hashString) else { return }
+        Task { @MainActor [weak self] in
+            guard let token = await TSAClient.requestTimestamp(forHash: hashData) else { return }
+            guard let self, let idx = self.changeLog.firstIndex(where: { $0.id == entryID }) else { return }
+            self.changeLog[idx].tsaTokenBase64 = token.base64EncodedString()
+        }
+    }
+
+    /// Versucht beim App-Start, fehlende RFC-3161-Zeitstempel nachträglich zu holen (z. B.
+    /// weil beim Anlegen kein Netz vorhanden war). Kleine Pause zwischen den Anfragen, um den
+    /// kostenlosen öffentlichen Dienst nicht zu belasten.
+    func retryMissingTSATimestamps() {
+        guard fahrtenbuchModusEnabled, !Self.isRunningUnitTests else { return }
+        let missingIDs = changeLog.filter { $0.tsaTokenBase64 == nil }.map { $0.id }
+        guard !missingIDs.isEmpty else { return }
+        Task { @MainActor [weak self] in
+            for entryID in missingIDs {
+                guard let self, let idx = self.changeLog.firstIndex(where: { $0.id == entryID }) else { continue }
+                guard let hashData = Data(hexString: self.changeLog[idx].hash) else { continue }
+                if let token = await TSAClient.requestTimestamp(forHash: hashData) {
+                    self.changeLog[idx].tsaTokenBase64 = token.base64EncodedString()
+                }
+                try? await Task.sleep(nanoseconds: 500_000_000)
+            }
+        }
+    }
+
+    /// Tachostand-Kontinuität: letzter bekannter End-Kilometerstand vor einem Zeitpunkt –
+    /// Vorschlag für den Start-Kilometerstand einer neuen Fahrt (Baustein 4).
+    func lastOdometerEnd(before date: Date) -> Double? {
+        trips.filter { $0.date <= date && $0.odometerEnd != nil }
+            .max { $0.date < $1.date }?.odometerEnd
     }
 
     /// GoBD-Zeitnähe-Prüfung: eine Fahrt muss spätestens 7 Kalendertage nach Fahrtende erfasst
@@ -756,18 +822,29 @@ class DataStore: ObservableObject {
         logChange(.trip, id: t.id, before: Optional<Trip>.none, after: t)
         AppLogger.shared.logData("Fahrt hinzugefügt: \(t.from) → \(t.to), \(String(format: "%.1f", t.km)) km")
     }
-    func updateTrip(_ t: Trip) {
+    func updateTrip(_ t: Trip, reason: String? = nil) {
         guard let i = trips.firstIndex(where: { $0.id == t.id }) else { return }
         let old = trips[i]
         trips[i] = t; trips.sort { $0.date < $1.date }
-        logChange(.trip, id: t.id, before: old, after: t)
+        logChange(.trip, id: t.id, before: old, after: t, changeReason: reason)
         AppLogger.shared.logData("Fahrt aktualisiert: \(t.from) → \(t.to)")
     }
+    /// Fahrtenbuchmodus: Fahrten werden nie physisch gelöscht (die Hash-Kette darf nie
+    /// reißen) – stattdessen als storniert markiert, bleiben sichtbar (durchgestrichen),
+    /// fließen aber nicht mehr in Erstattung/Statistik ein. Außerhalb des Modus unverändert
+    /// ein echtes Löschen.
     func deleteTrip(_ id: UUID) {
-        guard let old = trips.first(where: { $0.id == id }) else { return }
-        trips.removeAll { $0.id == id }
-        logChange(.trip, id: id, before: old, after: Optional<Trip>.none)
-        AppLogger.shared.logData("Fahrt gelöscht")
+        guard let i = trips.firstIndex(where: { $0.id == id }) else { return }
+        let old = trips[i]
+        if fahrtenbuchModusEnabled {
+            trips[i].isStorno = true
+            logChange(.trip, id: id, before: old, after: Optional<Trip>.none)
+            AppLogger.shared.logData("Fahrt storniert")
+        } else {
+            trips.removeAll { $0.id == id }
+            logChange(.trip, id: id, before: old, after: Optional<Trip>.none)
+            AppLogger.shared.logData("Fahrt gelöscht")
+        }
     }
     func duplicateTrip(_ trip: Trip) {
         var copy = trip

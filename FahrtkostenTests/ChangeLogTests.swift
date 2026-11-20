@@ -14,6 +14,7 @@ final class ChangeLogTests: XCTestCase {
         // selbst) können bereits Daten hinterlassen haben. Für isolierte Tests explizit leeren.
         store.fahrtenbuchModusEnabled = false
         store.trips = []
+        RollbackGuard.resetForTesting()
         store.meals = []
         store.changeLog = []
     }
