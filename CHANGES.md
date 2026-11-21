@@ -2,7 +2,7 @@
 
 ---
 
-## Version 1.17.50 Build 95 (November 2026)
+## Version 1.17.50 Build 96 (November 2026)
 
 - **Neu: Hardware-gesicherte Hash-Kette** – Jeder Änderungsprotokoll-Eintrag wird zusätzlich mit einem geräte­gebundenen Schlüssel (Secure Enclave) signiert. Ein Rollback-Schutz erkennt, wenn ein altes Backup eingespielt wurde.
 - **Neu: Externe Zeitstempel** – Jeder neue Eintrag bekommt einen amtlichen Zeitstempel von einer unabhängigen externen Zeitstempelstelle, unabhängig von der Systemzeit des Geräts.
@@ -10,6 +10,7 @@
 - **Neu: Pflicht-Änderungsgrund** – Das Bearbeiten einer Fahrt im Fahrtenbuchmodus verlangt jetzt einen Änderungsgrund.
 - **Neu: Storno statt Löschen** – Eine Fahrt wird im Fahrtenbuchmodus beim Löschen nur noch storniert (durchgestrichen sichtbar in Liste, PDF, CSV), nicht mehr entfernt – zählt nicht mehr zur Erstattung.
 - **Verbesserung: Export** – Der "Nachtrag > 7 Tage"-Hinweis ist jetzt auch im PDF-/CSV-Export sichtbar, nicht mehr nur in der App.
+- **Fehlerbehebung: Arbeitszeit über Mitternacht** – Endete die Arbeitszeit erst nach 0 Uhr (z. B. 06:00–01:00), wurde die Dauer bisher auf 0 Stunden berechnet statt die tatsächliche (lange) Dauer zu erfassen. Jetzt korrekt.
 
 ---
 

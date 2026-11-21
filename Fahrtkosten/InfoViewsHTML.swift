@@ -1273,11 +1273,12 @@ let versionHistoryHTML_de = #"""
       </div>
       <div class="preview-text">Hardware-Hash-Kette · Externe Zeitstempel · Storno statt Löschen</div>
     </div>
-    <span class="build-info">November 2026 · Build 95</span>
+    <span class="build-info">November 2026 · Build 96</span>
     <span class="chevron">›</span>
   </summary>
   <div class="detail-content">
     <ul>
+      <li><span class="badge-fix">FIX</span> <strong>Arbeitszeit über Mitternacht:</strong> Endete die Arbeitszeit erst nach 0 Uhr (z. B. 06:00–01:00), wurde die Dauer bisher auf 0 Stunden berechnet statt die tatsächliche (lange) Dauer zu erfassen. Jetzt korrekt.</li>
       <li><span class="badge-new">NEU</span> <strong>Hardware-gesicherte Hash-Kette:</strong> Jeder Änderungsprotokoll-Eintrag wird zusätzlich mit einem geräte­gebundenen Schlüssel (Secure Enclave) signiert. Ein Rollback-Schutz erkennt, wenn ein altes Backup eingespielt wurde.</li>
       <li><span class="badge-new">NEU</span> <strong>Externe Zeitstempel:</strong> Jeder neue Eintrag bekommt einen amtlichen Zeitstempel von einer unabhängigen externen Zeitstempelstelle, unabhängig von der Systemzeit des Geräts.</li>
       <li><span class="badge-new">NEU</span> <strong>Tachostand-Kontinuität:</strong> Beim Anlegen einer Fahrt wird der Start-Kilometerstand aus der letzten Fahrt vorgeschlagen; eine Abweichung muss begründet werden.</li>
