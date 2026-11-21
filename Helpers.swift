@@ -111,6 +111,15 @@ func tripReimbursement(_ trips: [Trip], rate: Double) -> Double {
     trips.filter { $0.art == .geschaeftlich && !$0.isStorno }.reduce(0) { $0 + $1.km * rate }
 }
 
+// MARK: - Tagessprung (Verpflegung)
+/// Endzeit liegt per DatePicker (nur Stunde/Minute) immer auf demselben Kalendertag wie der
+/// Formular-Tag – reicht die Arbeit über Mitternacht (z. B. 06:00–01:00), muss ein Tag
+/// addiert werden, sonst liegt das Ende rechnerisch vor dem Beginn und die Stundenzahl wird
+/// auf 0 statt auf die tatsächliche (lange) Dauer berechnet.
+func rolledOverIfNeeded(_ end: Date, after start: Date) -> Date {
+    end < start ? (Calendar.current.date(byAdding: .day, value: 1, to: end) ?? end) : end
+}
+
 // MARK: - GPS-Route (Fahrtenbuchmodus)
 /// Kodiert die während einer GPS-Fahrt aufgezeichneten Koordinaten kompakt als
 /// "lat,lon;lat,lon;...", damit die tatsächlich gefahrene Route nachweisbar bleibt (GoBD:

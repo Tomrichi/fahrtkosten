@@ -432,7 +432,9 @@ struct MealFormView: View {
     /// Bei manueller Gesamtzeit-Eingabe wird die Endzeit aus Beginn + eingegebener Stundenzahl
     /// berechnet, statt sie separat per DatePicker zu erfassen.
     private var effectiveEndTime: Date {
-        guard useManualHours else { return anchoredToFormDate(endTime) }
+        guard useManualHours else {
+            return rolledOverIfNeeded(anchoredToFormDate(endTime), after: anchoredToFormDate(startTime))
+        }
         let h = parseCurrency(manualHoursStr)
         return anchoredToFormDate(startTime).addingTimeInterval(h * 3600)
     }
@@ -800,7 +802,8 @@ struct MealFormView: View {
                     let earliestTripStart = tripsForResult.compactMap { $0.startTime }.min()
                     let totalHours: Double = {
                         if let start = earliestTripStart {
-                            return max(0, anchoredToFormDate(endTime).timeIntervalSince(start) / 3600.0)
+                            let end = rolledOverIfNeeded(anchoredToFormDate(endTime), after: start)
+                            return max(0, end.timeIntervalSince(start) / 3600.0)
                         }
                         return hours
                     }()
