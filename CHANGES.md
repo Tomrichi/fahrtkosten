@@ -2,8 +2,11 @@
 
 ---
 
-## Version 1.17.50 Build 96 (November 2026)
+## Version 1.17.50 Build 97 (November 2026)
 
+- **Fehlerbehebung: Kilometerstand bei GPS-Fahrten** – Der Tachostand-Vorschlag aus der letzten Fahrt wurde beim Nachtragen einer GPS-Fahrt (Fahrtenbuchmodus) bisher nicht übernommen, nur beim manuellen Anlegen. Jetzt auch dort.
+- **Neu: Nur km zählen im Fahrtenbuchmodus** – Uhrzeiten von Fahrten werden im Fahrtenbuchmodus nicht mehr angezeigt (Fahrten-Liste, Arbeitszeit & Spesen) – für dieses Nutzerprofil zählt nur der Kilometerstand. Für alle anderen Nutzer bleibt die Zeitanzeige unverändert.
+- **Neu: Kilometerstand ↔ km automatisch berechnen** – Sind Start- und Ende-Kilometerstand beide eingetragen, werden die km automatisch daraus berechnet. Ist nur der Start-Kilometerstand bekannt, wird umgekehrt der Ende-Kilometerstand aus den eingegebenen km berechnet.
 - **Neu: Hardware-gesicherte Hash-Kette** – Jeder Änderungsprotokoll-Eintrag wird zusätzlich mit einem geräte­gebundenen Schlüssel (Secure Enclave) signiert. Ein Rollback-Schutz erkennt, wenn ein altes Backup eingespielt wurde.
 - **Neu: Externe Zeitstempel** – Jeder neue Eintrag bekommt einen amtlichen Zeitstempel von einer unabhängigen externen Zeitstempelstelle, unabhängig von der Systemzeit des Geräts.
 - **Neu: Tachostand-Kontinuität** – Beim Anlegen einer Fahrt wird der Start-Kilometerstand aus der letzten Fahrt vorgeschlagen; eine Abweichung muss begründet werden.

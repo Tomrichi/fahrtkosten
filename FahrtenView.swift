@@ -1103,7 +1103,10 @@ struct TripRow: View {
                         Text("  ·  " + dur)
                             .foregroundStyle(.primary)
                     }
-                    if let st = trip.startTime, let et = trip.endTime {
+                    // Im Fahrtenbuchmodus zählen für diese Nutzer nur die km, nicht die Uhrzeit
+                    // der Fahrt – die Zeit bleibt am Trip gespeichert (GPS, Hash-Kette), wird
+                    // hier aber nicht mehr angezeigt.
+                    if !fahrtenbuchModusEnabled, let st = trip.startTime, let et = trip.endTime {
                         Text("  ·  \(st.timeOnly)–\(et.timeOnly)")
                             .foregroundStyle(.primary)
                     }

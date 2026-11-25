@@ -129,11 +129,32 @@ struct TripFormView: View {
     }
     private var kmValue: Double { parseCurrency(kmString) }
 
-    /// Tachostand-Kontinuität (nur beim Neuanlegen): weicht der eingegebene Start-
-    /// Kilometerstand vom vorgeschlagenen (End-Kilometerstand der letzten Fahrt) ab, muss
-    /// das begründet werden.
+    /// Km-Stand ↔ km-Berechnung (Fahrtenbuchmodus): sind Start- und Ende-Kilometerstand
+    /// beide bekannt, ergeben sich die gefahrenen km zwingend aus deren Differenz – ein
+    /// unabhängig eingegebener km-Wert könnte sonst der Tachostand-Differenz widersprechen.
+    private var odometerStartValue: Double? {
+        odometerStartString.isEmpty ? nil : parseCurrency(odometerStartString)
+    }
+    private var odometerEndValue: Double? {
+        odometerEndString.isEmpty ? nil : parseCurrency(odometerEndString)
+    }
+    private var odometerBothKnown: Bool {
+        guard store.fahrtenbuchModusEnabled,
+              let start = odometerStartValue, let end = odometerEndValue else { return false }
+        return end >= start
+    }
+
+    /// Trifft beim Neuanlegen zu, aber auch beim Bearbeiten einer GPS-Fahrt, die ohne
+    /// Formular gespeichert wurde und noch keinen Kilometerstand hat ("Nachtragen"-Flow) –
+    /// dort gilt die Tachostand-Kontinuität zum ersten Mal genauso wie beim Neuanlegen.
+    private var odometerContinuityApplies: Bool {
+        !isEdit || editingTrip?.odometerStart == nil
+    }
+
+    /// Tachostand-Kontinuität: weicht der eingegebene Start-Kilometerstand vom vorgeschlagenen
+    /// (End-Kilometerstand der letzten Fahrt) ab, muss das begründet werden.
     private var odometerHasGap: Bool {
-        guard !isEdit, let suggested = suggestedOdometerStart, !odometerStartString.isEmpty else { return false }
+        guard odometerContinuityApplies, let suggested = suggestedOdometerStart, !odometerStartString.isEmpty else { return false }
         return parseCurrency(odometerStartString) != suggested
     }
 
@@ -319,6 +340,13 @@ struct TripFormView: View {
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
                             .frame(width: 80)
+                            .disabled(odometerBothKnown)
+                            .foregroundStyle(odometerBothKnown ? .secondary : .primary)
+                    }
+                    if odometerBothKnown {
+                        Text("Berechnet aus Kilometerstand Start/Ende")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
                     }
                     if store.fahrtenbuchModusEnabled {
                         HStack {
@@ -339,7 +367,7 @@ struct TripFormView: View {
                                 .frame(width: 90)
                             Text("km").foregroundStyle(.secondary).font(.subheadline)
                         }
-                        if let suggested = suggestedOdometerStart, !isEdit {
+                        if let suggested = suggestedOdometerStart, odometerContinuityApplies {
                             Text("Vorschlag aus letzter Fahrt: \(Int(suggested)) km")
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
@@ -710,6 +738,18 @@ struct TripFormView: View {
                 guard let km = newKm, !isGPS, !isEdit else { return }
                 kmString = String(Int(km.rounded()))
             }
+            // Km-Stand ↔ km (Fahrtenbuchmodus): sind Start UND Ende bekannt, sind die km
+            // zwingend deren Differenz (odometerBothKnown deaktiviert dafür das km-Feld).
+            .onChange(of: odometerStartString) { _, _ in syncKmFromOdometerIfPossible() }
+            .onChange(of: odometerEndString)   { _, _ in syncKmFromOdometerIfPossible() }
+            // Ist nur der Start-Kilometerstand bekannt, lässt sich umgekehrt aus den km der
+            // Ende-Kilometerstand ableiten – sobald auch das Ende eingegeben wird, übernimmt
+            // ab dann der obige Zweig (Differenz zählt, km wird nicht mehr manuell editiert).
+            .onChange(of: kmString) { _, _ in
+                guard store.fahrtenbuchModusEnabled, !odometerBothKnown,
+                      let start = odometerStartValue, kmValue > 0 else { return }
+                odometerEndString = String(Int((start + kmValue).rounded()))
+            }
             .confirmationDialog(lm.t("trips.maps.open"), isPresented: $showMapsSheet, titleVisibility: .visible) {
                 Button(lm.t("trips.apple.maps")) { MapsService.openInAppleMaps(from: from, to: to) }
                 Button(lm.t("trips.google.maps"))  { MapsService.openInGoogleMaps(from: from, to: to) }
@@ -943,7 +983,15 @@ struct TripFormView: View {
             to          = t.to
             date        = t.date
             kmString    = String(Int(t.km.rounded()))
-            if let os = t.odometerStart { odometerStartString = String(Int(os.rounded())) }
+            if let os = t.odometerStart {
+                odometerStartString = String(Int(os.rounded()))
+            } else if store.fahrtenbuchModusEnabled, let last = store.lastOdometerEnd(before: t.date) {
+                // GPS-Fahrt wird ohne Formular gespeichert und danach zum Nachtragen der
+                // Pflichtfelder direkt im Edit-Modus geöffnet – ohne diesen Zweig bliebe der
+                // Kilometerstand-Vorschlag (sonst nur im .add-Fall gesetzt) leer.
+                suggestedOdometerStart = last
+                odometerStartString = String(Int(last.rounded()))
+            }
             if let oe = t.odometerEnd   { odometerEndString   = String(Int(oe.rounded())) }
             note        = t.note
             purpose     = t.purpose
@@ -1033,6 +1081,13 @@ struct TripFormView: View {
         return total
     }
 
+    /// Setzt kmString auf die Tachostand-Differenz, sobald Start UND Ende bekannt sind –
+    /// die km dürfen dem dann nicht mehr widersprechen (siehe odometerBothKnown).
+    private func syncKmFromOdometerIfPossible() {
+        guard odometerBothKnown, let start = odometerStartValue, let end = odometerEndValue else { return }
+        kmString = (end - start).kmInputString
+    }
+
     private func updateFahrzeitFromPicker() {
         guard fahrzeitEnd > fahrzeitStart else { return }
         let mins = Int(fahrzeitEnd.timeIntervalSince(fahrzeitStart) / 60)
@@ -1072,8 +1127,12 @@ struct TripFormView: View {
             // automatisch aufgezeichneten Fahrt darf sie nicht verloren gehen.
             trip.routeCoordinatesEncoded = existing.routeCoordinatesEncoded
             // Lücken-Begründung gilt für den Zeitpunkt des Anlegens – beim reinen Bearbeiten
-            // nicht neu bewertet (odometerHasGap ist im Edit-Modus immer false), daher erhalten.
-            trip.odometerGapReason = existing.odometerGapReason
+            // nicht neu bewertet und daher erhalten. Ausnahme: Nachtragen einer GPS-Fahrt ohne
+            // bisherigen Kilometerstand (odometerContinuityApplies) – dort zählt die eben
+            // eingegebene Begründung, da die Kontinuitätsprüfung hier zum ersten Mal greift.
+            if !odometerContinuityApplies {
+                trip.odometerGapReason = existing.odometerGapReason
+            }
             trip.isStorno = existing.isStorno
         }
         if isEdit {

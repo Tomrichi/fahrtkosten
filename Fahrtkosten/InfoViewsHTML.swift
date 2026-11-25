@@ -1263,7 +1263,7 @@ let versionHistoryHTML_de = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.50 – aktuell -->
+<!-- 1.17.50 Build 97 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
@@ -1271,13 +1271,16 @@ let versionHistoryHTML_de = #"""
         Version 1.17.50
         <span class="current-badge">● Aktuell</span>
       </div>
-      <div class="preview-text">Hardware-Hash-Kette · Externe Zeitstempel · Storno statt Löschen</div>
+      <div class="preview-text">Nur km zählen im Fahrtenbuchmodus · Km-Stand-Automatik · Hardware-Hash-Kette</div>
     </div>
-    <span class="build-info">November 2026 · Build 96</span>
+    <span class="build-info">November 2026 · Build 97</span>
     <span class="chevron">›</span>
   </summary>
   <div class="detail-content">
     <ul>
+      <li><span class="badge-fix">FIX</span> <strong>Kilometerstand bei GPS-Fahrten:</strong> Der Tachostand-Vorschlag aus der letzten Fahrt wurde beim Nachtragen einer GPS-Fahrt (Fahrtenbuchmodus) bisher nicht übernommen, nur beim manuellen Anlegen. Jetzt auch dort.</li>
+      <li><span class="badge-new">NEU</span> <strong>Nur km zählen im Fahrtenbuchmodus:</strong> Uhrzeiten von Fahrten werden im Fahrtenbuchmodus nicht mehr angezeigt (Fahrten-Liste, Arbeitszeit &amp; Spesen) – hier zählt nur der Kilometerstand. Für alle anderen Nutzer bleibt die Zeitanzeige unverändert.</li>
+      <li><span class="badge-new">NEU</span> <strong>Kilometerstand ↔ km automatisch berechnen:</strong> Sind Start- und Ende-Kilometerstand beide eingetragen, werden die km automatisch daraus berechnet. Ist nur der Start-Kilometerstand bekannt, wird umgekehrt der Ende-Kilometerstand aus den eingegebenen km berechnet.</li>
       <li><span class="badge-fix">FIX</span> <strong>Arbeitszeit über Mitternacht:</strong> Endete die Arbeitszeit erst nach 0 Uhr (z. B. 06:00–01:00), wurde die Dauer bisher auf 0 Stunden berechnet statt die tatsächliche (lange) Dauer zu erfassen. Jetzt korrekt.</li>
       <li><span class="badge-new">NEU</span> <strong>Hardware-gesicherte Hash-Kette:</strong> Jeder Änderungsprotokoll-Eintrag wird zusätzlich mit einem geräte­gebundenen Schlüssel (Secure Enclave) signiert. Ein Rollback-Schutz erkennt, wenn ein altes Backup eingespielt wurde.</li>
       <li><span class="badge-new">NEU</span> <strong>Externe Zeitstempel:</strong> Jeder neue Eintrag bekommt einen amtlichen Zeitstempel von einer unabhängigen externen Zeitstempelstelle, unabhängig von der Systemzeit des Geräts.</li>

@@ -79,7 +79,13 @@ struct ArbeitszeitView: View {
         case .monat: allFilteredTrips = store.trips.filter { cal.isDate($0.date, equalTo: selectedDate, toGranularity: .month) }
         }
 
-        let tripOnlyTrips = allFilteredTrips.filter { !mealDates.contains(cal.startOfDay(for: $0.date)) && $0.art == .geschaeftlich && !$0.isStorno }
+        // Ohne "Pauschale für Tage ohne Arbeitszeit" ergibt die Abwesenheits-Schätzung aus
+        // Fahrtzeiten ohnehin 0 € – dann auch keine (verwirrende) Karte dafür anzeigen.
+        // Im Fahrtenbuchmodus zählen für diese Nutzer nur die km, keine Fahrzeiten/Spesen –
+        // daher dort grundsätzlich keine Trip-only-Karte, unabhängig vom obigen Schalter.
+        let tripOnlyTrips = (store.allowanceForTripsOnly && !store.fahrtenbuchModusEnabled)
+            ? allFilteredTrips.filter { !mealDates.contains(cal.startOfDay(for: $0.date)) && $0.art == .geschaeftlich && !$0.isStorno }
+            : []
         let tripGroups = Dictionary(grouping: tripOnlyTrips) { cal.startOfDay(for: $0.date) }
 
         // Mehrere MealEntries am gleichen Tag → ein gemeinsamer Eintrag
