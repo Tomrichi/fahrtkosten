@@ -1263,12 +1263,12 @@ let versionHistoryHTML_de = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.50 Build 97 – aktuell -->
+<!-- 1.17.51 Build 97 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.50
+        Version 1.17.51
         <span class="current-badge">● Aktuell</span>
       </div>
       <div class="preview-text">Nur km zählen im Fahrtenbuchmodus · Km-Stand-Automatik · Hardware-Hash-Kette</div>

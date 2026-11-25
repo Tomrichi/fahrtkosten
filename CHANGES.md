@@ -2,7 +2,7 @@
 
 ---
 
-## Version 1.17.50 Build 97 (November 2026)
+## Version 1.17.51 Build 97 (November 2026)
 
 - **Fehlerbehebung: Kilometerstand bei GPS-Fahrten** – Der Tachostand-Vorschlag aus der letzten Fahrt wurde beim Nachtragen einer GPS-Fahrt (Fahrtenbuchmodus) bisher nicht übernommen, nur beim manuellen Anlegen. Jetzt auch dort.
 - **Neu: Nur km zählen im Fahrtenbuchmodus** – Uhrzeiten von Fahrten werden im Fahrtenbuchmodus nicht mehr angezeigt (Fahrten-Liste, Arbeitszeit & Spesen) – für dieses Nutzerprofil zählt nur der Kilometerstand. Für alle anderen Nutzer bleibt die Zeitanzeige unverändert.
