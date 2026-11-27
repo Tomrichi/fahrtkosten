@@ -164,7 +164,11 @@ struct TripFormView: View {
         guard !odometerStartString.isEmpty, !odometerEndString.isEmpty else { return false }
         if tripArt == .geschaeftlich && purpose.isEmpty { return false }
         if odometerHasGap && odometerGapReason.isEmpty { return false }
-        if isEdit && changeReasonText.isEmpty { return false }
+        // Änderungsgrund nur bei einer echten Änderung einer bereits vollständigen Fahrt
+        // verlangen – beim erstmaligen Nachtragen des Kilometerstands einer GPS-Fahrt
+        // (odometerContinuityApplies) wird hier noch kein bestehender Wert "geändert",
+        // sondern ein fehlendes Pflichtfeld zum ersten Mal ausgefüllt (wie beim Neuanlegen).
+        if isEdit && !odometerContinuityApplies && changeReasonText.isEmpty { return false }
         return true
     }
 

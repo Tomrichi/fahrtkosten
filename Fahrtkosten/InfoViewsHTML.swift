@@ -1263,13 +1263,34 @@ let versionHistoryHTML_de = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.51 Build 97 – aktuell -->
+<!-- 1.17.52 Build 98 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
       <div class="version-title">
-        Version 1.17.51
+        Version 1.17.52
         <span class="current-badge">● Aktuell</span>
+      </div>
+      <div class="preview-text">Fehlerbehebung: Änderungsgrund beim Nachtragen des Kilometerstands</div>
+    </div>
+    <span class="build-info">November 2026 · Build 98</span>
+    <span class="chevron">›</span>
+  </summary>
+  <div class="detail-content">
+    <ul>
+      <li><span class="badge-fix">FIX</span> <strong>Änderungsgrund beim Nachtragen des Kilometerstands:</strong> Beim erstmaligen Nachtragen des Kilometerstands einer GPS-Fahrt (Fahrtenbuchmodus) wurde fälschlich ein Änderungsgrund verlangt, bevor die daraus berechneten km übernommen werden konnten. Der Änderungsgrund ist jetzt nur noch bei echten späteren Änderungen Pflicht.</li>
+    </ul>
+  </div>
+</details>
+
+<hr>
+
+<!-- 1.17.51 Build 97 -->
+<details>
+  <summary>
+    <div class="summary-inner">
+      <div class="version-title">
+        Version 1.17.51
       </div>
       <div class="preview-text">Nur km zählen im Fahrtenbuchmodus · Km-Stand-Automatik · Hardware-Hash-Kette</div>
     </div>
