@@ -2,9 +2,10 @@
 
 ---
 
-## Version 1.17.52 Build 98 (November 2026)
+## Version 1.17.52 Build 99 (November 2026)
 
 - **Fehlerbehebung: Änderungsgrund beim Nachtragen des Kilometerstands** – Beim erstmaligen Nachtragen des Kilometerstands einer GPS-Fahrt (Fahrtenbuchmodus) wurde fälschlich ein Änderungsgrund verlangt, bevor die daraus berechneten km übernommen werden konnten. Das ist kein nachträgliches Ändern einer bestehenden Angabe, sondern das erstmalige Ausfüllen eines Pflichtfelds – der Änderungsgrund ist jetzt nur noch bei echten späteren Änderungen Pflicht.
+- **Verbesserung: GPS-Schätzung erkennbar** – Solange der Kilometerstand beim Nachtragen einer GPS-Fahrt noch nicht vollständig eingetragen ist, zeigt das km-Feld jetzt den Hinweis „Aus GPS geschätzt – wird nach Eingabe des Kilometerstands korrigiert" an, statt wie ein bereits feststehender Wert zu wirken.
 
 ---
 

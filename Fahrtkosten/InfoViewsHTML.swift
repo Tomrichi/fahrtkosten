@@ -1263,7 +1263,7 @@ let versionHistoryHTML_de = #"""
 <h1>Versionshinweise</h1>
 <p class="meta">Fahrtkosten · Thomas Wagner</p>
 
-<!-- 1.17.52 Build 98 – aktuell -->
+<!-- 1.17.52 Build 99 – aktuell -->
 <details open>
   <summary>
     <div class="summary-inner">
@@ -1273,12 +1273,13 @@ let versionHistoryHTML_de = #"""
       </div>
       <div class="preview-text">Fehlerbehebung: Änderungsgrund beim Nachtragen des Kilometerstands</div>
     </div>
-    <span class="build-info">November 2026 · Build 98</span>
+    <span class="build-info">November 2026 · Build 99</span>
     <span class="chevron">›</span>
   </summary>
   <div class="detail-content">
     <ul>
       <li><span class="badge-fix">FIX</span> <strong>Änderungsgrund beim Nachtragen des Kilometerstands:</strong> Beim erstmaligen Nachtragen des Kilometerstands einer GPS-Fahrt (Fahrtenbuchmodus) wurde fälschlich ein Änderungsgrund verlangt, bevor die daraus berechneten km übernommen werden konnten. Der Änderungsgrund ist jetzt nur noch bei echten späteren Änderungen Pflicht.</li>
+      <li><span class="badge-change">ÄNDERUNG</span> <strong>GPS-Schätzung erkennbar:</strong> Solange der Kilometerstand beim Nachtragen einer GPS-Fahrt noch nicht vollständig eingetragen ist, zeigt das km-Feld jetzt den Hinweis „Aus GPS geschätzt – wird nach Eingabe des Kilometerstands korrigiert" an, statt wie ein bereits feststehender Wert zu wirken.</li>
     </ul>
   </div>
 </details>

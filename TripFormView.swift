@@ -351,6 +351,14 @@ struct TripFormView: View {
                         Text("Berechnet aus Kilometerstand Start/Ende")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
+                    } else if isEdit && odometerContinuityApplies && store.fahrtenbuchModusEnabled {
+                        // GPS-Fahrten werden ohne Formular gespeichert, der km-Wert stammt also
+                        // zunächst nur aus der GPS-Messung – ohne diesen Hinweis wirkt der schon
+                        // ausgefüllte Wert wie eine bereits feststehende Angabe, obwohl er sich
+                        // gleich ändert, sobald unten der Kilometerstand eingetragen wird.
+                        Text("Aus GPS geschätzt – wird nach Eingabe des Kilometerstands korrigiert")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
                     }
                     if store.fahrtenbuchModusEnabled {
                         HStack {
